@@ -624,9 +624,9 @@ export default function Admin() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto py-8">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+    <div className="min-h-screen bg-background w-full">
+      <div className="w-full py-4 px-4 md:px-6 lg:px-8">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
           <div>
             <h1 className="text-3xl font-bold">Admin Panel</h1>
             <p className="text-muted-foreground">
@@ -643,9 +643,11 @@ export default function Admin() {
         </div>
         
         {canUseAdmin ? (
-          <ProfessionalAdminDashboard user={user} />
+          <div className="w-full">
+            <ProfessionalAdminDashboard user={user} />
+          </div>
         ) : (
-          <Card className="border-0 shadow-medium">
+          <Card className="border-0 shadow-medium w-full">
             <CardHeader>
               <CardTitle>Admin Panel Unavailable</CardTitle>
             </CardHeader>

@@ -17,6 +17,7 @@ import { AnalyticsCharts } from './dashboard/AnalyticsCharts';
 import { PerformanceMetrics } from './dashboard/PerformanceMetrics';
 import { ActivityLogs } from './dashboard/ActivityLogs';
 import { StatsGrid, type StatsData } from './dashboard/StatsGrid2';
+import { ProjectsTab } from './projects/ProjectsTab';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -66,10 +67,10 @@ export function ProfessionalAdminDashboard({ user }: ProfessionalAdminDashboardP
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 w-full">
       {/* Professional Header */}
-      <header className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-b border-slate-200 dark:border-slate-700 sticky top-0 z-50">
-        <div className="container mx-auto px-6 py-4">
+      <header className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-b border-slate-200 dark:border-slate-700 sticky top-0 z-50 w-full">
+        <div className="w-full px-4 md:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-3">
@@ -107,12 +108,12 @@ export function ProfessionalAdminDashboard({ user }: ProfessionalAdminDashboardP
         </div>
       </header>
 
-      <div className="container mx-auto px-6 py-8">
+      <div className="w-full px-4 md:px-6 lg:px-8 py-6 md:py-8">
         {/* Stats Overview */}
         <StatsGrid data={stats} className="mb-8" />
 
         {/* Main Content */}
-        <Card className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg shadow-xl">
+        <Card className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg shadow-xl w-full">
           <CardHeader className="border-b border-slate-200 dark:border-slate-700 pb-6">
             <div className="flex items-center justify-between">
               <div>
@@ -244,20 +245,8 @@ export function ProfessionalAdminDashboard({ user }: ProfessionalAdminDashboardP
                 </div>
               </TabsContent>
 
-              <TabsContent value="projects">
-                <div className="text-center py-12">
-                  <FolderOpen className="h-16 w-16 text-slate-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
-                    Projects Management
-                  </h3>
-                  <p className="text-slate-600 dark:text-slate-400 mb-6">
-                    Advanced project CRUD operations will be implemented here
-                  </p>
-                  <Button>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Project
-                  </Button>
-                </div>
+              <TabsContent value="projects" className="w-full">
+                <ProjectsTab className="w-full" />
               </TabsContent>
 
               <TabsContent value="skills">

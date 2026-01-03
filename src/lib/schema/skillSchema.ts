@@ -131,8 +131,8 @@ export const SkillExperienceSchema = z.object({
   frequency: z.enum(['daily', 'weekly', 'monthly', 'occasionally', 'rarely']).optional(),
 });
 
-// Main Skill Schema
-export const SkillSchema = z.object({
+// Main Skill Schema Base (without refinements)
+const SkillSchemaBase = z.object({
   // Basic Information
   name: z.string()
     .min(1, 'Skill name is required')
@@ -152,9 +152,10 @@ export const SkillSchema = z.object({
     errorMap: () => ({ message: 'Please select a valid skill category' })
   }),
 
-  level: z.nativeEnum(SkillLevel, {
-    errorMap: () => ({ message: 'Please select a valid skill level' })
-  }),
+  level: z.union([
+    z.nativeEnum(SkillLevel),
+    z.number().min(0).max(100)
+  ]),
 
   // Proficiency (0-100 scale)
   proficiency: z.number()
@@ -164,10 +165,13 @@ export const SkillSchema = z.object({
     .refine(
       (val) => val % 5 === 0 || val >= 90,
       { message: 'Proficiency should be in increments of 5 (except for expert levels 90+)' }
-    ),
+    )
+    .optional()
+    .default(50),
 
   // Experience
-  experience: SkillExperienceSchema,
+  experience: SkillExperienceSchema.optional(),
+  yearsOfExperience: z.number().min(0).optional(),
 
   // Description and Details
   description: z.string()
@@ -208,7 +212,7 @@ export const SkillSchema = z.object({
   featured: z.boolean().default(false),
   disabled: z.boolean().default(false),
   visibility: z.enum(['public', 'private']).default('public'),
-  
+
   priority: z.number()
     .int('Priority must be a whole number')
     .min(1, 'Priority must be at least 1')
@@ -222,12 +226,17 @@ export const SkillSchema = z.object({
   updatedAt: z.number().positive('Updated date must be valid'),
   version: z.number().int().min(1).default(1),
   schemaVersion: z.string().default('1.0.0'),
+});
 
-}).refine(
+// Main Skill Schema with refinements
+export const SkillSchema = SkillSchemaBase.refine(
   (data) => {
     // Calculate total months from years and months
-    const totalMonths = (data.experience.years * 12) + data.experience.months;
-    return totalMonths >= 0;
+    if (data.experience) {
+      const totalMonths = (data.experience.years * 12) + data.experience.months;
+      return totalMonths >= 0;
+    }
+    return true;
   },
   {
     message: 'Experience calculation error',
@@ -236,11 +245,13 @@ export const SkillSchema = z.object({
 ).refine(
   (data) => {
     // Validate proficiency vs experience relationship
-    const totalMonths = (data.experience.years * 12) + data.experience.months;
-    const expectedMinProficiency = Math.min(totalMonths * 2, 90); // Rough estimate
-    
-    if (totalMonths > 24 && data.proficiency < expectedMinProficiency) {
-      return false;
+    if (data.experience && data.proficiency) {
+      const totalMonths = (data.experience.years * 12) + data.experience.months;
+      const expectedMinProficiency = Math.min(totalMonths * 2, 90); // Rough estimate
+
+      if (totalMonths > 24 && data.proficiency < expectedMinProficiency) {
+        return false;
+      }
     }
     return true;
   },
@@ -251,7 +262,7 @@ export const SkillSchema = z.object({
 ).refine(
   (data) => {
     // Featured skills should have higher proficiency
-    if (data.featured && data.proficiency < 70) {
+    if (data.featured && data.proficiency && data.proficiency < 70) {
       return false;
     }
     return true;
@@ -263,10 +274,12 @@ export const SkillSchema = z.object({
 ).refine(
   (data) => {
     // High proficiency skills should have some experience or certifications
-    if (data.proficiency >= 80) {
-      const totalMonths = (data.experience.years * 12) + data.experience.months;
-      if (totalMonths === 0 && data.certifications.length === 0) {
-        return false;
+    if (data.proficiency && data.proficiency >= 80) {
+      if (data.experience) {
+        const totalMonths = (data.experience.years * 12) + data.experience.months;
+        if (totalMonths === 0 && data.certifications.length === 0) {
+          return false;
+        }
       }
     }
     return true;
@@ -278,15 +291,18 @@ export const SkillSchema = z.object({
 ).refine(
   (data) => {
     // Validate level vs proficiency alignment
-    const levelProficiencyMap = {
-      [SkillLevel.BEGINNER]: { min: 0, max: 30 },
-      [SkillLevel.INTERMEDIATE]: { min: 25, max: 60 },
-      [SkillLevel.ADVANCED]: { min: 55, max: 85 },
-      [SkillLevel.EXPERT]: { min: 80, max: 100 },
-    };
-    
-    const range = levelProficiencyMap[data.level];
-    return data.proficiency >= range.min && data.proficiency <= range.max;
+    if (typeof data.level === 'string' && data.proficiency) {
+      const levelProficiencyMap = {
+        [SkillLevel.BEGINNER]: { min: 0, max: 30 },
+        [SkillLevel.INTERMEDIATE]: { min: 25, max: 60 },
+        [SkillLevel.ADVANCED]: { min: 55, max: 85 },
+        [SkillLevel.EXPERT]: { min: 80, max: 100 },
+      };
+
+      const range = levelProficiencyMap[data.level];
+      return data.proficiency >= range.min && data.proficiency <= range.max;
+    }
+    return true;
   },
   {
     message: 'Proficiency level should align with skill level',
@@ -295,7 +311,7 @@ export const SkillSchema = z.object({
 ).refine(
   (data) => {
     // Validate experience dates
-    if (data.experience.firstUsed && data.experience.lastUsed) {
+    if (data.experience && data.experience.firstUsed && data.experience.lastUsed) {
       return data.experience.lastUsed >= data.experience.firstUsed;
     }
     return true;
@@ -311,7 +327,7 @@ export type SkillInput = z.input<typeof SkillSchema>;
 export type Skill = z.output<typeof SkillSchema>;
 
 // Partial schemas for updates
-export const SkillUpdateSchema = SkillSchema.partial().omit({
+export const SkillUpdateSchema = SkillSchemaBase.partial().omit({
   createdAt: true,
   schemaVersion: true
 }).extend({
@@ -322,7 +338,7 @@ export const SkillUpdateSchema = SkillSchema.partial().omit({
 export type SkillUpdate = z.infer<typeof SkillUpdateSchema>;
 
 // Create schema for new skills
-export const SkillCreateSchema = SkillSchema.omit({
+export const SkillCreateSchema = SkillSchemaBase.omit({
   createdAt: true,
   updatedAt: true,
   version: true,

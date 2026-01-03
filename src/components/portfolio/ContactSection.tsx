@@ -150,7 +150,7 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
 export const ContactSection: React.FC<ContactSectionProps> = ({
   className,
   contactInfo = {
-    email: "mounir.a@gmail.com",
+    email: "mounir.webdev@gmail.com",
     phone: "+213 555 123 456",
     location: "Algiers, Algeria",
     resumeUrl: "/resume.pdf"

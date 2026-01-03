@@ -1,0 +1,107 @@
+
+<svg width="1200" height="1400" viewBox="0 0 1200 1400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .box { fill:#ffffff; stroke:#1f2937; stroke-width:2; rx:12; }
+      .title { font-family:Arial, Helvetica, sans-serif; font-size:18px; font-weight:bold; fill:#111827; }
+      .text { font-family:Arial, Helvetica, sans-serif; font-size:14px; fill:#1f2937; }
+      .comment { font-family:Arial, Helvetica, sans-serif; font-size:12px; fill:#374151; }
+      .arrow { stroke:#2563eb; stroke-width:2.5; fill:none; marker-end:url(#arrowhead); }
+      .reject { stroke:#dc2626; stroke-width:2; fill:none; marker-end:url(#arrowhead-red); }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2563eb" />
+    </marker>
+    <marker id="arrowhead-red" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#dc2626" />
+    </marker>
+  </defs>
+
+  <!-- HEADER -->
+  <rect x="250" y="20" width="700" height="70" class="box" />
+  <text x="600" y="50" text-anchor="middle" class="title">Magento 2 Checkout Flow – Algeria Only</text>
+  <text x="600" y="75" text-anchor="middle" class="text">Amasty One Step Checkout + MSI + Yalidine</text>
+
+  <!-- STEP 1 SOURCE -->
+  <rect x="150" y="120" width="900" height="120" class="box" />
+  <text x="600" y="150" text-anchor="middle" class="title">1. Source (Store) Selection – Mandatory</text>
+  <text x="200" y="180" class="text">• Uses Amasty Store Locator</text>
+  <text x="200" y="205" class="text">• Show only sources where ALL cart items are available (MSI source items)</text>
+  <text x="200" y="230" class="text">• Selected source is persisted to checkout state + quote</text>
+
+  <text x="750" y="185" class="comment">Comment:</text>
+  <text x="750" y="205" class="comment">– No salable qty approximation</text>
+  <text x="750" y="225" class="comment">– No shipping methods before this step</text>
+
+  <!-- ARROW -->
+  <path d="M600 240 L600 280" class="arrow" />
+
+  <!-- STEP 2 FULFILLMENT -->
+  <rect x="150" y="280" width="900" height="160" class="box" />
+  <text x="600" y="310" text-anchor="middle" class="title">2. Fulfillment Method Selection</text>
+
+  <text x="200" y="345" class="text">A. Store Pickup</text>
+  <text x="220" y="370" class="comment">– Enabled only if source allows pickup</text>
+  <text x="220" y="390" class="comment">– Requires pickup date + time slot</text>
+  <text x="220" y="410" class="comment">– No address, no carrier</text>
+
+  <text x="650" y="345" class="text">B. Delivery (Yalidine Only)</text>
+  <text x="670" y="370" class="comment">– Visible only after source selection</text>
+  <text x="670" y="390" class="comment">– Yalidine is the ONLY carrier</text>
+
+  <!-- ARROW TO ADDRESS -->
+  <path d="M600 440 L600 480" class="arrow" />
+
+  <!-- STEP 3 ADDRESS -->
+  <rect x="150" y="480" width="900" height="160" class="box" />
+  <text x="600" y="510" text-anchor="middle" class="title">3. Customer Address (Yalidine-Driven)</text>
+
+  <text x="200" y="545" class="text">• Wilaya list loaded from Yalidine API</text>
+  <text x="200" y="570" class="text">• Commune list depends on selected wilaya</text>
+  <text x="200" y="595" class="text">• Structured address only (no free text city/region)</text>
+
+  <text x="750" y="545" class="comment">Comment:</text>
+  <text x="750" y="565" class="comment">– Same wilaya/commune model for customers & sources</text>
+  <text x="750" y="585" class="comment">– Magento default regions disabled</text>
+
+  <!-- INVALID ADDRESS -->
+  <path d="M1050 560 L1150 560" class="reject" />
+  <text x="1080" y="545" class="comment" fill="#dc2626">Invalid / incomplete address</text>
+
+  <!-- ARROW -->
+  <path d="M600 640 L600 680" class="arrow" />
+
+  <!-- STEP 4 FEES -->
+  <rect x="150" y="680" width="900" height="160" class="box" />
+  <text x="600" y="710" text-anchor="middle" class="title">4. Delivery Fees Calculation (Yalidine API)</text>
+
+  <text x="200" y="745" class="text">• Origin wilaya = source wilaya</text>
+  <text x="200" y="770" class="text">• Destination = customer wilaya + commune</text>
+  <text x="200" y="795" class="text">• Weight / volume if required</text>
+
+  <text x="650" y="745" class="text">Delivery Options:</text>
+  <text x="670" y="770" class="comment">– Stop Desk (commune pickup)</text>
+  <text x="670" y="790" class="comment">– Home Delivery</text>
+
+  <!-- ARROW -->
+  <path d="M600 840 L600 880" class="arrow" />
+
+  <!-- STEP 5 ORDER -->
+  <rect x="150" y="880" width="900" height="180" class="box" />
+  <text x="600" y="910" text-anchor="middle" class="title">5. Order Confirmation & Parcel Creation</text>
+
+  <text x="200" y="945" class="text">• Create Yalidine parcel BEFORE Magento order</text>
+  <text x="200" y="970" class="text">• Attach tracking number, delivery type, fees</text>
+  <text x="200" y="995" class="text">• Lock source assignment</text>
+
+  <text x="650" y="945" class="comment">Failure Handling:</text>
+  <text x="650" y="965" class="comment">– If Yalidine API fails → block checkout</text>
+  <text x="650" y="985" class="comment">– No partial orders allowed</text>
+
+  <!-- FINAL -->
+  <path d="M600 1060 L600 1120" class="arrow" />
+  <rect x="350" y="1120" width="500" height="80" class="box" />
+  <text x="600" y="1165" text-anchor="middle" class="title">✅ Order Placed – Deterministic & Valid</text>
+
+</svg>
+

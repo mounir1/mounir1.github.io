@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { toast } from "@/hooks/use-toast";
 import { useProjects } from "@/hooks/useProjects";
 import { useSkills } from "@/hooks/useSkills";
@@ -41,7 +41,7 @@ type DataLayerEvent = {
   theme?: string;
 };
 
-export function AdminDashboard() {
+export function OptimizedAdminDashboard() {
   const { skills, loading: skillsLoading, error: skillsError, refetch: refetchSkills } = useSkills();
   const { projects, loading: projectsLoading, error: projectsError, refetch: refetchProjects } = useProjects();
   const { theme, setTheme } = useTheme();

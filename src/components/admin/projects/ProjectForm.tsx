@@ -5,8 +5,7 @@ import { z } from "zod";
 import { toast } from "@/hooks/use-toast";
 import { useProjects, PROJECTS_COLLECTION, DEFAULT_PROJECT, type ProjectInput, type ProjectCategory, type ProjectStatus } from "@/hooks/useProjects";
 import type { Project } from "@/types/project";
-import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { firebaseService } from "@/lib/services/firebaseService";
 
 import {
   Save,
@@ -199,33 +198,24 @@ export function ProjectForm({ project, onSubmit, onCancel, mode }: ProjectFormPr
   }, []);
 
   const handleSubmit = useCallback(async (data: ProjectFormData) => {
-    if (!db) {
-      toast({
-        title: "Error",
-        description: "Database connection not available",
-        variant: "destructive",
-      });
-      return;
-    }
-
     setIsSubmitting(true);
 
     try {
-      const projectData = {
+      const projectData: ProjectInput = {
         ...data,
-        id: project?.id || "", // Will be set by Firestore if creating
         createdAt: project?.createdAt || Date.now(),
         updatedAt: Date.now(),
+        version: project?.version || 1,
       };
 
-      if (mode === "edit" && project) {
-        await updateDoc(doc(db, PROJECTS_COLLECTION, project.id), projectData);
+      if (mode === "edit" && project?.id) {
+        await firebaseService.updateProject(project.id, projectData);
         toast({
           title: "Project updated",
           description: `"${data.title}" has been updated successfully.`,
         });
       } else {
-        await addDoc(collection(db, PROJECTS_COLLECTION), projectData);
+        await firebaseService.createProject(projectData);
         toast({
           title: "Project created",
           description: `"${data.title}" has been created successfully.`,
@@ -235,9 +225,10 @@ export function ProjectForm({ project, onSubmit, onCancel, mode }: ProjectFormPr
       onSubmit();
     } catch (error) {
       console.error("Error saving project:", error);
+      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
       toast({
         title: "Error",
-        description: "Failed to save project. Please try again.",
+        description: `Failed to save project: ${errorMessage}. Please try again.`,
         variant: "destructive",
       });
     } finally {

@@ -14,89 +14,23 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      "react": path.resolve(__dirname, "./node_modules/react"),
-      "react-dom": path.resolve(__dirname, "./node_modules/react-dom"),
     },
+    dedupe: [
+      'react',
+      'react-dom'
+    ],
+    mainFields: ['module', 'browser', 'exports', 'main'],
+    conditions: ['module', 'import', 'browser', 'default']
   },
   build: {
     outDir: 'dist',
-    sourcemap: mode === 'development',
+    sourcemap: true,
     minify: mode === 'production' ? 'terser' : false,
     target: 'es2020',
     reportCompressedSize: false,
     chunkSizeWarningLimit: 500,
     rollupOptions: {
       output: {
-        manualChunks: (id) => {
-          // Vendor chunks for external dependencies
-          if (id.includes('node_modules')) {
-            // Core React and React DOM
-            if (id.includes('react') || id.includes('react-dom')) {
-              return 'react-vendor';
-            }
-            // Firebase services
-            if (id.includes('firebase')) {
-              return 'firebase';
-            }
-            // UI components (Radix)
-            if (id.includes('@radix-ui') || id.includes('class-variance-authority') || id.includes('clsx')) {
-              return 'ui-vendor';
-            }
-            // Router
-            if (id.includes('react-router-dom')) {
-              return 'router';
-            }
-            // Icons
-            if (id.includes('lucide-react')) {
-              return 'icons';
-            }
-            // Form handling
-            if (id.includes('react-hook-form') || id.includes('zod') || id.includes('@hookform')) {
-              return 'forms';
-            }
-            // Animation libraries
-            if (id.includes('framer-motion')) {
-              return 'animations';
-            }
-            // Date utilities
-            if (id.includes('date-fns')) {
-              return 'date-utils';
-            }
-            // Charts and analytics
-            if (id.includes('recharts') || id.includes('d3')) {
-              return 'charts';
-            }
-            // File handling
-            if (id.includes('file-saver')) {
-              return 'file-utils';
-            }
-            // Other vendor packages
-            return 'vendor-misc';
-          }
-          
-          // App-specific chunks
-          // Admin components
-          if (id.includes('/admin/')) {
-            return 'admin';
-          }
-          // Portfolio components (split by feature)
-          if (id.includes('/portfolio/')) {
-            if (id.includes('Animation') || id.includes('ScrollAnimations')) {
-              return 'portfolio-animations';
-            }
-            if (id.includes('Project') || id.includes('Gallery')) {
-              return 'portfolio-projects';
-            }
-            if (id.includes('Skill') || id.includes('Experience')) {
-              return 'portfolio-skills';
-            }
-            return 'portfolio';
-          }
-          // Shared utilities
-          if (id.includes('/lib/')) {
-            return 'utils';
-          }
-        },
         chunkFileNames: (chunkInfo) => {
           const facadeModuleId = chunkInfo.facadeModuleId ? chunkInfo.facadeModuleId.split('/').pop() : 'chunk';
           return `assets/js/[name]-[hash].js`;
@@ -114,10 +48,7 @@ export default defineConfig(({ mode }) => ({
           return `assets/[name]-[hash][extname]`;
         },
       },
-      external: (id) => {
-        // Don't bundle these as they should be loaded separately
-        return id.includes('web-vitals') && mode === 'production';
-      },
+      // keep default dependency graph ordering to avoid premature execution
     },
     terserOptions: {
       compress: {
@@ -129,12 +60,11 @@ export default defineConfig(({ mode }) => ({
         safari10: true,
       },
     },
+    commonjsOptions: {
+      transformMixedEsModules: true
+    }
   },
   base: mode === 'production' ? '/' : '/',
-  define: {
-    'process.env': {},
-    'import.meta.env.MODE': JSON.stringify(mode),
-  },
   optimizeDeps: {
     include: [
       'react', 
@@ -144,7 +74,10 @@ export default defineConfig(({ mode }) => ({
       'framer-motion',
       '@radix-ui/react-dialog',
       '@radix-ui/react-dropdown-menu',
-      'lucide-react'
+      'lucide-react',
+      'next-themes',
+      'sonner',
+      'use-callback-ref'
     ],
     exclude: ['@firebase/app-check'],
   },

@@ -168,3 +168,8 @@ pids
 *.pid
 *.seed
 *.pid.lock
+
+# Data export files (keep structure, ignore actual data)
+portfolio-data-export.json
+portfolio-data-optimized.json
+!portfolio-data-optimized.json.example

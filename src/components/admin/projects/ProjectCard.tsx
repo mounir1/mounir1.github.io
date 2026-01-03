@@ -21,11 +21,11 @@ import {
   Archive,
 } from "lucide-react";
 
-import { 
-  Card, 
-  CardContent, 
-  CardHeader, 
-  CardTitle 
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -85,7 +85,7 @@ const statusConfig = {
   }
 };
 
-export function ProjectCard({
+export const ProjectCard = React.memo(function ProjectCard({
   project,
   viewMode,
   selected = false,
@@ -99,8 +99,8 @@ export function ProjectCard({
   className = "",
 }: ProjectCardProps) {
   const [imageError, setImageError] = useState(false);
-  
-  const statusInfo = statusConfig[project.status];
+
+  const statusInfo = statusConfig[project.status as keyof typeof statusConfig] || statusConfig.completed;
   const StatusIcon = statusInfo.icon;
 
   const handleImageError = () => {
@@ -109,11 +109,9 @@ export function ProjectCard({
 
   if (viewMode === "list") {
     return (
-      <Card className={`transition-all duration-200 hover:shadow-md ${
-        selected ? "ring-2 ring-primary" : ""
-      } ${project.disabled ? "opacity-60" : ""} ${
-        project.featured ? "bg-yellow-50/30 dark:bg-yellow-950/20" : ""
-      } ${className}`}>
+      <Card className={`transition-all duration-200 hover:shadow-md ${selected ? "ring-2 ring-primary" : ""
+        } ${project.disabled ? "opacity-60" : ""} ${project.featured ? "bg-yellow-50/30 dark:bg-yellow-950/20" : ""
+        } ${className}`}>
         <CardContent className="p-4">
           <div className="flex items-center gap-4">
             {/* Selection Checkbox */}
@@ -133,6 +131,7 @@ export function ProjectCard({
                   alt={project.title}
                   className="w-full h-full object-cover"
                   onError={handleImageError}
+                  loading="lazy"
                 />
               ) : project.logo && !imageError ? (
                 <img
@@ -140,6 +139,7 @@ export function ProjectCard({
                   alt={project.title}
                   className="w-full h-full object-contain p-2"
                   onError={handleImageError}
+                  loading="lazy"
                 />
               ) : (
                 <Database className="h-8 w-8 text-muted-foreground" />
@@ -159,7 +159,7 @@ export function ProjectCard({
                       <EyeOff className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                     )}
                   </div>
-                  
+
                   <p className="text-muted-foreground text-sm mb-2 line-clamp-2">
                     {project.description}
                   </p>
@@ -169,7 +169,7 @@ export function ProjectCard({
                       <StatusIcon className={`h-4 w-4 ${statusInfo.color}`} />
                       <span>{statusInfo.label}</span>
                     </div>
-                    
+
                     <Badge variant="outline" className="capitalize">
                       {project.category}
                     </Badge>
@@ -317,11 +317,9 @@ export function ProjectCard({
 
   // Grid view
   return (
-    <Card className={`transition-all duration-200 hover:shadow-lg hover:-translate-y-1 ${
-      selected ? "ring-2 ring-primary" : ""
-    } ${project.disabled ? "opacity-60" : ""} ${
-      project.featured ? "bg-yellow-50/30 dark:bg-yellow-950/20" : ""
-    } ${className}`}>
+    <Card className={`transition-all duration-200 hover:shadow-lg hover:-translate-y-1 ${selected ? "ring-2 ring-primary" : ""
+      } ${project.disabled ? "opacity-60" : ""} ${project.featured ? "bg-yellow-50/30 dark:bg-yellow-950/20" : ""
+      } ${className}`}>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-2">
@@ -331,7 +329,7 @@ export function ProjectCard({
                 onCheckedChange={onSelect}
               />
             )}
-            
+
             <div className="w-8 h-8 rounded-md flex-shrink-0 overflow-hidden bg-muted flex items-center justify-center">
               {project.logo && !imageError ? (
                 <img
@@ -339,6 +337,7 @@ export function ProjectCard({
                   alt={project.title}
                   className="w-full h-full object-contain p-1"
                   onError={handleImageError}
+                  loading="lazy"
                 />
               ) : (
                 <Database className="h-4 w-4 text-muted-foreground" />
@@ -428,6 +427,7 @@ export function ProjectCard({
               alt={project.title}
               className="w-full h-full object-cover"
               onError={handleImageError}
+              loading="lazy"
             />
           </div>
         )}
@@ -443,7 +443,7 @@ export function ProjectCard({
             <StatusIcon className={`h-3 w-3 ${statusInfo.color}`} />
             <span className={statusInfo.color}>{statusInfo.label}</span>
           </div>
-          
+
           <Badge variant="outline" className="text-xs capitalize">
             {project.category}
           </Badge>
@@ -464,7 +464,7 @@ export function ProjectCard({
         </div>
 
         {/* Achievements */}
-        {project.achievements.length > 0 && (
+        {project.achievements && project.achievements.length > 0 && (
           <div className="flex items-center gap-1 text-xs text-muted-foreground">
             <Trophy className="h-3 w-3" />
             <span>{project.achievements.length} achievement{project.achievements.length !== 1 ? 's' : ''}</span>
@@ -524,14 +524,14 @@ export function ProjectCard({
             <Calendar className="h-3 w-3" />
             <span>{format(new Date(project.updatedAt), "MMM dd")}</span>
           </div>
-          
+
           {project.teamSize && (
             <div className="flex items-center gap-1">
               <Users className="h-3 w-3" />
               <span>{project.teamSize}</span>
             </div>
           )}
-          
+
           <div className="text-right">
             Priority: {project.priority}
           </div>
@@ -539,4 +539,4 @@ export function ProjectCard({
       </CardContent>
     </Card>
   );
-}
+});

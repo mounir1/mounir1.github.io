@@ -3,39 +3,11 @@ import { collection, query, orderBy, onSnapshot, where, addDoc, updateDoc, delet
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { db, isFirebaseEnabled } from "@/lib/firebase";
 import { initialSkills } from "@/data/initial-skills";
+import type { Skill, SkillInput } from "@/lib/schema/skillSchema";
+import { SkillCategory } from "@/lib/schema/types";
 
-export type SkillCategory = 
-  | "Frontend Development"
-  | "Backend Development"
-  | "Database"
-  | "Cloud & DevOps"
-  | "Mobile Development"
-  | "Machine Learning"
-  | "Design"
-  | "Project Management"
-  | "Languages"
-  | "Tools"
-  | "Other";
-
-export interface Skill {
-  id: string;
-  name: string;
-  category: SkillCategory;
-  level: number; // 1-100
-  yearsOfExperience: number;
-  description?: string;
-  certifications?: string[];
-  projects?: string[];
-  icon?: string;
-  color?: string;
-  featured: boolean;
-  disabled: boolean;
-  priority: number;
-  createdAt: number;
-  updatedAt: number;
-}
-
-export type SkillInput = Omit<Skill, "id">;
+export { SkillCategory };
+export type { Skill, SkillInput };
 
 export const SKILLS_COLLECTION = "skills";
 
@@ -82,13 +54,35 @@ export function useSkills() {
               id: doc.id,
               ...doc.data()
             })) as Skill[];
-            
+
             // Validate and sanitize data
-            const validSkills = skillsData.filter(skill => 
+            const validSkills = skillsData.filter(skill =>
               skill.name && skill.category && skill.level !== undefined
             );
-            
-            setSkills(validSkills);
+
+            // Deduplicate by normalized name + category
+            const seen = new Set<string>();
+            const deduped: Skill[] = [];
+            for (const s of validSkills) {
+              const key = `${s.name.trim().toLowerCase()}::${(s.category || '').toString().trim().toLowerCase()}`;
+              if (!seen.has(key)) {
+                seen.add(key);
+                deduped.push(s);
+              }
+            }
+
+            // Sort: featured (if present) then priority desc then level desc
+            deduped.sort((a, b) => {
+              const af = (a as any).featured ? 1 : 0;
+              const bf = (b as any).featured ? 1 : 0;
+              if (bf !== af) return bf - af;
+              const ap = typeof (a as any).priority === 'number' ? (a as any).priority : 0;
+              const bp = typeof (b as any).priority === 'number' ? (b as any).priority : 0;
+              if (bp !== ap) return bp - ap;
+              return (b.level || 0) - (a.level || 0);
+            });
+
+            setSkills(deduped);
             setLoading(false);
             setError(null);
             retryCount = 0; // Reset retry count on success
@@ -101,10 +95,10 @@ export function useSkills() {
         (err) => {
           console.error("Firebase listener error:", err);
           const errorMessage = err instanceof Error ? err.message : "Unknown error occurred";
-          
+
           // Implement retry logic for transient errors
           if (retryCount < maxRetries && (
-            errorMessage.includes('network') || 
+            errorMessage.includes('network') ||
             errorMessage.includes('timeout') ||
             errorMessage.includes('unavailable')
           )) {
@@ -115,16 +109,35 @@ export function useSkills() {
             }, retryDelay * retryCount); // Exponential backoff
             return;
           }
-          
+
           setError(`Failed to load skills: ${errorMessage}. Showing local data instead.`);
           console.log('Falling back to local skills data due to Firebase error');
-          
+
           // Fallback to local data on Firebase error
           const localSkills: Skill[] = initialSkills.map((skill, index) => ({
             id: `fallback-skill-${index}`,
             ...skill
           }));
-          setSkills(localSkills);
+          // Deduplicate and sort local fallback
+          const seen = new Set<string>();
+          const deduped: Skill[] = [];
+          for (const s of localSkills) {
+            const key = `${s.name.trim().toLowerCase()}::${(s.category || '').toString().trim().toLowerCase()}`;
+            if (!seen.has(key)) {
+              seen.add(key);
+              deduped.push(s);
+            }
+          }
+          deduped.sort((a, b) => {
+            const af = (a as any).featured ? 1 : 0;
+            const bf = (b as any).featured ? 1 : 0;
+            if (bf !== af) return bf - af;
+            const ap = typeof (a as any).priority === 'number' ? (a as any).priority : 0;
+            const bp = typeof (b as any).priority === 'number' ? (b as any).priority : 0;
+            if (bp !== ap) return bp - ap;
+            return (b.level || 0) - (a.level || 0);
+          });
+          setSkills(deduped);
           setLoading(false);
         }
       );
@@ -172,9 +185,9 @@ export function useSkills() {
     return grouped;
   }, [skills]);
 
-  const featuredSkills = useMemo(() => 
+  const featuredSkills = useMemo(() =>
     skills.filter(skill => skill.featured && !skill.disabled)
-  , [skills]);
+    , [skills]);
 
   // Enhanced CRUD Operations with better error handling
   const addSkill = useCallback(async (skillData: SkillInput) => {

@@ -145,18 +145,21 @@ export enum ProjectStatus {
 }
 
 export enum ProjectCategory {
-  WEB_APPLICATION = 'web-application',
-  MOBILE_APPLICATION = 'mobile-application',
-  ENTERPRISE_INTEGRATION = 'enterprise-integration',
-  E_COMMERCE = 'e-commerce',
-  MACHINE_LEARNING = 'machine-learning',
-  API_DEVELOPMENT = 'api-development',
-  DEVOPS_INFRASTRUCTURE = 'devops-infrastructure',
-  DESKTOP_APPLICATION = 'desktop-application',
-  GAME_DEVELOPMENT = 'game-development',
-  BLOCKCHAIN = 'blockchain',
-  IOT = 'iot',
-  OTHER = 'other'
+  WEB_APPLICATION = 'Web Application',
+  MOBILE_APPLICATION = 'Mobile App',
+  ENTERPRISE_INTEGRATION = 'Enterprise Integration',
+  E_COMMERCE = 'E-Commerce',
+  MACHINE_LEARNING = 'Machine Learning',
+  API_DEVELOPMENT = 'API Service',
+  DEVOPS_INFRASTRUCTURE = 'Cloud Infrastructure',
+  DESKTOP_APPLICATION = 'Desktop Application',
+  GAME_DEVELOPMENT = 'Game Development',
+  BLOCKCHAIN = 'Blockchain',
+  IOT = 'IoT',
+  DATA_PIPELINE = 'Data Pipeline',
+  UI_UX_DESIGN = 'UI/UX Design',
+  DEVOPS_TOOL = 'DevOps Tool',
+  OTHER = 'Other'
 }
 
 export enum ProjectPriority {
@@ -167,21 +170,23 @@ export enum ProjectPriority {
 }
 
 export enum SkillCategory {
-  FRONTEND_DEVELOPMENT = 'frontend-development',
-  BACKEND_DEVELOPMENT = 'backend-development',
-  DATABASE = 'database',
-  CLOUD_DEVOPS = 'cloud-devops',
-  MOBILE_DEVELOPMENT = 'mobile-development',
-  MACHINE_LEARNING = 'machine-learning',
-  AI_DATA_SCIENCE = 'ai-data-science',
-  CYBERSECURITY = 'cybersecurity',
-  BLOCKCHAIN = 'blockchain',
-  GAME_DEVELOPMENT = 'game-development',
-  DESIGN = 'design',
-  PROJECT_MANAGEMENT = 'project-management',
-  LANGUAGES = 'languages',
-  TOOLS = 'tools',
-  OTHER = 'other'
+  FRONTEND_DEVELOPMENT = 'Frontend Development',
+  BACKEND_DEVELOPMENT = 'Backend Development',
+  DATABASE = 'Database',
+  CLOUD_DEVOPS = 'Cloud & DevOps',
+  MOBILE_DEVELOPMENT = 'Mobile Development',
+  MACHINE_LEARNING = 'Machine Learning',
+  AI_DATA_SCIENCE = 'AI & Data Science',
+  CYBERSECURITY = 'Cybersecurity',
+  BLOCKCHAIN = 'Blockchain',
+  GAME_DEVELOPMENT = 'Game Development',
+  DESIGN = 'Design',
+  PROJECT_MANAGEMENT = 'Project Management',
+  LANGUAGES = 'Languages',
+  TOOLS = 'Tools',
+  LMS_EDUCATION = 'LMS & Education',
+  HOSPITALITY_SOLUTIONS = 'Hospitality Solutions',
+  OTHER = 'Other'
 }
 
 export enum SkillLevel {

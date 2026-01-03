@@ -1,5 +1,5 @@
 /**
- * Centralized type definitions
+* Centralized type definitions
  * Consolidates duplicate types and interfaces across the codebase
  */
 
@@ -79,121 +79,11 @@ export interface TableState {
 export interface FormField {
   name: string;
   label: string;
-  type: 'text' | 'email' | 'password' | 'number' | 'textarea' | 'select' | 'checkbox' | 'radio' | 'file' | 'date';
-  placeholder?: string;
+  type: string;
   required?: boolean;
-  disabled?: boolean;
-  options?: Array<{ label: string; value: any }>;
-  validation?: ValidationRule[];
-}
-
-export interface ValidationRule {
-  type: 'required' | 'minLength' | 'maxLength' | 'pattern' | 'custom';
-  value?: any;
-  message: string;
-}
-
-export interface ValidationResult {
-  isValid: boolean;
-  errors: Record<string, string>;
-}
-
-export interface FormState<T = any> {
-  values: T;
-  errors: Record<string, string>;
-  touched: Record<string, boolean>;
-  isSubmitting: boolean;
-  isValid: boolean;
-}
-
-// API types
-export interface ApiResponse<T = any> {
-  data?: T;
-  error?: string;
-  message?: string;
-  status: number;
-  meta?: {
-    total?: number;
-    page?: number;
-    pageSize?: number;
-    hasNext?: boolean;
-    hasPrev?: boolean;
-  };
-}
-
-export interface ApiError {
-  message: string;
-  status: number;
-  code?: string;
-  details?: Record<string, any>;
-}
-
-export interface PaginatedResponse<T> {
-  data: T[];
-  meta: {
-    total: number;
-    page: number;
-    pageSize: number;
-    totalPages: number;
-    hasNext: boolean;
-    hasPrev: boolean;
-  };
-}
-
-// Theme types
-export interface ThemeColors {
-  primary: string;
-  secondary: string;
-  accent: string;
-  background: string;
-  foreground: string;
-  muted: string;
-  border: string;
-  success: string;
-  warning: string;
-  error: string;
-  info: string;
-}
-
-export interface Theme {
-  name: string;
-  colors: ThemeColors;
-  isDark: boolean;
-}
-
-export type ThemeMode = 'light' | 'dark' | 'system';
-
-// Navigation types
-export interface NavigationItem {
-  id: string;
-  label: string;
-  href?: string;
-  icon?: React.ComponentType;
-  children?: NavigationItem[];
-  badge?: string | number;
-  disabled?: boolean;
-}
-
-export interface BreadcrumbItem {
-  label: string;
-  href?: string;
-  current?: boolean;
-}
-
-// Modal types
-export interface ModalProps extends BaseComponentProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  title?: string;
-  description?: string;
-  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
-}
-
-export interface ConfirmDialogProps extends ModalProps {
-  onConfirm: () => void | Promise<void>;
-  confirmText?: string;
-  cancelText?: string;
-  variant?: 'default' | 'destructive';
+  placeholder?: string;
+  defaultValue?: any;
+  validation?: (value: any) => boolean;
 }
 
 // Loading states
@@ -265,80 +155,6 @@ export interface FilterGroup {
 }
 
 export interface ActiveFilter {
-  groupId: string;
-  value: any;
-  label: string;
-}
-
-// Notification types
-export interface Notification {
-  id: string;
-  type: 'success' | 'error' | 'warning' | 'info';
-  title: string;
-  message?: string;
-  duration?: number;
-  action?: {
-    label: string;
-    onClick: () => void;
-  };
-}
-
-// User types
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  avatar?: string;
-  role: 'admin' | 'user';
-  permissions: string[];
-  preferences: UserPreferences;
-}
-
-export interface UserPreferences {
-  theme: ThemeMode;
-  language: string;
-  timezone: string;
-  notifications: {
-    email: boolean;
-    push: boolean;
-    desktop: boolean;
-  };
-  dashboard: {
-    layout: 'grid' | 'list';
-    density: 'compact' | 'comfortable' | 'spacious';
-  };
-}
-
-// Project types (consolidated)
-export interface Project extends BaseEntity {
-  title: string;
-  description: string;
-  longDescription?: string;
-  technologies: string[];
-  category: string;
-  status: 'draft' | 'active' | 'completed' | 'archived';
-  priority: number;
-  featured: boolean;
-  images: ProjectImage[];
-  links: ProjectLink[];
-  metrics?: ProjectMetrics;
-  tags: string[];
-  visibility: 'public' | 'private' | 'draft';
-  seo?: ProjectSEO;
-}
-
-export interface ProjectImage {
-  id: string;
-  url: string;
-  alt: string;
-  caption?: string;
-  primary?: boolean;
-}
-
-export interface ProjectLink {
-  id: string;
-  type: 'demo' | 'source' | 'documentation' | 'other';
-  url: string;
   label: string;
 }
 

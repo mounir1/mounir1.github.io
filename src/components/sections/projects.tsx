@@ -18,7 +18,7 @@ export const Projects = () => {
       if (!loading && projects.length === 0 && !error && !hasSeeded.current && !isSeeding) {
         hasSeeded.current = true;
         setIsSeeding(true);
-        
+
         try {
           const seeded = await seedInitialData();
           if (seeded) {
@@ -42,8 +42,8 @@ export const Projects = () => {
   // Show loading state
   if (loading || isSeeding) {
     return (
-      <section id="projects" className="py-20 px-6 bg-gradient-to-br from-background via-card/20 to-background">
-        <div className="max-w-6xl mx-auto">
+      <section id="projects" className="py-20 px-4 md:px-6 lg:px-8 bg-gradient-to-br from-background via-card/20 to-background w-full">
+        <div className="w-full max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-primary bg-clip-text text-transparent">
               Featured Projects
@@ -66,8 +66,8 @@ export const Projects = () => {
   // Show error state
   if (error) {
     return (
-      <section id="projects" className="py-20 px-6 bg-gradient-to-br from-background via-card/20 to-background">
-        <div className="max-w-6xl mx-auto">
+      <section id="projects" className="py-20 px-4 md:px-6 lg:px-8 bg-gradient-to-br from-background via-card/20 to-background w-full">
+        <div className="w-full max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-primary bg-clip-text text-transparent">
               Featured Projects
@@ -75,9 +75,9 @@ export const Projects = () => {
             <div className="text-muted-foreground">
               <Database className="w-8 h-8 mx-auto mb-2 opacity-50" />
               <p>Unable to load projects. Please check your connection.</p>
-              <Button 
-                onClick={() => window.location.reload()} 
-                variant="outline" 
+              <Button
+                onClick={() => window.location.reload()}
+                variant="outline"
                 className="mt-4"
               >
                 Retry
@@ -90,8 +90,8 @@ export const Projects = () => {
   }
 
   return (
-    <section id="projects" className="py-20 px-6 bg-gradient-to-br from-background via-card/20 to-background">
-      <div className="max-w-6xl mx-auto">
+    <section id="projects" className="py-20 px-4 md:px-6 lg:px-8 bg-gradient-to-br from-background via-card/20 to-background w-full">
+      <div className="w-full max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-primary bg-clip-text text-transparent">
             Featured Projects
@@ -111,8 +111,8 @@ export const Projects = () => {
               <Card key={project.id} className="group overflow-hidden border-0 shadow-medium hover:shadow-large transition-all duration-500 hover:scale-105 bg-card/50 backdrop-blur-sm">
                 <div className="relative overflow-hidden">
                   {project.image ? (
-                    <img 
-                      src={project.image} 
+                    <img
+                      src={project.image}
                       alt={project.title}
                       className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110"
                     />
@@ -122,18 +122,18 @@ export const Projects = () => {
                     </div>
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  
+
                   {/* Company Logo */}
                   {project.logo && (
                     <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm rounded-lg p-2 shadow-medium hover:scale-110 transition-transform duration-300">
-                      <img 
-                        src={project.logo} 
+                      <img
+                        src={project.logo}
                         alt={`${project.title} logo`}
                         className="h-6 w-auto max-w-[80px] object-contain"
                       />
                     </div>
                   )}
-                  
+
                   <div className="absolute top-4 right-4">
                     <Badge className="bg-primary/90 text-primary-foreground shadow-glow">
                       <Star className="w-3 h-3 mr-1" />
@@ -141,7 +141,7 @@ export const Projects = () => {
                     </Badge>
                   </div>
                 </div>
-                
+
                 <CardHeader className="pb-3">
                   <CardTitle className="text-xl group-hover:text-primary transition-colors duration-300">
                     {project.title}
@@ -150,7 +150,7 @@ export const Projects = () => {
                     {project.description}
                   </CardDescription>
                 </CardHeader>
-                
+
                 <CardContent className="space-y-4">
                   {project.technologies && project.technologies.length > 0 && (
                     <div className="flex flex-wrap gap-2">
@@ -166,7 +166,7 @@ export const Projects = () => {
                       )}
                     </div>
                   )}
-                  
+
                   {/* Project Stats */}
                   {project.achievements && project.achievements.length > 0 && (
                     <div className="py-3 border-t border-border/50">
@@ -176,27 +176,11 @@ export const Projects = () => {
                       </div>
                     </div>
                   )}
-                  
+
                   <div className="flex gap-3 pt-2">
                     {project.liveUrl && (
                       <Button size="sm" className="flex-1 shadow-glow hover:shadow-large transition-all duration-300" asChild>
                         <a href={project.liveUrl} target="_blank" rel="noopener noreferrer">
-                          <ExternalLink className="w-4 h-4 mr-2" />
-                          Live Demo
-                        </a>
-                      </Button>
-                    )}
-                    {project.githubUrl && (
-                      <Button size="sm" variant="outline" className="hover:bg-primary/10 transition-colors" asChild>
-                        <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
-                          <Github className="w-4 h-4" />
-                        </a>
-                      </Button>
-                    )}
-                    {project.demoUrl && !project.liveUrl && (
-                      <Button size="sm" className="flex-1 shadow-glow hover:shadow-large transition-all duration-300" asChild>
-                        <a href={project.demoUrl} target="_blank" rel="noopener noreferrer">
-                          <ExternalLink className="w-4 h-4 mr-2" />
                           Demo
                         </a>
                       </Button>
@@ -215,15 +199,15 @@ export const Projects = () => {
               <h3 className="text-2xl font-bold mb-4">More Projects</h3>
               <p className="text-muted-foreground">Additional projects showcasing diverse technical skills</p>
             </div>
-            
+
             <div className="grid md:grid-cols-2 gap-6">
               {others.map((project) => (
                 <Card key={project.id} className="group border-0 shadow-medium hover:shadow-large transition-all duration-300 hover:scale-102 bg-card/30 backdrop-blur-sm">
                   <div className="flex">
                     <div className="w-32 h-32 flex-shrink-0">
                       {project.image ? (
-                        <img 
-                          src={project.image} 
+                        <img
+                          src={project.image}
                           alt={project.title}
                           className="w-full h-full object-cover rounded-l-lg transition-transform duration-300 group-hover:scale-105"
                         />
@@ -239,8 +223,8 @@ export const Projects = () => {
                           {project.title}
                         </CardTitle>
                         {project.logo && (
-                          <img 
-                            src={project.logo} 
+                          <img
+                            src={project.logo}
                             alt=""
                             className="h-5 w-auto max-w-[60px] object-contain opacity-70"
                           />

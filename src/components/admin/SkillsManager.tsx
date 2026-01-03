@@ -1,6 +1,8 @@
 import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
-import { useSkills, type Skill, type SkillCategory } from "@/hooks/useSkills";
+import { useSkills } from "@/hooks/useSkills";
+import { type Skill, type SkillInput, SkillSchema } from "@/lib/schema/skillSchema";
+import { SkillCategory } from "@/lib/schema/types";
 import { doc, updateDoc, deleteDoc, writeBatch } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { AdminDataTable } from "@/components/admin/AdminDataTable";
@@ -35,12 +37,12 @@ import {
   Calendar,
 } from "lucide-react";
 
-import { 
-  Card, 
-  CardContent, 
-  CardHeader, 
-  CardTitle, 
-  CardDescription 
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription
 } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
@@ -75,12 +77,12 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
@@ -91,27 +93,12 @@ import { z } from "zod";
 import { DataExportManager } from "@/components/admin/DataExportManager";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 
-// Skill categories array
-const SKILL_CATEGORIES = [
-  "Frontend Development",
-  "Backend Development", 
-  "Database",
-  "Cloud & DevOps",
-  "Mobile Development",
-  "Machine Learning",
-  "Design",
-  "Project Management",
-  "Languages",
-  "Tools",
-  "Other"
-];
-
-// Function to get level label based on level value
+// Function to get level label based on proficiency value
 const getLevelLabel = (level: number) => {
-  if (level >= 1 && level <= 2) return "Beginner";
-  if (level >= 3 && level <= 4) return "Intermediate";
-  if (level === 5) return "Expert";
-  return "Beginner";
+  if (level < 30) return "Beginner";
+  if (level < 60) return "Intermediate";
+  if (level < 85) return "Advanced";
+  return "Expert";
 };
 
 // Map of category to icon
@@ -126,22 +113,10 @@ const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   "Project Management": <BarChart className="h-4 w-4" />,
   "Languages": <FileText className="h-4 w-4" />,
   "Tools": <PencilRuler className="h-4 w-4" />,
+  "LMS & Education": <Award className="h-4 w-4" />,
+  "Hospitality Solutions": <Calendar className="h-4 w-4" />,
   "Other": <LayoutPanelLeft className="h-4 w-4" />,
 };
-
-// Schema for the skill form
-const formSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  category: z.string().min(1, "Category is required"),
-  level: z.coerce.number().min(1).max(100),
-  yearsOfExperience: z.coerce.number().min(0),
-  description: z.string().optional(),
-  featured: z.boolean().default(false),
-  disabled: z.boolean().default(false),
-  priority: z.coerce.number().min(1).max(100).default(50),
-  icon: z.string().optional(),
-  color: z.string().optional(),
-});
 
 export function SkillsManager() {
   const { skills, loading, addSkill, updateSkill, deleteSkill, refetch } = useSkills();
@@ -154,12 +129,13 @@ export function SkillsManager() {
   const [iconPath, setIconPath] = useState<string>("");
 
   // Form setup
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<SkillInput>({
+    resolver: zodResolver(SkillSchema),
     defaultValues: {
       name: "",
-      category: "Frontend Development",
+      category: SkillCategory.FRONTEND_DEVELOPMENT,
       level: 50,
+      proficiency: 50,
       yearsOfExperience: 0,
       description: "",
       featured: false,
@@ -167,6 +143,9 @@ export function SkillsManager() {
       priority: 50,
       icon: "",
       color: "",
+      certifications: [],
+      projects: [],
+      tags: [],
     },
   });
 
@@ -174,8 +153,9 @@ export function SkillsManager() {
   const resetForm = useCallback(() => {
     form.reset({
       name: "",
-      category: "Frontend Development",
+      category: SkillCategory.FRONTEND_DEVELOPMENT,
       level: 50,
+      proficiency: 50,
       yearsOfExperience: 0,
       description: "",
       featured: false,
@@ -183,6 +163,9 @@ export function SkillsManager() {
       priority: 50,
       icon: "",
       color: "",
+      certifications: [],
+      projects: [],
+      tags: [],
     });
   }, [form]);
 
@@ -193,17 +176,27 @@ export function SkillsManager() {
     setIconUrl("");
     setIconPath("");
     setIsFormOpen(true);
-  }, [resetForm]); // Added resetForm to the dependency array
+  }, [resetForm]);
 
   // Handle form submission with enhanced validation and error handling
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: SkillInput) => {
     try {
       // Show loading state
-      const loadingToast = toast({
+      toast({
         title: skillToEdit ? "Updating skill..." : "Creating skill...",
         description: "Please wait while we save your skill.",
         duration: 3000,
       });
+
+      // Ensure level is a number for the slider
+      const levelValue = typeof values.level === 'number' ? values.level : 50;
+
+      // Sync proficiency with level if needed
+      const finalValues = {
+        ...values,
+        proficiency: values.proficiency || levelValue,
+        level: levelValue // Store as number for simplicity in this UI
+      };
 
       if (skillToEdit) {
         // Check if this is a local skill (can't be updated in Firebase)
@@ -216,15 +209,14 @@ export function SkillsManager() {
           });
           return;
         }
-        
+
         // Update existing skill
         await updateSkill(skillToEdit.id, {
-          ...values,
+          ...finalValues,
           icon: iconUrl || values.icon,
-          disabled: values.disabled ?? false,
           updatedAt: Date.now(),
         } as Partial<Skill>);
-        
+
         toast({
           title: "Skill updated successfully",
           description: `"${values.name}" has been updated and synced to Firebase.`,
@@ -234,22 +226,12 @@ export function SkillsManager() {
       } else {
         // Add new skill
         await addSkill({
-          name: values.name,
-          category: values.category as SkillCategory,
-          level: values.level,
-          yearsOfExperience: values.yearsOfExperience,
-          description: values.description || "",
+          ...finalValues,
           icon: iconUrl || values.icon || "",
-          color: values.color || "",
-          certifications: [],
-          projects: [],
           createdAt: Date.now(),
           updatedAt: Date.now(),
-          disabled: values.disabled ?? false,
-          featured: values.featured ?? false,
-          priority: values.priority ?? 50,
-        });
-        
+        } as SkillInput);
+
         toast({
           title: "Skill created successfully",
           description: `"${values.name}" has been added to your skills and synced to Firebase.`,
@@ -257,7 +239,7 @@ export function SkillsManager() {
           className: "bg-green-500 text-white",
         });
       }
-      
+
       setIsFormOpen(false);
       resetForm();
       setIconUrl("");
@@ -266,7 +248,7 @@ export function SkillsManager() {
     } catch (error) {
       console.error("Error saving skill:", error);
       let errorMessage = "Unknown error occurred";
-      
+
       if (error instanceof Error) {
         errorMessage = error.message;
         if (errorMessage.includes('permission')) {
@@ -275,7 +257,7 @@ export function SkillsManager() {
           errorMessage = "Network error. Please check your internet connection and try again.";
         }
       }
-      
+
       toast({
         title: "Failed to save skill",
         description: `Error: ${errorMessage}. Please try again or contact support if the issue persists.`,
@@ -283,8 +265,8 @@ export function SkillsManager() {
         duration: 7000,
         className: "bg-red-500 text-white",
         action: (
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={() => console.log("Error details:", error)}
             className="text-white border-white hover:bg-white hover:text-red-500"
           >
@@ -298,19 +280,33 @@ export function SkillsManager() {
   // Handle edit skill
   const handleEditSkill = useCallback((skill: Skill) => {
     setSkillToEdit(skill);
+
+    // Handle level potentially being an Enum or number
+    let levelValue = 50;
+    if (typeof skill.level === 'number') {
+      levelValue = skill.level;
+    } else {
+      // Map Enum to number if needed, or just default
+      levelValue = 50;
+    }
+
     form.reset({
       name: skill.name,
       category: skill.category,
-      level: skill.level,
-      yearsOfExperience: skill.yearsOfExperience,
+      level: levelValue,
+      proficiency: skill.proficiency || levelValue,
+      yearsOfExperience: skill.yearsOfExperience || (skill.experience?.years || 0),
       description: skill.description || "",
       featured: skill.featured,
       disabled: skill.disabled,
       priority: skill.priority,
       icon: skill.icon || "",
-      color: skill.color,
+      color: skill.color || "",
+      certifications: skill.certifications || [],
+      projects: skill.projects || [],
+      tags: skill.tags || [],
     });
-    setIconUrl(skill.icon || ""); // Fix: handle undefined values
+    setIconUrl(skill.icon || "");
   }, [form]);
 
   // Handle delete skill
@@ -381,35 +377,35 @@ export function SkillsManager() {
       }
 
       // Show loading state
-      const loadingToast = toast({
+      toast({
         title: "Deleting skills...",
         description: `Preparing to delete ${deletableSkills.length} skills.`,
         duration: 3000,
       });
 
       deletableSkills.forEach((skill) => {
-        if (db) { // Add check for db
+        if (db) {
           const skillRef = doc(db, "skills", skill.id);
           batch.delete(skillRef);
         }
       });
 
       await batch.commit();
-      
+
       toast({
         title: "Skills deleted successfully",
         description: `${deletableSkills.length} skills have been permanently deleted from Firebase.`,
         duration: 5000,
         className: "bg-green-500 text-white",
       });
-      
+
       setBulkDeleteOpen(false);
       setSkillsToDelete([]);
       refetch();
     } catch (error) {
       console.error("Error deleting skills:", error);
       const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
-      
+
       toast({
         title: "Failed to delete skills",
         description: `Error: ${errorMessage}. Please try again later.`,
@@ -417,8 +413,8 @@ export function SkillsManager() {
         duration: 7000,
         className: "bg-red-500 text-white",
         action: (
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={() => console.log("Error details:", error)}
             className="text-white border-white hover:bg-white hover:text-red-500"
           >
@@ -454,37 +450,45 @@ export function SkillsManager() {
     {
       accessorKey: "level",
       header: "Level",
-      cell: ({ row }) => (
-        <div className="flex items-center gap-2">
-          <Progress 
-            value={row.getValue("level")} 
-            className="w-24" 
-            indicatorClassName="bg-primary"
-          />
-          <span className="text-sm text-muted-foreground w-8">{row.getValue("level")}%</span>
-        </div>
-      ),
+      cell: ({ row }) => {
+        const level = row.original.level;
+        const val = typeof level === 'number' ? level : 50;
+        return (
+          <div className="flex items-center gap-2">
+            <Progress
+              value={val}
+              className="w-24"
+              indicatorClassName="bg-primary"
+            />
+            <span className="text-sm text-muted-foreground w-8">{val}%</span>
+          </div>
+        );
+      },
     },
     {
       accessorKey: "yearsOfExperience",
       header: "Years",
+      cell: ({ row }) => {
+        const years = row.original.yearsOfExperience || row.original.experience?.years || 0;
+        return <span>{years}</span>;
+      }
     },
     {
       accessorKey: "featured",
       header: "Featured",
       cell: ({ row }) => (
-        row.getValue("featured") ? 
-        <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" /> : 
-        <Star className="h-4 w-4 text-muted-foreground" />
+        row.getValue("featured") ?
+          <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" /> :
+          <Star className="h-4 w-4 text-muted-foreground" />
       ),
     },
     {
       accessorKey: "disabled",
       header: "Status",
       cell: ({ row }) => (
-        row.getValue("disabled") ? 
-        <Badge variant="destructive">Disabled</Badge> : 
-        <Badge variant="default" className="bg-green-500 hover:bg-green-600">Active</Badge>
+        row.getValue("disabled") ?
+          <Badge variant="destructive">Disabled</Badge> :
+          <Badge variant="default" className="bg-green-500 hover:bg-green-600">Active</Badge>
       ),
     },
     createActionColumnDef({
@@ -495,9 +499,9 @@ export function SkillsManager() {
 
   // Filter options
   const categoryOptions = useMemo(() => {
-    const categories = [...new Set(skills.map(s => s.category))];
+    const categories = Object.values(SkillCategory);
     return categories.map(cat => ({ label: cat, value: cat }));
-  }, [skills]);
+  }, []);
 
   const statusOptions = useMemo(() => [
     { label: "Active", value: "false" },
@@ -507,7 +511,7 @@ export function SkillsManager() {
   return (
     <div className="space-y-6">
       <DataExportManager />
-      
+
       <Card className="border-0 shadow-medium bg-card text-card-foreground">
         <CardHeader>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -569,185 +573,185 @@ export function SkillsManager() {
           <DialogHeader>
             <DialogTitle>{skillToEdit ? "Edit Skill" : "Add Skill"}</DialogTitle>
             <DialogDescription>
-              {skillToEdit 
-                ? "Update the skill details below" 
+              {skillToEdit
+                ? "Update the skill details below"
                 : "Fill in the details for your new skill"}
             </DialogDescription>
           </DialogHeader>
-          
+
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               {/* Use div instead of ScrollArea to maintain scroll position when form is long */}
               <ScrollArea className="max-h-[60vh] pr-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Name</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="e.g., React, Node.js" 
-                          {...field} 
-                          className="bg-background text-foreground border-input"
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        The name of the skill or technology
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="category"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Category</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Name</FormLabel>
                         <FormControl>
-                          <SelectTrigger className="bg-background text-foreground border-input">
-                            <SelectValue placeholder="Select category" />
-                          </SelectTrigger>
+                          <Input
+                            placeholder="e.g., React, Node.js"
+                            {...field}
+                            className="bg-background text-foreground border-input"
+                          />
                         </FormControl>
-                        <SelectContent>
-                          {SKILL_CATEGORIES.map((category) => (
-                            <SelectItem key={category} value={category}>
-                              {category}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormDescription>
-                        The category this skill belongs to
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="level"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Proficiency Level</FormLabel>
-                      <FormControl>
-                        <Slider
-                          min={1}
-                          max={5}
-                          step={1}
-                          value={[field.value]}
-                          onValueChange={(vals) => field.onChange(vals[0])}
-                          className="py-2"
-                        />
-                      </FormControl>
-                      <div className="flex justify-between text-xs text-muted-foreground">
-                        <span>Beginner</span>
-                        <span className="font-medium">
-                          {field.value} - {getLevelLabel(field.value)}
-                        </span>
-                        <span>Expert</span>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="yearsOfExperience"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Years of Experience</FormLabel>
-                      <FormControl>
-                        <Input 
-                          type="number" 
-                          min="0"
-                          max="20"
-                          {...field} 
-                          onChange={(e) => field.onChange(Number(e.target.value))}
-                          className="bg-background text-foreground border-input"
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        How many years have you been using this skill?
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="icon"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Icon</FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="e.g., code, database" 
-                          {...field} 
-                          className="bg-background text-foreground border-input"
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Icon name from Lucide Icons (optional)
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="featured"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 bg-background text-foreground border-input">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          className="border-input"
-                        />
-                      </FormControl>
-                      <div className="space-y-1 leading-none">
-                        <FormLabel>Featured</FormLabel>
                         <FormDescription>
-                          Show this skill in the featured section
+                          The name of the skill or technology
                         </FormDescription>
-                      </div>
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="disabled"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 bg-background text-foreground border-input">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          className="border-input"
-                        />
-                      </FormControl>
-                      <div className="space-y-1 leading-none">
-                        <FormLabel>Disabled</FormLabel>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="category"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Category</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="bg-background text-foreground border-input">
+                              <SelectValue placeholder="Select category" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {Object.values(SkillCategory).map((category) => (
+                              <SelectItem key={category} value={category}>
+                                {category}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                         <FormDescription>
-                          Hide this skill from public view
+                          The category this skill belongs to
                         </FormDescription>
-                      </div>
-                    </FormItem>
-                  )}
-                />
-              </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="level"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Proficiency Level</FormLabel>
+                        <FormControl>
+                          <Slider
+                            min={0}
+                            max={100}
+                            step={5}
+                            value={[typeof field.value === 'number' ? field.value : 50]}
+                            onValueChange={(vals) => field.onChange(vals[0])}
+                            className="py-2"
+                          />
+                        </FormControl>
+                        <div className="flex justify-between text-xs text-muted-foreground">
+                          <span>Beginner</span>
+                          <span className="font-medium">
+                            {field.value}% - {getLevelLabel(typeof field.value === 'number' ? field.value : 50)}
+                          </span>
+                          <span>Expert</span>
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="yearsOfExperience"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Years of Experience</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            min="0"
+                            max="50"
+                            {...field}
+                            onChange={(e) => field.onChange(Number(e.target.value))}
+                            className="bg-background text-foreground border-input"
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          How many years have you been using this skill?
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="icon"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Icon</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="e.g., code, database"
+                            {...field}
+                            className="bg-background text-foreground border-input"
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          Icon name from Lucide Icons (optional)
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="featured"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 bg-background text-foreground border-input">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            className="border-input"
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel>Featured</FormLabel>
+                          <FormDescription>
+                            Show this skill in the featured section
+                          </FormDescription>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="disabled"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 bg-background text-foreground border-input">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            className="border-input"
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel>Disabled</FormLabel>
+                          <FormDescription>
+                            Hide this skill from public view
+                          </FormDescription>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </ScrollArea>
-              
+
               <DialogFooter className="gap-2 pt-4">
                 <Button
                   type="button"
@@ -762,8 +766,8 @@ export function SkillsManager() {
                 >
                   Cancel
                 </Button>
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   className="shadow-glow"
                   disabled={form.formState.isSubmitting}
                 >
@@ -799,21 +803,19 @@ export function SkillsManager() {
               This will permanently delete the skill <strong>{skillToDelete?.name}</strong>.
               {skillToDelete?.id.startsWith('local-') || skillToDelete?.id.startsWith('fallback-') ? (
                 <span className="block mt-2 text-yellow-500 font-medium">
-                  This is a local/demo skill and cannot be deleted from Firebase.
+                  Note: Local/demo skills cannot be deleted from Firebase.
                 </span>
-              ) : null}
+              ) : (
+                <span className="block mt-2 text-red-500">
+                  This action cannot be undone.
+                </span>
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel 
-              onClick={() => setSkillToDelete(null)}
-              className="bg-background text-foreground border-input hover:bg-accent hover:text-accent-foreground"
-            >
-              Cancel
-            </AlertDialogCancel>
+            <AlertDialogCancel className="bg-background text-foreground border-input hover:bg-accent hover:text-accent-foreground">Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDeleteSkill}
-              disabled={skillToDelete?.id.startsWith('local-') || skillToDelete?.id.startsWith('fallback-')}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Delete
@@ -842,7 +844,7 @@ export function SkillsManager() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel 
+            <AlertDialogCancel
               onClick={() => setBulkDeleteOpen(false)}
               className="bg-background text-foreground border-input hover:bg-accent hover:text-accent-foreground"
             >

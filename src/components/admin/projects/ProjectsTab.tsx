@@ -48,12 +48,13 @@ interface ProjectsTabProps {
 }
 
 export function ProjectsTab({ className }: ProjectsTabProps) {
-  const { projects, loading } = useProjects();
+  const { projects, loading, deleteProject, refetch } = useProjects();
   const [viewMode, setViewMode] = useState<ViewMode>("table");
   const [selectedProjects, setSelectedProjects] = useState<Project[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [showBulkActions, setShowBulkActions] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // Filter and search state
   const [searchQuery, setSearchQuery] = useState("");
@@ -96,6 +97,31 @@ export function ProjectsTab({ className }: ProjectsTabProps) {
     setEditingProject(project);
     setShowForm(true);
   }, []);
+
+  const handleDeleteProject = useCallback(async (project: Project) => {
+    if (!confirm(`Are you sure you want to delete "${project.title}"? This action cannot be undone.`)) {
+      return;
+    }
+
+    setDeletingId(project.id);
+    try {
+      await deleteProject(project.id);
+      toast({
+        title: "Project deleted",
+        description: `"${project.title}" has been deleted successfully.`,
+      });
+      await refetch();
+    } catch (error) {
+      console.error("Error deleting project:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete project. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setDeletingId(null);
+    }
+  }, [deleteProject, refetch]);
 
   const handleFormClose = useCallback(() => {
     setShowForm(false);
@@ -268,12 +294,13 @@ export function ProjectsTab({ className }: ProjectsTabProps) {
     },
     createActionColumnDef({
       onEdit: handleEditProject,
+      onDelete: handleDeleteProject,
     }),
-  ], [selectedProjects, handleSelectAll, handleProjectSelect, handleEditProject]);
+  ], [selectedProjects, handleSelectAll, handleProjectSelect, handleEditProject, handleDeleteProject]);
 
   return (
-    <div className={className}>
-      <Card className="border-0 shadow-medium">
+    <div className={`${className} w-full`}>
+      <Card className="border-0 shadow-medium w-full">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
@@ -375,6 +402,7 @@ export function ProjectsTab({ className }: ProjectsTabProps) {
                     selected={selectedProjects.some(p => p.id === project.id)}
                     onSelect={(selected) => handleProjectSelect(project, selected)}
                     onEdit={() => handleEditProject(project)}
+                    onDelete={() => handleDeleteProject(project)}
                   />
                 ))}
               </div>
@@ -400,7 +428,10 @@ export function ProjectsTab({ className }: ProjectsTabProps) {
           
           <ProjectForm
             project={editingProject}
-            onSubmit={handleFormClose}
+            onSubmit={async () => {
+              await refetch();
+              handleFormClose();
+            }}
             onCancel={handleFormClose}
             mode={editingProject ? "edit" : "create"}
           />

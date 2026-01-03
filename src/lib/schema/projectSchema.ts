@@ -177,7 +177,7 @@ export const ProjectSchema = z.object({
       (val) => val.trim().length > 0,
       { message: 'Title cannot be just whitespace' }
     ),
-  
+
   description: z.string()
     .min(10, 'Description must be at least 10 characters')
     .max(500, 'Description must be less than 500 characters')
@@ -186,7 +186,7 @@ export const ProjectSchema = z.object({
       (val) => val.trim().length >= 10,
       { message: 'Description must contain meaningful content' }
     ),
-  
+
   longDescription: z.string()
     .max(5000, 'Long description must be less than 5000 characters')
     .trim()
@@ -196,11 +196,11 @@ export const ProjectSchema = z.object({
   category: z.nativeEnum(ProjectCategory, {
     errorMap: () => ({ message: 'Please select a valid project category' })
   }),
-  
+
   status: z.nativeEnum(ProjectStatus, {
     errorMap: () => ({ message: 'Please select a valid project status' })
   }).default(ProjectStatus.COMPLETED),
-  
+
   priority: z.nativeEnum(ProjectPriority).default(ProjectPriority.MEDIUM),
 
   // Technical Details
@@ -214,6 +214,14 @@ export const ProjectSchema = z.object({
   images: z.array(ProjectImageSchema).default([]),
   links: z.array(ProjectLinkSchema).default([]),
   icon: z.string().optional(),
+
+  // Legacy/Flat fields for form compatibility
+  image: urlSchema,
+  logo: urlSchema,
+  liveUrl: urlSchema,
+  githubUrl: githubUrlSchema,
+  demoUrl: urlSchema,
+  caseStudyUrl: urlSchema,
 
   // Project Details
   featured: z.boolean().default(false),
@@ -234,7 +242,7 @@ export const ProjectSchema = z.object({
     .min(1, 'Team size must be at least 1')
     .max(100, 'Team size cannot exceed 100')
     .default(1),
-  
+
   role: z.string()
     .min(1, 'Role is required')
     .max(100, 'Role must be less than 100 characters')
@@ -340,12 +348,12 @@ const ProjectSchemaBase = z.object({
     .min(1, 'Title is required')
     .max(100, 'Title must be less than 100 characters')
     .trim(),
-  
+
   description: z.string()
     .min(10, 'Description must be at least 10 characters')
     .max(500, 'Description must be less than 500 characters')
     .trim(),
-  
+
   longDescription: z.string()
     .max(5000, 'Long description must be less than 5000 characters')
     .trim()
@@ -355,11 +363,11 @@ const ProjectSchemaBase = z.object({
   category: z.nativeEnum(ProjectCategory, {
     errorMap: () => ({ message: 'Please select a valid project category' })
   }),
-  
+
   status: z.nativeEnum(ProjectStatus, {
     errorMap: () => ({ message: 'Please select a valid project status' })
   }).default(ProjectStatus.COMPLETED),
-  
+
   priority: z.nativeEnum(ProjectPriority).default(ProjectPriority.MEDIUM),
 
   // Technical Details
@@ -393,7 +401,7 @@ const ProjectSchemaBase = z.object({
     .min(1, 'Team size must be at least 1')
     .max(100, 'Team size cannot exceed 100')
     .default(1),
-  
+
   role: z.string()
     .min(1, 'Role is required')
     .max(100, 'Role must be less than 100 characters')
