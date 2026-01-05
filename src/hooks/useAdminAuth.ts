@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { User, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
-import { auth, isFirebaseEnabled } from '@/lib/firebase';
+import { User, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInWithPopup } from 'firebase/auth';
+import { auth, isFirebaseEnabled, GithubAuthProvider } from '@/lib/firebase';
 
 interface AuthState {
   user: User | null;
@@ -70,6 +70,36 @@ export function useAdminAuth() {
     }
   };
 
+  const loginWithGitHub = async (): Promise<void> => {
+    if (!auth) {
+      throw new Error('Firebase Auth is not available');
+    }
+
+    setAuthState(prev => ({
+      ...prev,
+      loading: true,
+      error: null,
+    }));
+
+    try {
+      const provider = new GithubAuthProvider();
+      // Add scopes if needed
+      // provider.addScope('repo');
+      // provider.addScope('user:email');
+      
+      await signInWithPopup(auth, provider);
+      // User state will be updated by onAuthStateChanged
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'GitHub login failed. Please try again.';
+      setAuthState(prev => ({
+        ...prev,
+        loading: false,
+        error: errorMessage,
+      }));
+      throw error;
+    }
+  };
+
   const clearError = () => {
     setAuthState(prev => ({
       ...prev,
@@ -88,6 +118,7 @@ export function useAdminAuth() {
     canUseAdmin,
     login,
     logout,
+    loginWithGitHub,
     clearError,
   };
 }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Shield, Zap } from 'lucide-react';
+import { Shield, Zap, Github } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -13,7 +13,7 @@ interface LoginFormProps {
 export function LoginForm({ onSuccess }: LoginFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { login, loading, error, clearError } = useAdminAuth();
+  const { login, loading, error, clearError, loginWithGitHub } = useAdminAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -124,6 +124,36 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
                 </span>
               </Button>
             </form>
+            
+            {/* GitHub Login Option */}
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-white/20"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-4 bg-transparent text-white/60 text-xs">OR CONTINUE WITH</span>
+              </div>
+            </div>
+            
+            <Button
+              type="button"
+              variant="outline"
+              onClick={async () => {
+                try {
+                  clearError();
+                  await loginWithGitHub();
+                } catch (err) {
+                  console.error('GitHub login failed:', err);
+                }
+              }}
+              disabled={loading}
+              className="w-full h-14 border-white/30 text-white hover:bg-white/10 transition-all duration-300 relative overflow-hidden group"
+            >
+              <span className="relative z-10 flex items-center justify-center gap-2">
+                <Github className="w-5 h-5" />
+                Continue with GitHub
+              </span>
+            </Button>
             
             {/* Footer */}
             <div className="text-center pt-4">

@@ -1,6 +1,6 @@
 import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
 import { getFirestore, type Firestore, connectFirestoreEmulator } from "firebase/firestore";
-import { getAuth, type Auth, connectAuthEmulator } from "firebase/auth";
+import { getAuth, type Auth, connectAuthEmulator, GithubAuthProvider } from "firebase/auth";
 import { getAnalytics, type Analytics } from "firebase/analytics";
 import { getStorage, type FirebaseStorage } from "firebase/storage";
 
@@ -114,13 +114,9 @@ if (isFirebaseEnabled) {
     // Connect to emulators in development - disabled to avoid connection issues in production
     if (import.meta.env.DEV && typeof window !== 'undefined' && import.meta.env.VITE_FIREBASE_USE_EMULATORS === 'true') {
       try {
-        // Only connect if not already connected
-        if (auth && !auth._delegate._config?.emulator) {
-          connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
-        }
-        if (db && !db._delegate._databaseId?.projectId?.includes('demo-')) {
-          connectFirestoreEmulator(db, 'localhost', 8081);
-        }
+        // Connect to emulators
+        connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
+        connectFirestoreEmulator(db, 'localhost', 8081);
       } catch (error) {
         console.log('Firebase emulators not available, using production');
       }
@@ -138,4 +134,4 @@ if (isFirebaseEnabled) {
   }
 }
 
-export { app, db, auth, analytics, firebaseConfig, storage };
+export { app, db, auth, analytics, firebaseConfig, storage, GithubAuthProvider };

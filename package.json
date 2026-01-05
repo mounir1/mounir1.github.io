@@ -8,6 +8,7 @@
     "start": "vite",
     "dev": "vite",
     "build": "vite build",
+    "build:prod": "vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext .ts,.tsx",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",

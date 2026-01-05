@@ -47,16 +47,6 @@ export default defineConfig(({ mode }) => ({
           }
           return `assets/[name]-[hash][extname]`;
         },
-        manualChunks: {
-          // Split large libraries into separate chunks
-          vendor: ['react', 'react-dom', 'react-router-dom'],
-          ui: ['lucide-react', '@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
-          forms: ['react-hook-form', 'zod'],
-          animation: ['framer-motion'],
-          charts: ['recharts', 'd3-array'],
-          firebase: ['firebase', 'firebase/auth', 'firebase/firestore'],
-          utils: ['date-fns', 'clsx', 'tailwind-merge'],
-        },
       },
       // keep default dependency graph ordering to avoid premature execution
     },

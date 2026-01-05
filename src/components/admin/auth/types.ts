@@ -40,3 +40,15 @@ export interface User {
   avatar?: string;
   lastLogin?: Date;
 }
+
+export interface UseAdminAuthReturn {
+  user: User | null;
+  loading: boolean;
+  error: string | null;
+  isAuthenticated: boolean;
+  canUseAdmin: boolean;
+  login: (credentials: LoginCredentials) => Promise<void>;
+  logout: () => Promise<void>;
+  loginWithGitHub: () => Promise<void>;
+  clearError: () => void;
+}
