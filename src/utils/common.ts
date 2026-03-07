@@ -93,7 +93,7 @@ export const performanceUtils = {
   /**
    * Debounce function calls
    */
-  debounce: <T extends (...args: any[]) => any>(
+  debounce: <T extends (...args: unknown[]) => unknown>(
     func: T,
     delay: number
   ): ((...args: Parameters<T>) => void) => {
@@ -107,7 +107,7 @@ export const performanceUtils = {
   /**
    * Throttle function calls
    */
-  throttle: <T extends (...args: any[]) => any>(
+  throttle: <T extends (...args: unknown[]) => unknown>(
     func: T,
     limit: number
   ): ((...args: Parameters<T>) => void) => {
@@ -225,11 +225,11 @@ export const dataUtils = {
     if (obj instanceof Date) return new Date(obj.getTime()) as unknown as T;
     if (obj instanceof Array) return obj.map(item => dataUtils.deepClone(item)) as unknown as T;
     if (typeof obj === 'object') {
-      const cloned = {} as T;
+      const cloned = {} as Record<string, unknown>;
       Object.keys(obj).forEach(key => {
-        (cloned as any)[key] = dataUtils.deepClone((obj as any)[key]);
+        cloned[key] = dataUtils.deepClone((obj as Record<string, unknown>)[key]);
       });
-      return cloned;
+      return cloned as T;
     }
     return obj;
   },
