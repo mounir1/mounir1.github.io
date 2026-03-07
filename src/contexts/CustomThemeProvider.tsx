@@ -8,9 +8,13 @@ interface CustomThemeContextType {
   setTheme: (theme: CustomTheme) => void;
 }
 
-const CustomThemeContext = createContext<CustomThemeContextType | undefined>(undefined);
+const CustomThemeContext = createContext<CustomThemeContextType | undefined>(
+  undefined
+);
 
-export const CustomThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const CustomThemeProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [theme, setTheme] = useState<CustomTheme>('default');
 
   const themeValue = useMemo(() => ({ theme, setTheme }), [theme]);

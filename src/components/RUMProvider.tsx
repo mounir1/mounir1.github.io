@@ -32,10 +32,10 @@ const defaultRUMConfig: RUMConfig = {
   enableLocalStorage: true,
 };
 
-export const RUMProvider: React.FC<RUMProviderProps> = ({ 
-  children, 
-  config = {}, 
-  enabled = true 
+export const RUMProvider: React.FC<RUMProviderProps> = ({
+  children,
+  config = {},
+  enabled = true,
 }) => {
   const rumRef = useRef<RealUserMonitoring | null>(null);
 
@@ -54,7 +54,7 @@ export const RUMProvider: React.FC<RUMProviderProps> = ({
       enableLocalStorage: true,
       apiEndpoint: process.env.VITE_RUM_API_ENDPOINT,
       apiKey: process.env.VITE_RUM_API_KEY,
-      ...config
+      ...config,
     };
 
     rumRef.current = RealUserMonitoring.initialize(rumConfig);
@@ -64,12 +64,12 @@ export const RUMProvider: React.FC<RUMProviderProps> = ({
     rumRef.current.recordCustomMetric('UserAgent', navigator.userAgent);
     rumRef.current.recordCustomMetric('Viewport', {
       width: window.innerWidth,
-      height: window.innerHeight
+      height: window.innerHeight,
     });
     rumRef.current.recordCustomMetric('Screen', {
       width: screen.width,
       height: screen.height,
-      colorDepth: screen.colorDepth
+      colorDepth: screen.colorDepth,
     });
 
     // Track React-specific metrics
@@ -104,7 +104,7 @@ export const RUMProvider: React.FC<RUMProviderProps> = ({
     if (rumRef.current) {
       rumRef.current.recordError({
         ...error,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
     }
   };
@@ -122,9 +122,7 @@ export const RUMProvider: React.FC<RUMProviderProps> = ({
   };
 
   return (
-    <RUMContext.Provider value={contextValue}>
-      {children}
-    </RUMContext.Provider>
+    <RUMContext.Provider value={contextValue}>{children}</RUMContext.Provider>
   );
 };
 
@@ -141,7 +139,7 @@ export function withRUMTracking<P extends object>(
   WrappedComponent: React.ComponentType<P>,
   componentName?: string
 ) {
-  const TrackedComponent: React.FC<P> = (props) => {
+  const TrackedComponent: React.FC<P> = props => {
     const { recordMetric, recordCustomMetric } = useRUM();
     const renderStartRef = useRef<number>(0);
     const mountTimeRef = useRef<number>(0);
@@ -149,13 +147,19 @@ export function withRUMTracking<P extends object>(
     useEffect(() => {
       // Record component mount time
       mountTimeRef.current = Date.now();
-      recordCustomMetric(`${componentName || WrappedComponent.name}_MountTime`, mountTimeRef.current);
+      recordCustomMetric(
+        `${componentName || WrappedComponent.name}_MountTime`,
+        mountTimeRef.current
+      );
 
       return () => {
         // Record component unmount time
         const unmountTime = Date.now();
         const lifespan = unmountTime - mountTimeRef.current;
-        recordMetric(`${componentName || WrappedComponent.name}_Lifespan`, lifespan);
+        recordMetric(
+          `${componentName || WrappedComponent.name}_Lifespan`,
+          lifespan
+        );
       };
     }, [recordMetric, recordCustomMetric]);
 
@@ -163,7 +167,10 @@ export function withRUMTracking<P extends object>(
       // Record render time
       const renderTime = Date.now() - renderStartRef.current;
       if (renderTime > 0) {
-        recordMetric(`${componentName || WrappedComponent.name}_RenderTime`, renderTime);
+        recordMetric(
+          `${componentName || WrappedComponent.name}_RenderTime`,
+          renderTime
+        );
       }
     });
 
@@ -185,10 +192,10 @@ export const useRUMInteraction = () => {
   const trackInteraction = (name: string, startTime?: number) => {
     const endTime = Date.now();
     const duration = startTime ? endTime - startTime : 0;
-    
+
     recordCustomMetric(`Interaction_${name}`, {
       timestamp: endTime,
-      duration: duration
+      duration: duration,
     });
 
     if (duration > 0) {
@@ -204,15 +211,19 @@ export const useRUMInteraction = () => {
     recordCustomMetric('Navigation', {
       from,
       to,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
   };
 
-  const trackFormSubmission = (formName: string, success: boolean, duration?: number) => {
+  const trackFormSubmission = (
+    formName: string,
+    success: boolean,
+    duration?: number
+  ) => {
     recordCustomMetric(`Form_${formName}`, {
       success,
       timestamp: Date.now(),
-      duration
+      duration,
     });
   };
 
@@ -220,6 +231,6 @@ export const useRUMInteraction = () => {
     trackInteraction,
     trackClick,
     trackNavigation,
-    trackFormSubmission
+    trackFormSubmission,
   };
 };

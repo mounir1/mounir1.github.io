@@ -11,14 +11,15 @@ import { BaseCardProps } from '@/lib/shared/types';
 const cardVariants = {
   default: 'bg-card text-card-foreground border border-border',
   outlined: 'bg-transparent border-2 border-border hover:border-primary/50',
-  elevated: 'bg-card text-card-foreground border border-border shadow-lg hover:shadow-xl',
-  ghost: 'bg-transparent border-0 hover:bg-muted/50'
+  elevated:
+    'bg-card text-card-foreground border border-border shadow-lg hover:shadow-xl',
+  ghost: 'bg-transparent border-0 hover:bg-muted/50',
 };
 
 const sizeVariants = {
   sm: 'p-3 rounded-md',
   md: 'p-4 rounded-lg',
-  lg: 'p-6 rounded-xl'
+  lg: 'p-6 rounded-xl',
 };
 
 export const BaseCard: React.FC<BaseCardProps> = ({
@@ -43,14 +44,12 @@ export const BaseCard: React.FC<BaseCardProps> = ({
       {(title || description) && (
         <div className="mb-4">
           {title && (
-            <h3 className="text-lg font-semibold text-foreground mb-1">
+            <h3 className="mb-1 text-lg font-semibold text-foreground">
               {title}
             </h3>
           )}
           {description && (
-            <p className="text-sm text-muted-foreground">
-              {description}
-            </p>
+            <p className="text-sm text-muted-foreground">{description}</p>
           )}
         </div>
       )}
@@ -73,25 +72,22 @@ export const CardHeader: React.FC<CardHeaderProps> = ({
   ...props
 }) => {
   return (
-    <div className={cn('flex items-start justify-between mb-4', className)} {...props}>
+    <div
+      className={cn('mb-4 flex items-start justify-between', className)}
+      {...props}
+    >
       <div className="flex-1">
         {title && (
-          <h3 className="text-lg font-semibold text-foreground mb-1">
+          <h3 className="mb-1 text-lg font-semibold text-foreground">
             {title}
           </h3>
         )}
         {description && (
-          <p className="text-sm text-muted-foreground">
-            {description}
-          </p>
+          <p className="text-sm text-muted-foreground">{description}</p>
         )}
         {children}
       </div>
-      {actions && (
-        <div className="flex items-center gap-2 ml-4">
-          {actions}
-        </div>
-      )}
+      {actions && <div className="ml-4 flex items-center gap-2">{actions}</div>}
     </div>
   );
 };
@@ -116,7 +112,10 @@ export const CardFooter: React.FC<BaseCardProps> = ({
   ...props
 }) => {
   return (
-    <div className={cn('mt-4 pt-4 border-t border-border', className)} {...props}>
+    <div
+      className={cn('mt-4 border-t border-border pt-4', className)}
+      {...props}
+    >
       {children}
     </div>
   );
@@ -136,12 +135,8 @@ export const CardActions: React.FC<CardActionsProps> = ({
   const alignClasses = ALIGN_CLASSES;
 
   return (
-    <div 
-      className={cn(
-        'flex items-center gap-2',
-        alignClasses[align],
-        className
-      )} 
+    <div
+      className={cn('flex items-center gap-2', alignClasses[align], className)}
       {...props}
     >
       {children}

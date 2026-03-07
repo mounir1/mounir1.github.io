@@ -1,21 +1,21 @@
-import { 
-  collection, 
-  doc, 
-  getDocs, 
-  getDoc, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
-  query, 
-  orderBy, 
-  where, 
+import {
+  collection,
+  doc,
+  getDocs,
+  getDoc,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  orderBy,
+  where,
   limit,
   onSnapshot,
   serverTimestamp,
   writeBatch,
   type DocumentData,
   type QuerySnapshot,
-  type Unsubscribe
+  type Unsubscribe,
 } from 'firebase/firestore';
 import { db, isFirebaseEnabled } from './firebase';
 import type { Project, ProjectInput } from '@/types/project';
@@ -25,10 +25,10 @@ import type { Experience, ExperienceInput } from '@/types/experience';
 // Collection names
 export const COLLECTIONS = {
   PROJECTS: 'projects',
-  SKILLS: 'skills', 
+  SKILLS: 'skills',
   EXPERIENCES: 'experiences',
   PORTFOLIO_CONFIG: 'portfolio_config',
-  ANALYTICS: 'analytics'
+  ANALYTICS: 'analytics',
 } as const;
 
 // Base data service class
@@ -43,7 +43,10 @@ class FirebaseDataService {
   }
 
   // Generic CRUD operations
-  async create<T extends DocumentData>(collectionName: string, data: T): Promise<string> {
+  async create<T extends DocumentData>(
+    collectionName: string,
+    data: T
+  ): Promise<string> {
     if (!this.isEnabled || !db) {
       throw new Error('Firebase not available');
     }
@@ -52,7 +55,7 @@ class FirebaseDataService {
       const docRef = await addDoc(collection(db, collectionName), {
         ...data,
         createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
+        updatedAt: serverTimestamp(),
       });
       console.log(`✅ Created document in ${collectionName}:`, docRef.id);
       return docRef.id;
@@ -70,7 +73,7 @@ class FirebaseDataService {
     try {
       const docRef = doc(db, collectionName, docId);
       const docSnap = await getDoc(docRef);
-      
+
       if (docSnap.exists()) {
         return { id: docSnap.id, ...docSnap.data() } as T;
       }
@@ -81,34 +84,48 @@ class FirebaseDataService {
     }
   }
 
-  async readAll<T>(collectionName: string, orderByField = 'createdAt', limitCount?: number): Promise<T[]> {
+  async readAll<T>(
+    collectionName: string,
+    orderByField = 'createdAt',
+    limitCount?: number
+  ): Promise<T[]> {
     if (!this.isEnabled || !db) {
       return [];
     }
 
     try {
-      let q = query(collection(db, collectionName), orderBy(orderByField, 'desc'));
-      
+      let q = query(
+        collection(db, collectionName),
+        orderBy(orderByField, 'desc')
+      );
+
       if (limitCount) {
         q = query(q, limit(limitCount));
       }
 
       const querySnapshot = await getDocs(q);
       const results: T[] = [];
-      
-      querySnapshot.forEach((doc) => {
+
+      querySnapshot.forEach(doc => {
         results.push({ id: doc.id, ...doc.data() } as T);
       });
 
       console.log(`✅ Read ${results.length} documents from ${collectionName}`);
       return results;
     } catch (error) {
-      console.error(`❌ Error reading documents from ${collectionName}:`, error);
+      console.error(
+        `❌ Error reading documents from ${collectionName}:`,
+        error
+      );
       return [];
     }
   }
 
-  async update<T extends Partial<DocumentData>>(collectionName: string, docId: string, data: T): Promise<void> {
+  async update<T extends Partial<DocumentData>>(
+    collectionName: string,
+    docId: string,
+    data: T
+  ): Promise<void> {
     if (!this.isEnabled || !db) {
       throw new Error('Firebase not available');
     }
@@ -117,7 +134,7 @@ class FirebaseDataService {
       const docRef = doc(db, collectionName, docId);
       await updateDoc(docRef, {
         ...data,
-        updatedAt: serverTimestamp()
+        updatedAt: serverTimestamp(),
       });
       console.log(`✅ Updated document in ${collectionName}:`, docId);
     } catch (error) {
@@ -136,14 +153,17 @@ class FirebaseDataService {
       await deleteDoc(docRef);
       console.log(`✅ Deleted document from ${collectionName}:`, docId);
     } catch (error) {
-      console.error(`❌ Error deleting document from ${collectionName}:`, error);
+      console.error(
+        `❌ Error deleting document from ${collectionName}:`,
+        error
+      );
       throw error;
     }
   }
 
   // Real-time subscription
   subscribe<T>(
-    collectionName: string, 
+    collectionName: string,
     callback: (data: T[]) => void,
     orderByField = 'createdAt'
   ): Unsubscribe | null {
@@ -151,22 +171,29 @@ class FirebaseDataService {
       return null;
     }
 
-    const q = query(collection(db, collectionName), orderBy(orderByField, 'desc'));
-    
-    return onSnapshot(q, (snapshot) => {
-      const results: T[] = [];
-      snapshot.forEach((doc) => {
-        results.push({ id: doc.id, ...doc.data() } as T);
-      });
-      callback(results);
-    }, (error) => {
-      console.error(`❌ Error in subscription for ${collectionName}:`, error);
-    });
+    const q = query(
+      collection(db, collectionName),
+      orderBy(orderByField, 'desc')
+    );
+
+    return onSnapshot(
+      q,
+      snapshot => {
+        const results: T[] = [];
+        snapshot.forEach(doc => {
+          results.push({ id: doc.id, ...doc.data() } as T);
+        });
+        callback(results);
+      },
+      error => {
+        console.error(`❌ Error in subscription for ${collectionName}:`, error);
+      }
+    );
   }
 
   // Batch operations
   async batchUpdate<T extends Record<string, any>>(
-    collectionName: string, 
+    collectionName: string,
     updates: Array<{ id: string; data: Partial<T> }>
   ): Promise<void> {
     if (!this.isEnabled || !db) {
@@ -175,17 +202,19 @@ class FirebaseDataService {
 
     try {
       const batch = writeBatch(db);
-      
+
       updates.forEach(({ id, data }) => {
         const docRef = doc(db, collectionName, id);
         batch.update(docRef, {
           ...data,
-          updatedAt: serverTimestamp()
+          updatedAt: serverTimestamp(),
         });
       });
 
       await batch.commit();
-      console.log(`✅ Batch updated ${updates.length} documents in ${collectionName}`);
+      console.log(
+        `✅ Batch updated ${updates.length} documents in ${collectionName}`
+      );
     } catch (error) {
       console.error(`❌ Error in batch update for ${collectionName}:`, error);
       throw error;
@@ -221,8 +250,8 @@ class FirebaseDataService {
 
       const querySnapshot = await getDocs(q);
       const results: T[] = [];
-      
-      querySnapshot.forEach((doc) => {
+
+      querySnapshot.forEach(doc => {
         results.push({ id: doc.id, ...doc.data() } as T);
       });
 
@@ -241,7 +270,10 @@ class FirebaseDataService {
 
     try {
       // Try to read a document to test connection
-      const testQuery = query(collection(db, COLLECTIONS.PORTFOLIO_CONFIG), limit(1));
+      const testQuery = query(
+        collection(db, COLLECTIONS.PORTFOLIO_CONFIG),
+        limit(1)
+      );
       await getDocs(testQuery);
       return true;
     } catch (error) {
@@ -287,7 +319,9 @@ export class ProjectService extends FirebaseDataService {
     return this.delete(COLLECTIONS.PROJECTS, id);
   }
 
-  subscribeToProjects(callback: (projects: Project[]) => void): Unsubscribe | null {
+  subscribeToProjects(
+    callback: (projects: Project[]) => void
+  ): Unsubscribe | null {
     return this.subscribe<Project>(COLLECTIONS.PROJECTS, callback, 'priority');
   }
 }
@@ -339,7 +373,10 @@ export class ExperienceService extends FirebaseDataService {
     return this.readAll<Experience>(COLLECTIONS.EXPERIENCES, 'startDate');
   }
 
-  async updateExperience(id: string, data: Partial<ExperienceInput>): Promise<void> {
+  async updateExperience(
+    id: string,
+    data: Partial<ExperienceInput>
+  ): Promise<void> {
     return this.update(COLLECTIONS.EXPERIENCES, id, data);
   }
 
@@ -347,8 +384,14 @@ export class ExperienceService extends FirebaseDataService {
     return this.delete(COLLECTIONS.EXPERIENCES, id);
   }
 
-  subscribeToExperiences(callback: (experiences: Experience[]) => void): Unsubscribe | null {
-    return this.subscribe<Experience>(COLLECTIONS.EXPERIENCES, callback, 'startDate');
+  subscribeToExperiences(
+    callback: (experiences: Experience[]) => void
+  ): Unsubscribe | null {
+    return this.subscribe<Experience>(
+      COLLECTIONS.EXPERIENCES,
+      callback,
+      'startDate'
+    );
   }
 }
 

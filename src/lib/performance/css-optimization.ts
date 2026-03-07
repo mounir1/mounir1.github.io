@@ -16,12 +16,19 @@ export class CriticalCSSManager {
   private extractCriticalCSS() {
     // Extract above-the-fold CSS
     const criticalSelectors = [
-      'body', 'html',
-      '.header', '.nav', '.hero',
-      '.loading', '.spinner',
-      '.btn-primary', '.btn-secondary',
-      '.card', '.container',
-      '.grid', '.flex',
+      'body',
+      'html',
+      '.header',
+      '.nav',
+      '.hero',
+      '.loading',
+      '.spinner',
+      '.btn-primary',
+      '.btn-secondary',
+      '.card',
+      '.container',
+      '.grid',
+      '.flex',
       // Add more critical selectors based on your design
     ];
 
@@ -29,7 +36,7 @@ export class CriticalCSSManager {
     // - Critical (npm package)
     // - Puppeteer to analyze above-the-fold content
     // - PostCSS plugins
-    
+
     this.criticalCSS = this.generateCriticalCSS(criticalSelectors);
   }
 
@@ -72,7 +79,7 @@ export class CriticalCSSManager {
         resolve();
       };
       link.onerror = reject;
-      
+
       document.head.appendChild(link);
     });
   }
@@ -90,7 +97,7 @@ export class CriticalCSSManager {
       stylesheet.href = href;
       document.head.appendChild(stylesheet);
     };
-    
+
     document.head.appendChild(link);
   }
 }
@@ -227,7 +234,9 @@ export class CSSInJSOptimizer {
   private styleCache: Map<string, HTMLStyleElement> = new Map();
   private classNameCache: Map<string, string> = new Map();
 
-  public createOptimizedStyles(styles: Record<string, any>): Record<string, string> {
+  public createOptimizedStyles(
+    styles: Record<string, any>
+  ): Record<string, string> {
     const optimizedStyles: Record<string, string> = {};
 
     Object.entries(styles).forEach(([key, value]) => {
@@ -259,7 +268,7 @@ export class CSSInJSOptimizer {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
       const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash; // Convert to 32-bit integer
     }
     return Math.abs(hash).toString(36);
@@ -303,11 +312,11 @@ export class CSSPerformanceMonitor {
     totalCSSSize: 0,
     renderBlockingCSS: 0,
     unusedCSS: 0,
-    criticalCSS: 0
+    criticalCSS: 0,
   };
 
   public analyzeCSS(): Promise<typeof this.metrics> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       if (typeof document === 'undefined') {
         resolve(this.metrics);
         return;
@@ -328,7 +337,9 @@ export class CSSPerformanceMonitor {
             totalSize += estimatedSize;
 
             // Check if render-blocking
-            const link = document.querySelector(`link[href="${stylesheet.href}"]`) as HTMLLinkElement;
+            const link = document.querySelector(
+              `link[href="${stylesheet.href}"]`
+            ) as HTMLLinkElement;
             if (link && link.media !== 'print' && !link.hasAttribute('async')) {
               renderBlocking++;
             }
@@ -356,7 +367,7 @@ export class CSSPerformanceMonitor {
     // - PurgeCSS
     // - UnCSS
     // - Chrome DevTools Coverage API
-    
+
     if (typeof document === 'undefined') return 0;
 
     const allElements = document.querySelectorAll('*');
@@ -371,7 +382,7 @@ export class CSSPerformanceMonitor {
     // Estimate unused CSS (very rough approximation)
     const totalClasses = document.styleSheets.length * 100; // Rough estimate
     const unusedClasses = Math.max(0, totalClasses - usedClasses.size);
-    
+
     return unusedClasses * 30; // Rough size estimate per class
   }
 
@@ -391,7 +402,9 @@ export class CSSPerformanceMonitor {
     }
 
     if (this.metrics.criticalCSS === 0) {
-      recommendations.push('Implement critical CSS inlining for faster initial render');
+      recommendations.push(
+        'Implement critical CSS inlining for faster initial render'
+      );
     }
 
     return recommendations;
@@ -417,17 +430,17 @@ export const cssOptimization = {
   generateCSSCustomProperties: (theme: Record<string, any>): string => {
     const flattenObject = (obj: any, prefix = ''): Record<string, string> => {
       const result: Record<string, string> = {};
-      
+
       Object.entries(obj).forEach(([key, value]) => {
         const newKey = prefix ? `${prefix}-${key}` : key;
-        
+
         if (typeof value === 'object' && value !== null) {
           Object.assign(result, flattenObject(value, newKey));
         } else {
           result[`--${newKey}`] = String(value);
         }
       });
-      
+
       return result;
     };
 
@@ -440,13 +453,13 @@ export const cssOptimization = {
   // Optimize CSS for production
   optimizeForProduction: (css: string): string => {
     let optimized = cssOptimization.minifyCSS(css);
-    
+
     // Remove unused vendor prefixes (simplified)
     optimized = optimized.replace(/-webkit-[^:]+:[^;]+;/g, '');
     optimized = optimized.replace(/-moz-[^:]+:[^;]+;/g, '');
-    
+
     return optimized;
-  }
+  },
 };
 
 // Initialize CSS optimization
@@ -473,6 +486,6 @@ export const initializeCSSOptimization = () => {
   return {
     criticalCSS,
     modernCSS,
-    monitor
+    monitor,
   };
 };

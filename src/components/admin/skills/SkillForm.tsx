@@ -1,28 +1,44 @@
-import React, { useState } from "react";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { Slider } from "@/components/ui/slider";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import type { SkillInput } from "@/hooks/useSkills";
-import type { Skill } from "@/types/skill";
-import { SkillCategory } from "@/lib/schema/types";
+import React, { useState } from 'react';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Slider } from '@/components/ui/slider';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import type { SkillInput } from '@/hooks/useSkills';
+import type { Skill } from '@/types/skill';
+import { SkillCategory } from '@/lib/schema/types';
 
 const formSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  category: z.string().min(1, "Category is required"),
+  name: z.string().min(1, 'Name is required'),
+  category: z.string().min(1, 'Category is required'),
   level: z.coerce.number().min(1).max(100),
   proficiency: z.coerce.number().min(0).max(100).default(50),
-  experience: z.object({
-    years: z.coerce.number().min(0).default(1),
-    months: z.coerce.number().min(0).max(11).default(0),
-  }).default({ years: 1, months: 0 }),
+  experience: z
+    .object({
+      years: z.coerce.number().min(0).default(1),
+      months: z.coerce.number().min(0).max(11).default(0),
+    })
+    .default({ years: 1, months: 0 }),
   description: z.string().optional(),
   featured: z.boolean().default(false),
   disabled: z.boolean().default(false),
@@ -43,34 +59,36 @@ export type SkillFormProps = {
   error?: string;
 };
 
-export const SkillForm: React.FC<SkillFormProps> = ({ 
-  mode, 
-  skill, 
-  onSubmit, 
-  onCancel, 
-  loading = false, 
-  error 
+export const SkillForm: React.FC<SkillFormProps> = ({
+  mode,
+  skill,
+  onSubmit,
+  onCancel,
+  loading = false,
+  error,
 }) => {
-  const [proficiencyValue, setProficiencyValue] = useState(skill?.proficiency || 50);
+  const [proficiencyValue, setProficiencyValue] = useState(
+    skill?.proficiency || 50
+  );
   const [tagsInput, setTagsInput] = useState(skill?.tags?.join(', ') || '');
 
   const form = useForm<SkillFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: skill?.name || "",
-      category: skill?.category || "",
-      level: typeof skill?.level === 'string' ? 50 : (skill?.level || 50),
+      name: skill?.name || '',
+      category: skill?.category || '',
+      level: typeof skill?.level === 'string' ? 50 : skill?.level || 50,
       proficiency: skill?.proficiency || 50,
       experience: {
         years: skill?.experience?.years || 1,
         months: skill?.experience?.months || 0,
       },
-      description: skill?.description || "",
+      description: skill?.description || '',
       featured: skill?.featured || false,
       disabled: skill?.disabled || false,
       priority: skill?.priority || 50,
-      icon: skill?.icon || "",
-      color: skill?.color || "",
+      icon: skill?.icon || '',
+      color: skill?.color || '',
       tags: skill?.tags || [],
     },
   });
@@ -108,7 +126,7 @@ export const SkillForm: React.FC<SkillFormProps> = ({
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">{getFormTitle()}</h2>
-      
+
       {error && (
         <Alert variant="destructive">
           <AlertDescription>{error}</AlertDescription>
@@ -116,7 +134,10 @@ export const SkillForm: React.FC<SkillFormProps> = ({
       )}
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmitHandler)} className="space-y-6">
+        <form
+          onSubmit={form.handleSubmit(onSubmitHandler)}
+          className="space-y-6"
+        >
           <FormField
             control={form.control}
             name="name"
@@ -144,9 +165,11 @@ export const SkillForm: React.FC<SkillFormProps> = ({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {categories.map((category) => (
+                    {categories.map(category => (
                       <SelectItem key={category} value={category}>
-                        {category.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                        {category
+                          .replace(/-/g, ' ')
+                          .replace(/\b\w/g, l => l.toUpperCase())}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -156,7 +179,7 @@ export const SkillForm: React.FC<SkillFormProps> = ({
             )}
           />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <FormField
               control={form.control}
               name="level"
@@ -164,15 +187,17 @@ export const SkillForm: React.FC<SkillFormProps> = ({
                 <FormItem>
                   <FormLabel>Skill Level</FormLabel>
                   <FormControl>
-                    <Input 
-                      type="range" 
-                      min={1} 
-                      max={100} 
-                      {...field} 
-                      onChange={(e) => field.onChange(+e.target.value)} 
+                    <Input
+                      type="range"
+                      min={1}
+                      max={100}
+                      {...field}
+                      onChange={e => field.onChange(+e.target.value)}
                     />
                   </FormControl>
-                  <FormDescription>Rate your skill level from 1 to 100</FormDescription>
+                  <FormDescription>
+                    Rate your skill level from 1 to 100
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -185,11 +210,11 @@ export const SkillForm: React.FC<SkillFormProps> = ({
                 <FormItem>
                   <FormLabel>Years of Experience</FormLabel>
                   <FormControl>
-                    <Input 
-                      type="number" 
-                      min={0} 
-                      {...field} 
-                      onChange={(e) => field.onChange(+e.target.value)} 
+                    <Input
+                      type="number"
+                      min={0}
+                      {...field}
+                      onChange={e => field.onChange(+e.target.value)}
                     />
                   </FormControl>
                   <FormMessage />
@@ -198,7 +223,7 @@ export const SkillForm: React.FC<SkillFormProps> = ({
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <FormField
               control={form.control}
               name="experience.months"
@@ -206,12 +231,12 @@ export const SkillForm: React.FC<SkillFormProps> = ({
                 <FormItem>
                   <FormLabel>Months</FormLabel>
                   <FormControl>
-                    <Input 
-                      type="number" 
-                      min={0} 
-                      max={11} 
-                      {...field} 
-                      onChange={(e) => field.onChange(+e.target.value)} 
+                    <Input
+                      type="number"
+                      min={0}
+                      max={11}
+                      {...field}
+                      onChange={e => field.onChange(+e.target.value)}
                     />
                   </FormControl>
                   <FormMessage />
@@ -227,7 +252,7 @@ export const SkillForm: React.FC<SkillFormProps> = ({
                   min={0}
                   max={100}
                   value={proficiencyValue}
-                  onChange={(e) => {
+                  onChange={e => {
                     const value = Math.max(0, Math.min(100, +e.target.value));
                     setProficiencyValue(value);
                   }}
@@ -263,7 +288,7 @@ export const SkillForm: React.FC<SkillFormProps> = ({
             <Input
               placeholder="Enter tags separated by commas"
               value={tagsInput}
-              onChange={(e) => setTagsInput(e.target.value)}
+              onChange={e => setTagsInput(e.target.value)}
             />
           </div>
 
@@ -281,7 +306,7 @@ export const SkillForm: React.FC<SkillFormProps> = ({
             )}
           />
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             <FormField
               control={form.control}
               name="featured"
@@ -289,7 +314,9 @@ export const SkillForm: React.FC<SkillFormProps> = ({
                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                   <div className="space-y-0.5">
                     <FormLabel className="text-base">Featured Skill</FormLabel>
-                    <FormDescription>Display this skill prominently</FormDescription>
+                    <FormDescription>
+                      Display this skill prominently
+                    </FormDescription>
                   </div>
                   <FormControl>
                     <Switch
@@ -308,7 +335,9 @@ export const SkillForm: React.FC<SkillFormProps> = ({
                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                   <div className="space-y-0.5">
                     <FormLabel className="text-base">Disabled</FormLabel>
-                    <FormDescription>Hide this skill from display</FormDescription>
+                    <FormDescription>
+                      Hide this skill from display
+                    </FormDescription>
                   </div>
                   <FormControl>
                     <Switch
@@ -327,12 +356,12 @@ export const SkillForm: React.FC<SkillFormProps> = ({
                 <FormItem>
                   <FormLabel>Priority</FormLabel>
                   <FormControl>
-                    <Input 
-                      type="number" 
-                      min={1} 
-                      max={100} 
-                      {...field} 
-                      onChange={(e) => field.onChange(+e.target.value)} 
+                    <Input
+                      type="number"
+                      min={1}
+                      max={100}
+                      {...field}
+                      onChange={e => field.onChange(+e.target.value)}
                     />
                   </FormControl>
                   <FormDescription>Higher values appear first</FormDescription>

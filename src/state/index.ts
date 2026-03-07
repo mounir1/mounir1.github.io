@@ -44,7 +44,16 @@ export const stateActions = {
 
 // Default exports for lazy loading
 export default {
-  GlobalStateProvider: () => import('@/contexts/GlobalStateContext').then(m => ({ default: m.GlobalStateProvider })),
-  AdminStatsProvider: () => import('@/contexts/AdminStatsContext').then(m => ({ default: m.AdminStatsProvider })),
-  AccessibilityProvider: () => import('@/contexts/AccessibilityContext').then(m => ({ default: m.AccessibilityProvider })),
+  GlobalStateProvider: () =>
+    import('@/contexts/GlobalStateContext').then(m => ({
+      default: m.GlobalStateProvider,
+    })),
+  AdminStatsProvider: () =>
+    import('@/contexts/AdminStatsContext').then(m => ({
+      default: m.AdminStatsProvider,
+    })),
+  AccessibilityProvider: () =>
+    import('@/contexts/AccessibilityContext').then(m => ({
+      default: m.AccessibilityProvider,
+    })),
 };

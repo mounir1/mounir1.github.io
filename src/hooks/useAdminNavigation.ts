@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useState, useCallback, useEffect, useMemo } from 'react';
 
 // Navigation item type
 export interface NavItem {
@@ -39,54 +39,70 @@ export interface UseAdminNavigationConfig {
 // Default navigation items for admin dashboard
 export const defaultAdminNavItems: NavItem[] = [
   {
-    id: "dashboard",
-    label: "Dashboard",
-    path: "/admin",
-    icon: "📊"
+    id: 'dashboard',
+    label: 'Dashboard',
+    path: '/admin',
+    icon: '📊',
   },
   {
-    id: "projects",
-    label: "Projects",
-    path: "/admin/projects",
-    icon: "💼",
+    id: 'projects',
+    label: 'Projects',
+    path: '/admin/projects',
+    icon: '💼',
     children: [
-      { id: "projects-list", label: "All Projects", path: "/admin/projects" },
-      { id: "projects-add", label: "Add Project", path: "/admin/projects/add" },
-      { id: "projects-categories", label: "Categories", path: "/admin/projects/categories" }
-    ]
+      { id: 'projects-list', label: 'All Projects', path: '/admin/projects' },
+      { id: 'projects-add', label: 'Add Project', path: '/admin/projects/add' },
+      {
+        id: 'projects-categories',
+        label: 'Categories',
+        path: '/admin/projects/categories',
+      },
+    ],
   },
   {
-    id: "skills",
-    label: "Skills",
-    path: "/admin/skills",
-    icon: "🎯",
+    id: 'skills',
+    label: 'Skills',
+    path: '/admin/skills',
+    icon: '🎯',
     children: [
-      { id: "skills-list", label: "All Skills", path: "/admin/skills" },
-      { id: "skills-add", label: "Add Skill", path: "/admin/skills/add" },
-      { id: "skills-categories", label: "Categories", path: "/admin/skills/categories" }
-    ]
+      { id: 'skills-list', label: 'All Skills', path: '/admin/skills' },
+      { id: 'skills-add', label: 'Add Skill', path: '/admin/skills/add' },
+      {
+        id: 'skills-categories',
+        label: 'Categories',
+        path: '/admin/skills/categories',
+      },
+    ],
   },
   {
-    id: "analytics",
-    label: "Analytics",
-    path: "/admin/analytics",
-    icon: "📈"
+    id: 'analytics',
+    label: 'Analytics',
+    path: '/admin/analytics',
+    icon: '📈',
   },
   {
-    id: "settings",
-    label: "Settings",
-    path: "/admin/settings",
-    icon: "⚙️",
+    id: 'settings',
+    label: 'Settings',
+    path: '/admin/settings',
+    icon: '⚙️',
     children: [
-      { id: "settings-general", label: "General", path: "/admin/settings" },
-      { id: "settings-profile", label: "Profile", path: "/admin/settings/profile" },
-      { id: "settings-security", label: "Security", path: "/admin/settings/security" }
-    ]
-  }
+      { id: 'settings-general', label: 'General', path: '/admin/settings' },
+      {
+        id: 'settings-profile',
+        label: 'Profile',
+        path: '/admin/settings/profile',
+      },
+      {
+        id: 'settings-security',
+        label: 'Security',
+        path: '/admin/settings/security',
+      },
+    ],
+  },
 ];
 
 // Storage key for persisting sidebar state
-const SIDEBAR_STORAGE_KEY = "admin-sidebar-collapsed";
+const SIDEBAR_STORAGE_KEY = 'admin-sidebar-collapsed';
 
 // Hook implementation
 export const useAdminNavigation = (config: UseAdminNavigationConfig) => {
@@ -94,18 +110,18 @@ export const useAdminNavigation = (config: UseAdminNavigationConfig) => {
     navItems,
     defaultCollapsed = false,
     persistCollapsedState = true,
-    autoExpandParents = true
+    autoExpandParents = true,
   } = config;
 
   // Initialize sidebar collapsed state
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
-    if (typeof window === "undefined") return defaultCollapsed;
-    
+    if (typeof window === 'undefined') return defaultCollapsed;
+
     if (persistCollapsedState) {
       const stored = localStorage.getItem(SIDEBAR_STORAGE_KEY);
       return stored ? JSON.parse(stored) : defaultCollapsed;
     }
-    
+
     return defaultCollapsed;
   });
 
@@ -113,10 +129,10 @@ export const useAdminNavigation = (config: UseAdminNavigationConfig) => {
 
   // Get current path (using window.location for browser compatibility)
   const [currentPath, setCurrentPath] = useState(() => {
-    if (typeof window !== "undefined") {
+    if (typeof window !== 'undefined') {
       return window.location.pathname + window.location.search;
     }
-    return "/admin";
+    return '/admin';
   });
 
   // Listen for location changes
@@ -126,10 +142,10 @@ export const useAdminNavigation = (config: UseAdminNavigationConfig) => {
     };
 
     // Listen for browser navigation
-    window.addEventListener("popstate", handleLocationChange);
-    
+    window.addEventListener('popstate', handleLocationChange);
+
     return () => {
-      window.removeEventListener("popstate", handleLocationChange);
+      window.removeEventListener('popstate', handleLocationChange);
     };
   }, []);
 
@@ -157,21 +173,29 @@ export const useAdminNavigation = (config: UseAdminNavigationConfig) => {
   // Generate breadcrumbs based on current path
   const breadcrumbs = useMemo(() => {
     const crumbs: BreadcrumbItem[] = [];
-    
+
     // Add home/dashboard
-    crumbs.push({ label: "Dashboard", path: "/admin" });
+    crumbs.push({ label: 'Dashboard', path: '/admin' });
 
     // Find path to current item
-    const findPathToItem = (items: NavItem[], targetPath: string, path: NavItem[] = []): NavItem[] | null => {
+    const findPathToItem = (
+      items: NavItem[],
+      targetPath: string,
+      path: NavItem[] = []
+    ): NavItem[] | null => {
       for (const item of items) {
         const currentPath = [...path, item];
-        
+
         if (item.path === targetPath) {
           return currentPath;
         }
-        
+
         if (item.children) {
-          const childPath = findPathToItem(item.children, targetPath, currentPath);
+          const childPath = findPathToItem(
+            item.children,
+            targetPath,
+            currentPath
+          );
           if (childPath) return childPath;
         }
       }
@@ -179,16 +203,16 @@ export const useAdminNavigation = (config: UseAdminNavigationConfig) => {
     };
 
     const pathToActive = findPathToItem(navItems, currentPath);
-    
+
     if (pathToActive && pathToActive.length > 0) {
       // Skip dashboard if it's already added and it's the first item
-      const startIndex = pathToActive[0]?.path === "/admin" ? 1 : 0;
-      
+      const startIndex = pathToActive[0]?.path === '/admin' ? 1 : 0;
+
       pathToActive.slice(startIndex).forEach((item, index, array) => {
         crumbs.push({
           label: item.label,
           path: item.path,
-          isActive: index === array.length - 1
+          isActive: index === array.length - 1,
         });
       });
     }
@@ -199,14 +223,24 @@ export const useAdminNavigation = (config: UseAdminNavigationConfig) => {
   // Auto-expand parent items when child is active
   useEffect(() => {
     if (autoExpandParents && activeNavItem) {
-      const findParentItems = (items: NavItem[], targetId: string, parents: string[] = []): string[] => {
+      const findParentItems = (
+        items: NavItem[],
+        targetId: string,
+        parents: string[] = []
+      ): string[] => {
         for (const item of items) {
           if (item.id === targetId) {
             return parents;
           }
           if (item.children) {
-            const childParents = findParentItems(item.children, targetId, [...parents, item.id]);
-            if (childParents.length > 0 || item.children.some(child => child.id === targetId)) {
+            const childParents = findParentItems(item.children, targetId, [
+              ...parents,
+              item.id,
+            ]);
+            if (
+              childParents.length > 0 ||
+              item.children.some(child => child.id === targetId)
+            ) {
               return [...parents, item.id];
             }
           }
@@ -223,7 +257,7 @@ export const useAdminNavigation = (config: UseAdminNavigationConfig) => {
 
   // Navigation actions
   const navigateTo = useCallback((path: string) => {
-    if (typeof window !== "undefined") {
+    if (typeof window !== 'undefined') {
       window.history.pushState(null, '', path);
       setCurrentPath(path);
     }
@@ -288,7 +322,7 @@ export const useAdminNavigation = (config: UseAdminNavigationConfig) => {
         ...item,
         isActive: item.id === activeNavId || item.path === currentPath,
         isExpanded: expandedItems.has(item.id),
-        children: item.children ? enhanceItems(item.children) : undefined
+        children: item.children ? enhanceItems(item.children) : undefined,
       }));
     };
 
@@ -301,11 +335,11 @@ export const useAdminNavigation = (config: UseAdminNavigationConfig) => {
     activeNavId,
     breadcrumbs,
     sidebarCollapsed,
-    expandedItems
+    expandedItems,
   };
 
   // Check if current path is admin route
-  const isAdminRoute = currentPath.startsWith("/admin");
+  const isAdminRoute = currentPath.startsWith('/admin');
 
   // Check if sidebar should be shown
   const showSidebar = isAdminRoute;
@@ -326,15 +360,17 @@ export const useAdminNavigation = (config: UseAdminNavigationConfig) => {
     toggleNavItem,
     expandNavItem,
     collapseNavItem,
-    collapseAllNavItems
+    collapseAllNavItems,
   };
 };
 
 // Default hook with predefined nav items
-export const useDefaultAdminNavigation = (options?: Partial<UseAdminNavigationConfig>) => {
+export const useDefaultAdminNavigation = (
+  options?: Partial<UseAdminNavigationConfig>
+) => {
   return useAdminNavigation({
     navItems: defaultAdminNavItems,
-    ...options
+    ...options,
   });
 };
 

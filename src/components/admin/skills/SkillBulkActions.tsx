@@ -1,8 +1,8 @@
-import React from "react";
-import type { Skill } from "@/hooks/useSkills";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Download, Trash2, Eye, EyeOff, Star, RefreshCw } from "lucide-react";
+import React from 'react';
+import type { Skill } from '@/hooks/useSkills';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Download, Trash2, Eye, EyeOff, Star, RefreshCw } from 'lucide-react';
 
 export type SkillBulkActionsProps = {
   selected: Skill[];
@@ -24,8 +24,10 @@ export const SkillBulkActions: React.FC<SkillBulkActionsProps> = ({
   const disabled = selected.length === 0;
 
   return (
-    <div className={`flex flex-wrap items-center gap-2 ${className || ""}`}>
-      <Badge variant="secondary" className="mr-2">{selected.length} selected</Badge>
+    <div className={`flex flex-wrap items-center gap-2 ${className || ''}`}>
+      <Badge variant="secondary" className="mr-2">
+        {selected.length} selected
+      </Badge>
 
       <Button
         size="sm"
@@ -33,10 +35,10 @@ export const SkillBulkActions: React.FC<SkillBulkActionsProps> = ({
         disabled={disabled}
         onClick={() => onExportSelected?.(selected)}
       >
-        <Download className="h-4 w-4 mr-2" /> Export
+        <Download className="mr-2 h-4 w-4" /> Export
       </Button>
 
-      <div aria-hidden className="h-6 w-px bg-border mx-1" />
+      <div aria-hidden className="mx-1 h-6 w-px bg-border" />
 
       <Button
         size="sm"
@@ -44,7 +46,7 @@ export const SkillBulkActions: React.FC<SkillBulkActionsProps> = ({
         disabled={disabled}
         onClick={() => onToggleVisibilitySelected?.(selected, true)}
       >
-        <EyeOff className="h-4 w-4 mr-2" /> Hide
+        <EyeOff className="mr-2 h-4 w-4" /> Hide
       </Button>
       <Button
         size="sm"
@@ -52,10 +54,10 @@ export const SkillBulkActions: React.FC<SkillBulkActionsProps> = ({
         disabled={disabled}
         onClick={() => onToggleVisibilitySelected?.(selected, false)}
       >
-        <Eye className="h-4 w-4 mr-2" /> Show
+        <Eye className="mr-2 h-4 w-4" /> Show
       </Button>
 
-      <div aria-hidden className="h-6 w-px bg-border mx-1" />
+      <div aria-hidden className="mx-1 h-6 w-px bg-border" />
 
       <Button
         size="sm"
@@ -63,7 +65,7 @@ export const SkillBulkActions: React.FC<SkillBulkActionsProps> = ({
         disabled={disabled}
         onClick={() => onToggleFeaturedSelected?.(selected, true)}
       >
-        <Star className="h-4 w-4 mr-2" /> Mark Featured
+        <Star className="mr-2 h-4 w-4" /> Mark Featured
       </Button>
       <Button
         size="sm"
@@ -71,10 +73,10 @@ export const SkillBulkActions: React.FC<SkillBulkActionsProps> = ({
         disabled={disabled}
         onClick={() => onToggleFeaturedSelected?.(selected, false)}
       >
-        <RefreshCw className="h-4 w-4 mr-2" /> Unmark Featured
+        <RefreshCw className="mr-2 h-4 w-4" /> Unmark Featured
       </Button>
 
-      <div aria-hidden className="h-6 w-px bg-border mx-1" />
+      <div aria-hidden className="mx-1 h-6 w-px bg-border" />
 
       <Button
         size="sm"
@@ -82,7 +84,7 @@ export const SkillBulkActions: React.FC<SkillBulkActionsProps> = ({
         disabled={disabled}
         onClick={() => onDeleteSelected?.(selected)}
       >
-        <Trash2 className="h-4 w-4 mr-2" /> Delete
+        <Trash2 className="mr-2 h-4 w-4" /> Delete
       </Button>
     </div>
   );

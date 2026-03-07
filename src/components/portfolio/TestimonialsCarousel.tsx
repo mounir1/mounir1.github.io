@@ -1,63 +1,63 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { 
-  ChevronLeft, 
-  ChevronRight, 
-  Star, 
-  Quote, 
-  Play, 
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Star,
+  Quote,
+  Play,
   Pause,
   ExternalLink,
   User,
   Building,
   Calendar,
   Heart,
-  Share2
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useReducedMotion } from "@/hooks/useAccessibility";
+  Share2,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useReducedMotion } from '@/hooks/useAccessibility';
 
 // Rating component
 interface RatingProps {
   rating: number;
   maxRating?: number;
   showNumber?: boolean;
-  size?: "sm" | "md" | "lg";
+  size?: 'sm' | 'md' | 'lg';
   className?: string;
 }
 
-const Rating: React.FC<RatingProps> = ({ 
-  rating, 
-  maxRating = 5, 
-  showNumber = false, 
-  size = "md",
-  className 
+const Rating: React.FC<RatingProps> = ({
+  rating,
+  maxRating = 5,
+  showNumber = false,
+  size = 'md',
+  className,
 }) => {
   const sizeClasses = {
-    sm: "w-3 h-3",
-    md: "w-4 h-4", 
-    lg: "w-5 h-5"
+    sm: 'w-3 h-3',
+    md: 'w-4 h-4',
+    lg: 'w-5 h-5',
   };
 
   const iconSize = sizeClasses[size];
 
   return (
-    <div className={cn("flex items-center gap-1", className)}>
+    <div className={cn('flex items-center gap-1', className)}>
       {Array.from({ length: maxRating }, (_, i) => (
         <Star
           key={i}
           className={cn(
             iconSize,
-            i < rating 
-              ? "fill-yellow-400 text-yellow-400" 
-              : "fill-muted text-muted-foreground"
+            i < rating
+              ? 'fill-yellow-400 text-yellow-400'
+              : 'fill-muted text-muted-foreground'
           )}
         />
       ))}
       {showNumber && (
-        <span className="text-sm text-muted-foreground ml-2">
+        <span className="ml-2 text-sm text-muted-foreground">
           {rating}/{maxRating}
         </span>
       )}
@@ -106,7 +106,7 @@ export interface TestimonialsCarouselProps {
   testimonials: Testimonial[];
   config?: CarouselConfig;
   className?: string;
-  cardVariant?: "default" | "minimal" | "detailed" | "compact";
+  cardVariant?: 'default' | 'minimal' | 'detailed' | 'compact';
   showFilters?: boolean;
   onTestimonialClick?: (testimonial: Testimonial) => void;
   onShare?: (testimonial: Testimonial) => void;
@@ -128,13 +128,13 @@ const DEFAULT_CONFIG: CarouselConfig = {
   centerMode: false,
   adaptiveHeight: false,
   transitionDuration: 500,
-  swipeThreshold: 50
+  swipeThreshold: 50,
 };
 
 // Individual testimonial card
 interface TestimonialCardProps {
   testimonial: Testimonial;
-  variant: "default" | "minimal" | "detailed" | "compact";
+  variant: 'default' | 'minimal' | 'detailed' | 'compact';
   isActive?: boolean;
   onClick?: () => void;
   onShare?: () => void;
@@ -147,7 +147,7 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({
   isActive = false,
   onClick,
   onShare,
-  className
+  className,
 }) => {
   const [imageError, setImageError] = useState(false);
 
@@ -161,18 +161,18 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({
         <img
           src={testimonial.avatar}
           alt={testimonial.name}
-          className="w-12 h-12 rounded-full object-cover"
+          className="h-12 w-12 rounded-full object-cover"
           onError={handleImageError}
         />
       ) : (
-        <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
-          <User className="w-6 h-6 text-muted-foreground" />
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+          <User className="h-6 w-6 text-muted-foreground" />
         </div>
       )}
-      
+
       {testimonial.verified && (
-        <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background flex items-center justify-center">
-          <Star className="w-2 h-2 text-white fill-white" />
+        <div className="absolute -bottom-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full border-2 border-background bg-green-500">
+          <Star className="h-2 w-2 fill-white text-white" />
         </div>
       )}
     </div>
@@ -180,32 +180,38 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({
 
   const renderContent = () => {
     switch (variant) {
-      case "minimal":
+      case 'minimal':
         return (
-          <div className="text-center space-y-4">
-            <Quote className="w-8 h-8 text-primary mx-auto opacity-50" />
-            <blockquote className="text-lg italic text-muted-foreground leading-relaxed font-sans">
+          <div className="space-y-4 text-center">
+            <Quote className="mx-auto h-8 w-8 text-primary opacity-50" />
+            <blockquote className="font-sans text-lg italic leading-relaxed text-muted-foreground">
               "{testimonial.content}"
             </blockquote>
             <div className="flex items-center justify-center gap-3">
               {renderAvatar()}
               <div>
-                <p className="font-semibold text-lg font-heading">{testimonial.name}</p>
-                <p className="text-sm text-muted-foreground font-sans">{testimonial.role}</p>
+                <p className="font-heading text-lg font-semibold">
+                  {testimonial.name}
+                </p>
+                <p className="font-sans text-sm text-muted-foreground">
+                  {testimonial.role}
+                </p>
               </div>
             </div>
           </div>
         );
 
-      case "compact":
+      case 'compact':
         return (
           <div className="flex gap-3">
             {renderAvatar()}
             <div className="flex-1">
-              <div className="flex items-start justify-between mb-2">
+              <div className="mb-2 flex items-start justify-between">
                 <div>
-                  <p className="font-semibold text-sm font-heading">{testimonial.name}</p>
-                  <p className="text-xs text-muted-foreground font-sans">
+                  <p className="font-heading text-sm font-semibold">
+                    {testimonial.name}
+                  </p>
+                  <p className="font-sans text-xs text-muted-foreground">
                     {testimonial.role} at {testimonial.company}
                   </p>
                 </div>
@@ -213,69 +219,88 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({
                   <Rating rating={testimonial.rating} size="sm" />
                 )}
               </div>
-              <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed font-sans">
+              <p className="line-clamp-3 font-sans text-sm leading-relaxed text-muted-foreground">
                 "{testimonial.content}"
               </p>
             </div>
           </div>
         );
 
-      case "detailed":
+      case 'detailed':
         return (
           <div className="space-y-6">
             <div className="flex items-start justify-between">
               <div className="flex gap-4">
                 {renderAvatar()}
                 <div>
-                  <h4 className="font-semibold text-lg font-heading">{testimonial.name}</h4>
-                  <p className="text-sm text-muted-foreground font-sans">{testimonial.role}</p>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Building className="w-3 h-3 text-muted-foreground" />
-                    <span className="text-xs text-muted-foreground font-sans">{testimonial.company}</span>
+                  <h4 className="font-heading text-lg font-semibold">
+                    {testimonial.name}
+                  </h4>
+                  <p className="font-sans text-sm text-muted-foreground">
+                    {testimonial.role}
+                  </p>
+                  <div className="mt-1 flex items-center gap-2">
+                    <Building className="h-3 w-3 text-muted-foreground" />
+                    <span className="font-sans text-xs text-muted-foreground">
+                      {testimonial.company}
+                    </span>
                   </div>
                 </div>
               </div>
-              
+
               <div className="text-right">
                 {testimonial.rating && (
                   <Rating rating={testimonial.rating} size="sm" showNumber />
                 )}
                 {testimonial.date && (
-                  <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
-                    <Calendar className="w-3 h-3" />
+                  <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+                    <Calendar className="h-3 w-3" />
                     {testimonial.date}
                   </div>
                 )}
               </div>
             </div>
 
-            <blockquote className="text-muted-foreground italic relative">
-              <Quote className="w-6 h-6 text-primary/30 absolute -top-2 -left-2" />
-              <p className="relative z-10 text-lg leading-relaxed font-sans">{testimonial.content}</p>
+            <blockquote className="relative italic text-muted-foreground">
+              <Quote className="absolute -left-2 -top-2 h-6 w-6 text-primary/30" />
+              <p className="relative z-10 font-sans text-lg leading-relaxed">
+                {testimonial.content}
+              </p>
             </blockquote>
 
             {(testimonial.projectType || testimonial.skills) && (
               <div className="space-y-3">
                 {testimonial.projectType && (
                   <div>
-                    <span className="text-xs font-medium text-muted-foreground font-sans">Project:</span>
-                    <Badge variant="secondary" className="ml-2 text-xs font-sans">
+                    <span className="font-sans text-xs font-medium text-muted-foreground">
+                      Project:
+                    </span>
+                    <Badge
+                      variant="secondary"
+                      className="ml-2 font-sans text-xs"
+                    >
                       {testimonial.projectType}
                     </Badge>
                   </div>
                 )}
-                
+
                 {testimonial.skills && testimonial.skills.length > 0 && (
                   <div>
-                    <span className="text-xs font-medium text-muted-foreground font-sans">Skills:</span>
-                    <div className="flex flex-wrap gap-1 mt-1">
+                    <span className="font-sans text-xs font-medium text-muted-foreground">
+                      Skills:
+                    </span>
+                    <div className="mt-1 flex flex-wrap gap-1">
                       {testimonial.skills.slice(0, 4).map(skill => (
-                        <Badge key={skill} variant="outline" className="text-xs font-sans">
+                        <Badge
+                          key={skill}
+                          variant="outline"
+                          className="font-sans text-xs"
+                        >
                           {skill}
                         </Badge>
                       ))}
                       {testimonial.skills.length > 4 && (
-                        <Badge variant="outline" className="text-xs font-sans">
+                        <Badge variant="outline" className="font-sans text-xs">
                           +{testimonial.skills.length - 4}
                         </Badge>
                       )}
@@ -286,26 +311,49 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({
             )}
 
             {(testimonial.linkedInUrl || testimonial.companyUrl) && (
-              <div className="flex gap-2 pt-4 border-t border-border">
+              <div className="flex gap-2 border-t border-border pt-4">
                 {testimonial.linkedInUrl && (
-                  <Button variant="outline" size="sm" asChild className="font-sans">
-                    <a href={testimonial.linkedInUrl} target="_blank" rel="noopener noreferrer">
-                      <ExternalLink className="w-3 h-3 mr-1" />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    asChild
+                    className="font-sans"
+                  >
+                    <a
+                      href={testimonial.linkedInUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <ExternalLink className="mr-1 h-3 w-3" />
                       LinkedIn
                     </a>
                   </Button>
                 )}
                 {testimonial.companyUrl && (
-                  <Button variant="outline" size="sm" asChild className="font-sans">
-                    <a href={testimonial.companyUrl} target="_blank" rel="noopener noreferrer">
-                      <Building className="w-3 h-3 mr-1" />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    asChild
+                    className="font-sans"
+                  >
+                    <a
+                      href={testimonial.companyUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Building className="mr-1 h-3 w-3" />
                       Company
                     </a>
                   </Button>
                 )}
                 {onShare && (
-                  <Button variant="ghost" size="sm" onClick={onShare} className="font-sans">
-                    <Share2 className="w-3 h-3 mr-1" />
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={onShare}
+                    className="font-sans"
+                  >
+                    <Share2 className="mr-1 h-3 w-3" />
                     Share
                   </Button>
                 )}
@@ -320,8 +368,10 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({
             <div className="flex items-center gap-3">
               {renderAvatar()}
               <div className="flex-1">
-                <h4 className="font-semibold text-lg font-heading">{testimonial.name}</h4>
-                <p className="text-sm text-muted-foreground font-sans">
+                <h4 className="font-heading text-lg font-semibold">
+                  {testimonial.name}
+                </h4>
+                <p className="font-sans text-sm text-muted-foreground">
                   {testimonial.role} at {testimonial.company}
                 </p>
               </div>
@@ -330,14 +380,18 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({
               )}
             </div>
 
-            <blockquote className="text-muted-foreground italic text-lg leading-relaxed font-sans">
+            <blockquote className="font-sans text-lg italic leading-relaxed text-muted-foreground">
               "{testimonial.content}"
             </blockquote>
 
             {testimonial.tags && testimonial.tags.length > 0 && (
               <div className="flex flex-wrap gap-1">
                 {testimonial.tags.map(tag => (
-                  <Badge key={tag} variant="secondary" className="text-xs font-sans">
+                  <Badge
+                    key={tag}
+                    variant="secondary"
+                    className="font-sans text-xs"
+                  >
                     {tag}
                   </Badge>
                 ))}
@@ -349,11 +403,11 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({
   };
 
   return (
-    <Card 
+    <Card
       className={cn(
-        "h-full transition-all duration-300 cursor-pointer",
-        isActive ? "ring-2 ring-primary shadow-lg" : "hover:shadow-md",
-        testimonial.featured && "border-primary/50",
+        'h-full cursor-pointer transition-all duration-300',
+        isActive ? 'shadow-lg ring-2 ring-primary' : 'hover:shadow-md',
+        testimonial.featured && 'border-primary/50',
         className
       )}
       onClick={onClick}
@@ -361,7 +415,7 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({
       <CardContent className="p-6">
         {testimonial.featured && (
           <Badge className="mb-4" variant="default">
-            <Star className="w-3 h-3 mr-1" />
+            <Star className="mr-1 h-3 w-3" />
             Featured
           </Badge>
         )}
@@ -376,44 +430,48 @@ export const TestimonialsCarousel: React.FC<TestimonialsCarouselProps> = ({
   testimonials,
   config = {},
   className,
-  cardVariant = "detailed",
+  cardVariant = 'detailed',
   showFilters = false,
   onTestimonialClick,
   onShare,
   enableKeyboardNavigation = true,
-  enableSwipeGestures = true
+  enableSwipeGestures = true,
 }) => {
   const mergedConfig = { ...DEFAULT_CONFIG, ...config };
   const prefersReducedMotion = useReducedMotion();
-  
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(mergedConfig.autoPlay);
   const [filter, setFilter] = useState<string | null>(null);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
-  
+
   const intervalRef = useRef<NodeJS.Timeout>();
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Filter testimonials
-  const filteredTestimonials = filter 
-    ? testimonials.filter(t => 
-        t.company.toLowerCase().includes(filter.toLowerCase()) ||
-        t.role.toLowerCase().includes(filter.toLowerCase()) ||
-        t.tags?.some(tag => tag.toLowerCase().includes(filter.toLowerCase()))
+  const filteredTestimonials = filter
+    ? testimonials.filter(
+        t =>
+          t.company.toLowerCase().includes(filter.toLowerCase()) ||
+          t.role.toLowerCase().includes(filter.toLowerCase()) ||
+          t.tags?.some(tag => tag.toLowerCase().includes(filter.toLowerCase()))
       )
     : testimonials;
 
   const totalSlides = filteredTestimonials.length;
 
   // Navigation functions
-  const goToSlide = useCallback((index: number) => {
-    if (mergedConfig.infinite) {
-      setCurrentIndex((index + totalSlides) % totalSlides);
-    } else {
-      setCurrentIndex(Math.max(0, Math.min(index, totalSlides - 1)));
-    }
-  }, [totalSlides, mergedConfig.infinite]);
+  const goToSlide = useCallback(
+    (index: number) => {
+      if (mergedConfig.infinite) {
+        setCurrentIndex((index + totalSlides) % totalSlides);
+      } else {
+        setCurrentIndex(Math.max(0, Math.min(index, totalSlides - 1)));
+      }
+    },
+    [totalSlides, mergedConfig.infinite]
+  );
 
   const nextSlide = useCallback(() => {
     goToSlide(currentIndex + (mergedConfig.slidesToScroll || 1));
@@ -426,7 +484,10 @@ export const TestimonialsCarousel: React.FC<TestimonialsCarouselProps> = ({
   // Auto-play functionality
   useEffect(() => {
     if (isPlaying && !prefersReducedMotion && totalSlides > 1) {
-      intervalRef.current = setInterval(nextSlide, mergedConfig.autoPlayInterval);
+      intervalRef.current = setInterval(
+        nextSlide,
+        mergedConfig.autoPlayInterval
+      );
     }
 
     return () => {
@@ -434,7 +495,13 @@ export const TestimonialsCarousel: React.FC<TestimonialsCarouselProps> = ({
         clearInterval(intervalRef.current);
       }
     };
-  }, [isPlaying, nextSlide, mergedConfig.autoPlayInterval, prefersReducedMotion, totalSlides]);
+  }, [
+    isPlaying,
+    nextSlide,
+    mergedConfig.autoPlayInterval,
+    prefersReducedMotion,
+    totalSlides,
+  ]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -442,31 +509,31 @@ export const TestimonialsCarousel: React.FC<TestimonialsCarouselProps> = ({
 
     const handleKeyDown = (e: KeyboardEvent) => {
       switch (e.key) {
-        case "ArrowLeft":
+        case 'ArrowLeft':
           e.preventDefault();
           prevSlide();
           break;
-        case "ArrowRight":
+        case 'ArrowRight':
           e.preventDefault();
           nextSlide();
           break;
-        case " ":
+        case ' ':
           e.preventDefault();
           setIsPlaying(prev => !prev);
           break;
-        case "Home":
+        case 'Home':
           e.preventDefault();
           goToSlide(0);
           break;
-        case "End":
+        case 'End':
           e.preventDefault();
           goToSlide(totalSlides - 1);
           break;
       }
     };
 
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
   }, [enableKeyboardNavigation, prevSlide, nextSlide, goToSlide, totalSlides]);
 
   // Touch/Swipe handling
@@ -483,7 +550,7 @@ export const TestimonialsCarousel: React.FC<TestimonialsCarouselProps> = ({
 
   const handleTouchEnd = () => {
     if (!enableSwipeGestures || !touchStart || !touchEnd) return;
-    
+
     const distance = touchStart - touchEnd;
     const isLeftSwipe = distance > (mergedConfig.swipeThreshold || 50);
     const isRightSwipe = distance < -(mergedConfig.swipeThreshold || 50);
@@ -509,28 +576,30 @@ export const TestimonialsCarousel: React.FC<TestimonialsCarouselProps> = ({
   };
 
   // Get unique companies/roles for filter
-  const filterOptions = Array.from(new Set([
-    ...testimonials.map(t => t.company),
-    ...testimonials.map(t => t.role),
-    ...testimonials.flatMap(t => t.tags || [])
-  ])).sort();
+  const filterOptions = Array.from(
+    new Set([
+      ...testimonials.map(t => t.company),
+      ...testimonials.map(t => t.role),
+      ...testimonials.flatMap(t => t.tags || []),
+    ])
+  ).sort();
 
   if (totalSlides === 0) {
     return (
-      <div className="text-center py-12">
-        <Quote className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+      <div className="py-12 text-center">
+        <Quote className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
         <p className="text-muted-foreground">No testimonials available</p>
       </div>
     );
   }
 
   return (
-    <div className={cn("space-y-6", className)}>
+    <div className={cn('space-y-6', className)}>
       {/* Filters */}
       {showFilters && filterOptions.length > 0 && (
         <div className="flex flex-wrap gap-2">
           <Button
-            variant={filter === null ? "default" : "outline"}
+            variant={filter === null ? 'default' : 'outline'}
             size="sm"
             onClick={() => setFilter(null)}
           >
@@ -539,7 +608,7 @@ export const TestimonialsCarousel: React.FC<TestimonialsCarouselProps> = ({
           {filterOptions.slice(0, 6).map(option => (
             <Button
               key={option}
-              variant={filter === option ? "default" : "outline"}
+              variant={filter === option ? 'default' : 'outline'}
               size="sm"
               onClick={() => setFilter(option)}
             >
@@ -565,40 +634,39 @@ export const TestimonialsCarousel: React.FC<TestimonialsCarouselProps> = ({
             <Button
               variant="outline"
               size="icon"
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-10 shadow-lg"
+              className="absolute left-4 top-1/2 z-10 -translate-y-1/2 shadow-lg"
               onClick={prevSlide}
               disabled={!mergedConfig.infinite && currentIndex === 0}
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="h-4 w-4" />
             </Button>
             <Button
               variant="outline"
               size="icon"
-              className="absolute right-4 top-1/2 -translate-y-1/2 z-10 shadow-lg"
+              className="absolute right-4 top-1/2 z-10 -translate-y-1/2 shadow-lg"
               onClick={nextSlide}
-              disabled={!mergedConfig.infinite && currentIndex >= totalSlides - 1}
+              disabled={
+                !mergedConfig.infinite && currentIndex >= totalSlides - 1
+              }
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="h-4 w-4" />
             </Button>
           </>
         )}
 
         {/* Slides */}
         <div className="overflow-hidden rounded-lg">
-          <div 
+          <div
             className={cn(
-              "flex transition-transform duration-500 ease-out",
-              prefersReducedMotion && "transition-none"
+              'flex transition-transform duration-500 ease-out',
+              prefersReducedMotion && 'transition-none'
             )}
             style={{
-              transform: `translateX(-${currentIndex * 100}%)`
+              transform: `translateX(-${currentIndex * 100}%)`,
             }}
           >
             {filteredTestimonials.map((testimonial, index) => (
-              <div 
-                key={testimonial.id} 
-                className="w-full flex-shrink-0 px-2"
-              >
+              <div key={testimonial.id} className="w-full flex-shrink-0 px-2">
                 <TestimonialCard
                   testimonial={testimonial}
                   variant={cardVariant}
@@ -614,10 +682,12 @@ export const TestimonialsCarousel: React.FC<TestimonialsCarouselProps> = ({
         {/* Progress Bar */}
         {mergedConfig.showProgress && (
           <div className="absolute bottom-4 left-4 right-4">
-            <div className="h-1 bg-background/50 rounded-full overflow-hidden">
-              <div 
+            <div className="h-1 overflow-hidden rounded-full bg-background/50">
+              <div
                 className="h-full bg-primary transition-all duration-300"
-                style={{ width: `${((currentIndex + 1) / totalSlides) * 100}%` }}
+                style={{
+                  width: `${((currentIndex + 1) / totalSlides) * 100}%`,
+                }}
               />
             </div>
           </div>
@@ -633,10 +703,10 @@ export const TestimonialsCarousel: React.FC<TestimonialsCarouselProps> = ({
               <button
                 key={index}
                 className={cn(
-                  "w-2 h-2 rounded-full transition-all duration-200",
-                  index === currentIndex 
-                    ? "bg-primary scale-125" 
-                    : "bg-muted-foreground/30 hover:bg-muted-foreground/50"
+                  'h-2 w-2 rounded-full transition-all duration-200',
+                  index === currentIndex
+                    ? 'scale-125 bg-primary'
+                    : 'bg-muted-foreground/30 hover:bg-muted-foreground/50'
                 )}
                 onClick={() => goToSlide(index)}
                 aria-label={`Go to slide ${index + 1}`}
@@ -654,9 +724,9 @@ export const TestimonialsCarousel: React.FC<TestimonialsCarouselProps> = ({
               onClick={() => setIsPlaying(!isPlaying)}
             >
               {isPlaying ? (
-                <Pause className="w-4 h-4" />
+                <Pause className="h-4 w-4" />
               ) : (
-                <Play className="w-4 h-4" />
+                <Play className="h-4 w-4" />
               )}
             </Button>
             <span className="text-sm text-muted-foreground">

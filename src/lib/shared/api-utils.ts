@@ -34,9 +34,12 @@ export interface RequestConfig {
 // API utilities
 export const apiUtils = {
   // Create headers with common defaults
-  createHeaders: (token?: string, additionalHeaders?: Record<string, string>) => ({
+  createHeaders: (
+    token?: string,
+    additionalHeaders?: Record<string, string>
+  ) => ({
     'Content-Type': 'application/json',
-    'Accept': 'application/json',
+    Accept: 'application/json',
     ...(token && { Authorization: `Bearer ${token}` }),
     ...additionalHeaders,
   }),
@@ -58,7 +61,7 @@ export const apiUtils = {
         message: data?.message || data?.error || `HTTP ${response.status}`,
         status: response.status,
         code: data?.code,
-        details: data?.details
+        details: data?.details,
       };
       throw error;
     }
@@ -68,7 +71,7 @@ export const apiUtils = {
 
   // Create request with timeout and retry logic
   createRequest: async <T = any>(
-    url: string, 
+    url: string,
     config: RequestConfig = {}
   ): Promise<T> => {
     const {
@@ -77,7 +80,7 @@ export const apiUtils = {
       body,
       timeout = 10000,
       retries = 3,
-      retryDelay = 1000
+      retryDelay = 1000,
     } = config;
 
     const controller = new AbortController();
@@ -87,7 +90,7 @@ export const apiUtils = {
       method,
       headers: apiUtils.createHeaders(undefined, headers),
       signal: controller.signal,
-      ...(body && { body: JSON.stringify(body) })
+      ...(body && { body: JSON.stringify(body) }),
     };
 
     let lastError: Error;
@@ -99,20 +102,25 @@ export const apiUtils = {
         return await apiUtils.handleResponse<T>(response);
       } catch (error) {
         lastError = error as Error;
-        
+
         // Don't retry on certain errors
         if (error instanceof Error) {
           if (error.name === 'AbortError') {
             throw new Error('Request timeout');
           }
-          if ((error as ApiError).status >= 400 && (error as ApiError).status < 500) {
+          if (
+            (error as ApiError).status >= 400 &&
+            (error as ApiError).status < 500
+          ) {
             throw error; // Client errors shouldn't be retried
           }
         }
 
         // Wait before retry (except on last attempt)
         if (attempt < retries) {
-          await new Promise(resolve => setTimeout(resolve, retryDelay * (attempt + 1)));
+          await new Promise(resolve =>
+            setTimeout(resolve, retryDelay * (attempt + 1))
+          );
         }
       }
     }
@@ -122,29 +130,42 @@ export const apiUtils = {
   },
 
   // GET request
-  get: <T = any>(url: string, config?: Omit<RequestConfig, 'method' | 'body'>) =>
-    apiUtils.createRequest<T>(url, { ...config, method: 'GET' }),
+  get: <T = any>(
+    url: string,
+    config?: Omit<RequestConfig, 'method' | 'body'>
+  ) => apiUtils.createRequest<T>(url, { ...config, method: 'GET' }),
 
   // POST request
-  post: <T = any>(url: string, body?: any, config?: Omit<RequestConfig, 'method'>) =>
-    apiUtils.createRequest<T>(url, { ...config, method: 'POST', body }),
+  post: <T = any>(
+    url: string,
+    body?: any,
+    config?: Omit<RequestConfig, 'method'>
+  ) => apiUtils.createRequest<T>(url, { ...config, method: 'POST', body }),
 
   // PUT request
-  put: <T = any>(url: string, body?: any, config?: Omit<RequestConfig, 'method'>) =>
-    apiUtils.createRequest<T>(url, { ...config, method: 'PUT', body }),
+  put: <T = any>(
+    url: string,
+    body?: any,
+    config?: Omit<RequestConfig, 'method'>
+  ) => apiUtils.createRequest<T>(url, { ...config, method: 'PUT', body }),
 
   // PATCH request
-  patch: <T = any>(url: string, body?: any, config?: Omit<RequestConfig, 'method'>) =>
-    apiUtils.createRequest<T>(url, { ...config, method: 'PATCH', body }),
+  patch: <T = any>(
+    url: string,
+    body?: any,
+    config?: Omit<RequestConfig, 'method'>
+  ) => apiUtils.createRequest<T>(url, { ...config, method: 'PATCH', body }),
 
   // DELETE request
-  delete: <T = any>(url: string, config?: Omit<RequestConfig, 'method' | 'body'>) =>
-    apiUtils.createRequest<T>(url, { ...config, method: 'DELETE' }),
+  delete: <T = any>(
+    url: string,
+    config?: Omit<RequestConfig, 'method' | 'body'>
+  ) => apiUtils.createRequest<T>(url, { ...config, method: 'DELETE' }),
 
   // Build query string from object
   buildQueryString: (params: Record<string, any>): string => {
     const searchParams = new URLSearchParams();
-    
+
     Object.entries(params).forEach(([key, value]) => {
       if (value !== undefined && value !== null) {
         if (Array.isArray(value)) {
@@ -167,7 +188,11 @@ export const apiUtils = {
 
   // Check if error is an API error
   isApiError: (error: any): error is ApiError => {
-    return error && typeof error.status === 'number' && typeof error.message === 'string';
+    return (
+      error &&
+      typeof error.status === 'number' &&
+      typeof error.message === 'string'
+    );
   },
 
   // Format error for display
@@ -198,13 +223,16 @@ export const apiUtils = {
 
       if (executing.length >= concurrency) {
         await Promise.race(executing);
-        executing.splice(executing.findIndex(p => p === promise), 1);
+        executing.splice(
+          executing.findIndex(p => p === promise),
+          1
+        );
       }
     }
 
     await Promise.all(executing);
     return results;
-  }
+  },
 };
 
 // Export individual functions for convenience
@@ -221,5 +249,5 @@ export const {
   buildUrl,
   isApiError,
   formatError,
-  batchRequests
+  batchRequests,
 } = apiUtils;

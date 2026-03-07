@@ -31,32 +31,36 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
   onLogout,
   showUserMenu = true,
   actions = [],
-  className
+  className,
 }) => {
   return (
-    <div className={cn(
-      "glass border-b border-border/30 sticky top-0 z-50",
-      className
-    )}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
+    <div
+      className={cn(
+        'glass sticky top-0 z-50 border-b border-border/30',
+        className
+      )}
+    >
+      <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 sm:py-4">
         <div className="flex items-center justify-between">
           {/* Logo and Title */}
           <div className="flex items-center gap-3 sm:gap-4">
-            <div className="relative group">
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-full blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <div className="relative bg-white/10 dark:bg-gray-800/10 rounded-full p-1.5 sm:p-2 backdrop-blur-sm">
-                <img 
-                  src="/mounir-icon.svg" 
-                  alt="Admin" 
-                  className="w-7 h-7 sm:w-8 sm:h-8 transition-transform duration-300 group-hover:scale-110" 
+            <div className="group relative">
+              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-400/20 to-pink-400/20 opacity-0 blur-sm transition-opacity duration-300 group-hover:opacity-100" />
+              <div className="relative rounded-full bg-white/10 p-1.5 backdrop-blur-sm dark:bg-gray-800/10 sm:p-2">
+                <img
+                  src="/mounir-icon.svg"
+                  alt="Admin"
+                  className="h-7 w-7 transition-transform duration-300 group-hover:scale-110 sm:h-8 sm:w-8"
                 />
               </div>
             </div>
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              <h1 className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-xl font-bold text-transparent sm:text-2xl">
                 Portfolio Admin
               </h1>
-              <p className="hidden sm:block text-xs sm:text-sm text-muted-foreground">Content Management System</p>
+              <p className="hidden text-xs text-muted-foreground sm:block sm:text-sm">
+                Content Management System
+              </p>
             </div>
           </div>
 
@@ -69,9 +73,9 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                 variant={action.variant || 'outline'}
                 onClick={action.onClick}
                 size="sm"
-                className="hover-lift glass border-border/30 hover:glow-primary hidden sm:flex"
+                className="hover-lift glass hover:glow-primary hidden border-border/30 sm:flex"
               >
-                <action.icon className="w-4 h-4 mr-2" />
+                <action.icon className="mr-2 h-4 w-4" />
                 {action.label}
               </Button>
             ))}
@@ -83,43 +87,43 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({
                 variant={action.variant || 'outline'}
                 onClick={action.onClick}
                 size="sm"
-                className="hover-lift glass border-border/30 hover:glow-primary sm:hidden"
+                className="hover-lift glass hover:glow-primary border-border/30 sm:hidden"
               >
-                <action.icon className="w-4 h-4" />
+                <action.icon className="h-4 w-4" />
                 <span className="sr-only">{action.label}</span>
               </Button>
             ))}
 
             {/* Theme Toggle */}
             <ThemeToggle />
-            
+
             {/* Professional Signature */}
             <div className="hidden lg:block">
               <ProfessionalSignature />
             </div>
-            
+
             {/* User Menu */}
             {showUserMenu && user && (
-              <Button 
-                variant="outline" 
-                onClick={onLogout} 
+              <Button
+                variant="outline"
+                onClick={onLogout}
                 size="sm"
-                className="hover-lift glass border-border/30 hover:glow-primary hidden md:flex"
+                className="hover-lift glass hover:glow-primary hidden border-border/30 md:flex"
               >
-                <Settings className="w-4 h-4 mr-2" />
+                <Settings className="mr-2 h-4 w-4" />
                 Sign Out
               </Button>
             )}
-            
+
             {/* Mobile user menu */}
             {showUserMenu && user && (
-              <Button 
-                variant="outline" 
-                onClick={onLogout} 
+              <Button
+                variant="outline"
+                onClick={onLogout}
                 size="sm"
-                className="hover-lift glass border-border/30 hover:glow-primary md:hidden"
+                className="hover-lift glass hover:glow-primary border-border/30 md:hidden"
               >
-                <Settings className="w-4 h-4" />
+                <Settings className="h-4 w-4" />
                 <span className="sr-only">Sign Out</span>
               </Button>
             )}

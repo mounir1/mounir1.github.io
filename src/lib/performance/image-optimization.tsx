@@ -23,11 +23,18 @@ interface OptimizedImageProps {
 }
 
 // Generate srcSet for different formats and sizes
-const generateSrcSet = (src: string, format: string, sizes: number[] = [640, 768, 1024, 1280, 1920]) => {
+const generateSrcSet = (
+  src: string,
+  format: string,
+  sizes: number[] = [640, 768, 1024, 1280, 1920]
+) => {
   return sizes
     .map(size => {
       const extension = format === 'jpg' ? 'jpeg' : format;
-      const optimizedSrc = src.replace(/\.(jpg|jpeg|png|webp)$/i, `_${size}w.${extension}`);
+      const optimizedSrc = src.replace(
+        /\.(jpg|jpeg|png|webp)$/i,
+        `_${size}w.${extension}`
+      );
       return `${optimizedSrc} ${size}w`;
     })
     .join(', ');
@@ -39,18 +46,18 @@ const createBlurPlaceholder = (width: number = 40, height: number = 40) => {
   canvas.width = width;
   canvas.height = height;
   const ctx = canvas.getContext('2d');
-  
+
   if (ctx) {
     // Create a simple gradient blur effect
     const gradient = ctx.createLinearGradient(0, 0, width, height);
     gradient.addColorStop(0, '#f3f4f6');
     gradient.addColorStop(0.5, '#e5e7eb');
     gradient.addColorStop(1, '#d1d5db');
-    
+
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, width, height);
   }
-  
+
   return canvas.toDataURL('image/jpeg', 0.1);
 };
 
@@ -94,7 +101,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
       },
       {
         rootMargin: '50px',
-        threshold: 0.1
+        threshold: 0.1,
       }
     );
 
@@ -115,11 +122,12 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
     onError?.();
   };
 
-  const shouldShowPlaceholder = placeholder !== 'empty' && !isLoaded && !hasError;
+  const shouldShowPlaceholder =
+    placeholder !== 'empty' && !isLoaded && !hasError;
   const placeholderSrc = blurDataURL || placeholderRef.current;
 
   return (
-    <div 
+    <div
       className={cn('relative overflow-hidden', className)}
       style={{ width, height }}
       {...props}
@@ -130,7 +138,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
           src={placeholderSrc}
           alt=""
           className={cn(
-            'absolute inset-0 w-full h-full object-cover transition-opacity duration-300',
+            'absolute inset-0 h-full w-full object-cover transition-opacity duration-300',
             isLoaded ? 'opacity-0' : 'opacity-100'
           )}
           style={{ filter: 'blur(10px)', transform: 'scale(1.1)' }}
@@ -157,7 +165,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
             loading={priority ? 'eager' : 'lazy'}
             decoding="async"
             className={cn(
-              'w-full h-full object-cover transition-opacity duration-300',
+              'h-full w-full object-cover transition-opacity duration-300',
               isLoaded ? 'opacity-100' : 'opacity-0'
             )}
             onLoad={handleLoad}
@@ -176,7 +184,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
       {/* Loading indicator */}
       {!isLoaded && !hasError && isInView && (
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary"></div>
         </div>
       )}
     </div>
@@ -199,13 +207,15 @@ export const ProgressiveImage: React.FC<ProgressiveImageProps> = ({
   const [loadedSources, setLoadedSources] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    const sources = [lowQualitySrc, mediumQualitySrc, src].filter(Boolean) as string[];
-    
+    const sources = [lowQualitySrc, mediumQualitySrc, src].filter(
+      Boolean
+    ) as string[];
+
     sources.forEach((source, index) => {
       const img = new Image();
       img.onload = () => {
         setLoadedSources(prev => new Set([...prev, source]));
-        
+
         // Update current source to the highest quality available
         if (index === sources.length - 1) {
           setCurrentSrc(source); // Final high-quality image
@@ -221,33 +231,35 @@ export const ProgressiveImage: React.FC<ProgressiveImageProps> = ({
 };
 
 // Image with automatic format detection
-export const SmartImage: React.FC<OptimizedImageProps> = (props) => {
+export const SmartImage: React.FC<OptimizedImageProps> = props => {
   const [supportedFormats, setSupportedFormats] = useState<string[]>(['jpg']);
 
   useEffect(() => {
     const checkFormatSupport = async () => {
       const formats: string[] = ['jpg'];
-      
+
       // Check WebP support
       const webpCanvas = document.createElement('canvas');
       webpCanvas.width = 1;
       webpCanvas.height = 1;
-      const webpSupported = webpCanvas.toDataURL('image/webp').indexOf('data:image/webp') === 0;
+      const webpSupported =
+        webpCanvas.toDataURL('image/webp').indexOf('data:image/webp') === 0;
       if (webpSupported) formats.unshift('webp');
-      
+
       // Check AVIF support
       try {
-        const avifSupported = await new Promise<boolean>((resolve) => {
+        const avifSupported = await new Promise<boolean>(resolve => {
           const img = new Image();
           img.onload = () => resolve(true);
           img.onerror = () => resolve(false);
-          img.src = 'data:image/avif;base64,AAAAIGZ0eXBhdmlmAAAAAGF2aWZtaWYxbWlhZk1BMUIAAADybWV0YQAAAAAAAAAoaGRscgAAAAAAAAAAcGljdAAAAAAAAAAAAAAAAGxpYmF2aWYAAAAADnBpdG0AAAAAAAEAAAAeaWxvYwAAAABEAAABAAEAAAABAAABGgAAAB0AAAAoaWluZgAAAAAAAQAAABppbmZlAgAAAAABAABhdjAxQ29sb3IAAAAAamlwcnAAAABLaXBjbwAAABRpc3BlAAAAAAAAAAIAAAACAAAAEHBpeGkAAAAAAwgICAAAAAxhdjFDgQ0MAAAAABNjb2xybmNseAACAAIAAYAAAAAXaXBtYQAAAAAAAAABAAEEAQKDBAAAACVtZGF0EgAKCBgABogQEAwgMg8f8D///8WfhwB8+ErK42A=';
+          img.src =
+            'data:image/avif;base64,AAAAIGZ0eXBhdmlmAAAAAGF2aWZtaWYxbWlhZk1BMUIAAADybWV0YQAAAAAAAAAoaGRscgAAAAAAAAAAcGljdAAAAAAAAAAAAAAAAGxpYmF2aWYAAAAADnBpdG0AAAAAAAEAAAAeaWxvYwAAAABEAAABAAEAAAABAAABGgAAAB0AAAAoaWluZgAAAAAAAQAAABppbmZlAgAAAAABAABhdjAxQ29sb3IAAAAAamlwcnAAAABLaXBjbwAAABRpc3BlAAAAAAAAAAIAAAACAAAAEHBpeGkAAAAAAwgICAAAAAxhdjFDgQ0MAAAAABNjb2xybmNseAACAAIAAYAAAAAXaXBtYQAAAAAAAAABAAEEAQKDBAAAACVtZGF0EgAKCBgABogQEAwgMg8f8D///8WfhwB8+ErK42A=';
         });
         if (avifSupported) formats.unshift('avif');
       } catch {
         // AVIF not supported
       }
-      
+
       setSupportedFormats(formats);
     };
 

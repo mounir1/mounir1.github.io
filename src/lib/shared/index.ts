@@ -31,17 +31,21 @@ export * from '../../utils/tableExport';
  */
 export const utils = {
   // Date utilities
-  formatDate: (date: Date | string | number, locale = 'en-US') => 
+  formatDate: (date: Date | string | number, locale = 'en-US') =>
     new Date(date).toLocaleDateString(locale),
-  
+
   formatRelativeTime: (date: Date | string | number) => {
     const now = new Date();
     const dateObj = new Date(date);
-    const diffInSeconds = Math.floor((now.getTime() - dateObj.getTime()) / 1000);
+    const diffInSeconds = Math.floor(
+      (now.getTime() - dateObj.getTime()) / 1000
+    );
 
     if (diffInSeconds < 60) return 'just now';
-    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
-    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+    if (diffInSeconds < 3600)
+      return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+    if (diffInSeconds < 86400)
+      return `${Math.floor(diffInSeconds / 3600)} hours ago`;
     return `${Math.floor(diffInSeconds / 86400)} days ago`;
   },
 
@@ -51,38 +55,43 @@ export const utils = {
     return str.substring(0, maxLength - suffix.length) + suffix;
   },
 
-  capitalize: (str: string) => 
+  capitalize: (str: string) =>
     str.charAt(0).toUpperCase() + str.slice(1).toLowerCase(),
 
-  slugify: (str: string) => 
-    str.toLowerCase()
-       .trim()
-       .replace(/[^\w\s-]/g, '')
-       .replace(/[\s_-]+/g, '-')
-       .replace(/^-+|-+$/g, ''),
+  slugify: (str: string) =>
+    str
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/[\s_-]+/g, '-')
+      .replace(/^-+|-+$/g, ''),
 
   // Number utilities
-  formatNumber: (num: number) => 
-    new Intl.NumberFormat('en-US').format(num),
+  formatNumber: (num: number) => new Intl.NumberFormat('en-US').format(num),
 
-  formatCurrency: (amount: number, currency = 'USD') => 
-    new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(amount),
+  formatCurrency: (amount: number, currency = 'USD') =>
+    new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(
+      amount
+    ),
 
-  formatPercentage: (value: number, decimals = 1) => 
+  formatPercentage: (value: number, decimals = 1) =>
     `${(value * 100).toFixed(decimals)}%`,
 
   // Array utilities
   unique: <T>(array: T[]) => [...new Set(array)],
 
-  groupBy: <T>(array: T[], key: keyof T) => 
-    array.reduce((groups, item) => {
-      const group = item[key] as unknown as string;
-      groups[group] = groups[group] || [];
-      groups[group].push(item);
-      return groups;
-    }, {} as Record<string, T[]>),
+  groupBy: <T>(array: T[], key: keyof T) =>
+    array.reduce(
+      (groups, item) => {
+        const group = item[key] as unknown as string;
+        groups[group] = groups[group] || [];
+        groups[group].push(item);
+        return groups;
+      },
+      {} as Record<string, T[]>
+    ),
 
-  sortBy: <T>(array: T[], key: keyof T, direction: 'asc' | 'desc' = 'asc') => 
+  sortBy: <T>(array: T[], key: keyof T, direction: 'asc' | 'desc' = 'asc') =>
     [...array].sort((a, b) => {
       const aVal = a[key];
       const bVal = b[key];
@@ -92,13 +101,22 @@ export const utils = {
     }),
 
   // Object utilities
-  pick: <T extends Record<string, any>, K extends keyof T>(obj: T, keys: K[]): Pick<T, K> => 
-    keys.reduce((result, key) => {
-      if (key in obj) result[key] = obj[key];
-      return result;
-    }, {} as Pick<T, K>),
+  pick: <T extends Record<string, any>, K extends keyof T>(
+    obj: T,
+    keys: K[]
+  ): Pick<T, K> =>
+    keys.reduce(
+      (result, key) => {
+        if (key in obj) result[key] = obj[key];
+        return result;
+      },
+      {} as Pick<T, K>
+    ),
 
-  omit: <T extends Record<string, any>, K extends keyof T>(obj: T, keys: K[]): Omit<T, K> => {
+  omit: <T extends Record<string, any>, K extends keyof T>(
+    obj: T,
+    keys: K[]
+  ): Omit<T, K> => {
     const result = { ...obj };
     keys.forEach(key => delete result[key]);
     return result;
@@ -107,10 +125,16 @@ export const utils = {
   // Validation utilities
   isEmail: (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email),
   isUrl: (url: string) => {
-    try { new URL(url); return true; } catch { return false; }
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
   },
-  isEmpty: (value: any) => 
-    value === null || value === undefined || 
+  isEmpty: (value: any) =>
+    value === null ||
+    value === undefined ||
     (typeof value === 'string' && value.trim() === '') ||
     (Array.isArray(value) && value.length === 0) ||
     (typeof value === 'object' && Object.keys(value).length === 0),
@@ -119,8 +143,8 @@ export const utils = {
   delay: (ms: number) => new Promise(resolve => setTimeout(resolve, ms)),
 
   retry: async <T>(
-    fn: () => Promise<T>, 
-    attempts = 3, 
+    fn: () => Promise<T>,
+    attempts = 3,
     delayMs = 1000
   ): Promise<T> => {
     try {
@@ -157,7 +181,7 @@ export const utils = {
       } catch (error) {
         console.warn('Failed to remove from localStorage:', error);
       }
-    }
+    },
   },
 
   // Debug utilities
@@ -178,16 +202,15 @@ export const utils = {
       if (process.env.NODE_ENV === 'development') {
         console.timeEnd(label);
       }
-    }
-  }
+    },
+  },
 };
 
 /**
  * Type-safe error handling utilities
  */
 export const errorUtils = {
-  isError: (value: unknown): value is Error => 
-    value instanceof Error,
+  isError: (value: unknown): value is Error => value instanceof Error,
 
   getErrorMessage: (error: unknown): string => {
     if (typeof error === 'string') return error;
@@ -199,7 +222,7 @@ export const errorUtils = {
     const error = new Error(message);
     if (code) (error as any).code = code;
     return error;
-  }
+  },
 };
 
 /**
@@ -210,11 +233,11 @@ export const performanceUtils = {
     const start = performance.now();
     const result = fn();
     const end = performance.now();
-    
+
     if (label && process.env.NODE_ENV === 'development') {
       console.log(`[Performance] ${label}: ${(end - start).toFixed(2)}ms`);
     }
-    
+
     return result;
   },
 
@@ -222,17 +245,17 @@ export const performanceUtils = {
     const start = performance.now();
     const result = await fn();
     const end = performance.now();
-    
+
     if (label && process.env.NODE_ENV === 'development') {
       console.log(`[Performance] ${label}: ${(end - start).toFixed(2)}ms`);
     }
-    
+
     return result;
-  }
+  },
 };
 
 export default {
   utils,
   errorUtils,
-  performanceUtils
+  performanceUtils,
 };

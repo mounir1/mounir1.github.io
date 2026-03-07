@@ -2,121 +2,121 @@
  * Theme configuration and design tokens
  */
 
-export type ThemeMode = 'light' | 'dark' | 'system'
+export type ThemeMode = 'light' | 'dark' | 'system';
 
 export interface ColorPalette {
-  50: string
-  100: string
-  200: string
-  300: string
-  400: string
-  500: string
-  600: string
-  700: string
-  800: string
-  900: string
-  950: string
+  50: string;
+  100: string;
+  200: string;
+  300: string;
+  400: string;
+  500: string;
+  600: string;
+  700: string;
+  800: string;
+  900: string;
+  950: string;
 }
 
 export interface SemanticColors {
-  success: ColorPalette
-  warning: ColorPalette
-  error: ColorPalette
-  info: ColorPalette
+  success: ColorPalette;
+  warning: ColorPalette;
+  error: ColorPalette;
+  info: ColorPalette;
 }
 
 export interface ThemeColors {
-  primary: ColorPalette
-  secondary: ColorPalette
-  accent: ColorPalette
-  neutral: ColorPalette
-  semantic: SemanticColors
+  primary: ColorPalette;
+  secondary: ColorPalette;
+  accent: ColorPalette;
+  neutral: ColorPalette;
+  semantic: SemanticColors;
 }
 
 export interface TypographyConfig {
   fontFamilies: {
-    sans: string[]
-    mono: string[]
-    heading: string[]
-  }
+    sans: string[];
+    mono: string[];
+    heading: string[];
+  };
   fontSizes: {
-    xs: string
-    sm: string
-    base: string
-    lg: string
-    xl: string
-    '2xl': string
-    '3xl': string
-    '4xl': string
-    '5xl': string
-    '6xl': string
-  }
+    xs: string;
+    sm: string;
+    base: string;
+    lg: string;
+    xl: string;
+    '2xl': string;
+    '3xl': string;
+    '4xl': string;
+    '5xl': string;
+    '6xl': string;
+  };
   fontWeights: {
-    thin: number
-    light: number
-    normal: number
-    medium: number
-    semibold: number
-    bold: number
-    extrabold: number
-  }
+    thin: number;
+    light: number;
+    normal: number;
+    medium: number;
+    semibold: number;
+    bold: number;
+    extrabold: number;
+  };
   lineHeights: {
-    tight: number
-    normal: number
-    relaxed: number
-    loose: number
-  }
+    tight: number;
+    normal: number;
+    relaxed: number;
+    loose: number;
+  };
 }
 
 export interface SpacingConfig {
-  xs: string
-  sm: string
-  md: string
-  lg: string
-  xl: string
-  '2xl': string
-  '3xl': string
-  '4xl': string
-  '5xl': string
-  '6xl': string
+  xs: string;
+  sm: string;
+  md: string;
+  lg: string;
+  xl: string;
+  '2xl': string;
+  '3xl': string;
+  '4xl': string;
+  '5xl': string;
+  '6xl': string;
 }
 
 export interface ShadowConfig {
-  soft: string
-  medium: string
-  large: string
-  glow: string
+  soft: string;
+  medium: string;
+  large: string;
+  glow: string;
 }
 
 export interface AnimationConfig {
   durations: {
-    fast: string
-    normal: string
-    slow: string
-  }
+    fast: string;
+    normal: string;
+    slow: string;
+  };
   easings: {
-    easeInOut: string
-    easeOut: string
-    easeIn: string
-    bounce: string
-    spring: string
-  }
+    easeInOut: string;
+    easeOut: string;
+    easeIn: string;
+    bounce: string;
+    spring: string;
+  };
   presets: {
-    fadeIn: string
-    slideUp: string
-    scaleIn: string
-    slideInRight: string
-  }
+    fadeIn: string;
+    slideUp: string;
+    scaleIn: string;
+    slideInRight: string;
+  };
 }
 
 export interface ThemeConfig {
-  name: string
-  displayName: string
-  colors: ThemeColors
-  typography: TypographyConfig
-  spacing: SpacingConfig
-  shadows: ShadowConfig
-  animations: AnimationConfig
+  name: string;
+  displayName: string;
+  colors: ThemeColors;
+  typography: TypographyConfig;
+  spacing: SpacingConfig;
+  shadows: ShadowConfig;
+  animations: AnimationConfig;
 }
 
 // Default theme configuration
@@ -303,7 +303,7 @@ export const defaultTheme: ThemeConfig = {
       slideInRight: 'slideInRight 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards',
     },
   },
-}
+};
 
 // Theme utilities
 export const themeUtils = {
@@ -311,65 +311,65 @@ export const themeUtils = {
    * Get CSS custom property value
    */
   getCSSVariable: (name: string): string => {
-    if (typeof window === 'undefined') return ''
+    if (typeof window === 'undefined') return '';
     return getComputedStyle(document.documentElement)
       .getPropertyValue(`--${name}`)
-      .trim()
+      .trim();
   },
 
   /**
    * Set CSS custom property
    */
   setCSSVariable: (name: string, value: string): void => {
-    if (typeof window === 'undefined') return
-    document.documentElement.style.setProperty(`--${name}`, value)
+    if (typeof window === 'undefined') return;
+    document.documentElement.style.setProperty(`--${name}`, value);
   },
 
   /**
    * Apply theme configuration to CSS variables
    */
   applyThemeConfig: (config: Partial<ThemeConfig>): void => {
-    if (typeof window === 'undefined') return
+    if (typeof window === 'undefined') return;
 
-    const root = document.documentElement
+    const root = document.documentElement;
 
     // Apply colors
     if (config.colors) {
       Object.entries(config.colors).forEach(([colorName, palette]) => {
         if (typeof palette === 'object' && palette !== null) {
           Object.entries(palette).forEach(([shade, value]) => {
-            root.style.setProperty(`--color-${colorName}-${shade}`, value)
-          })
+            root.style.setProperty(`--color-${colorName}-${shade}`, value);
+          });
         }
-      })
+      });
     }
 
     // Apply spacing
     if (config.spacing) {
       Object.entries(config.spacing).forEach(([size, value]) => {
-        root.style.setProperty(`--spacing-${size}`, value)
-      })
+        root.style.setProperty(`--spacing-${size}`, value);
+      });
     }
 
     // Apply shadows
     if (config.shadows) {
       Object.entries(config.shadows).forEach(([name, value]) => {
-        root.style.setProperty(`--shadow-${name}`, value)
-      })
+        root.style.setProperty(`--shadow-${name}`, value);
+      });
     }
 
     // Apply animations
     if (config.animations) {
       if (config.animations.durations) {
         Object.entries(config.animations.durations).forEach(([name, value]) => {
-          root.style.setProperty(`--duration-${name}`, value)
-        })
+          root.style.setProperty(`--duration-${name}`, value);
+        });
       }
       if (config.animations.easings) {
         Object.entries(config.animations.easings).forEach(([name, value]) => {
-          root.style.setProperty(`--easing-${name}`, value)
-        })
+          root.style.setProperty(`--easing-${name}`, value);
+        });
       }
     }
   },
-}
+};

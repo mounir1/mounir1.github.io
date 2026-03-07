@@ -1,6 +1,6 @@
-import React from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { 
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
   LineChart,
   Line,
   XAxis,
@@ -9,9 +9,9 @@ import {
   Tooltip,
   ResponsiveContainer,
   Area,
-  AreaChart
-} from 'recharts'
-import { cn } from '@/lib/utils'
+  AreaChart,
+} from 'recharts';
+import { cn } from '@/lib/utils';
 
 const data = [
   { name: 'Jan', pageViews: 4000, uniqueVisitors: 2400, avgTime: 2.5 },
@@ -21,14 +21,16 @@ const data = [
   { name: 'May', pageViews: 1890, uniqueVisitors: 4800, avgTime: 2.7 },
   { name: 'Jun', pageViews: 2390, uniqueVisitors: 3800, avgTime: 2.2 },
   { name: 'Jul', pageViews: 3490, uniqueVisitors: 4300, avgTime: 2.8 },
-]
+];
 
-export const AnalyticsCharts: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
-  className,
-  ...props
-}) => {
+export const AnalyticsCharts: React.FC<
+  React.HTMLAttributes<HTMLDivElement>
+> = ({ className, ...props }) => {
   return (
-    <div className={cn("grid grid-cols-1 lg:grid-cols-2 gap-6", className)} {...props}>
+    <div
+      className={cn('grid grid-cols-1 gap-6 lg:grid-cols-2', className)}
+      {...props}
+    >
       <Card>
         <CardHeader>
           <CardTitle className="text-base font-medium">
@@ -50,13 +52,13 @@ export const AnalyticsCharts: React.FC<React.HTMLAttributes<HTMLDivElement>> = (
                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                 <XAxis dataKey="name" className="text-xs" />
                 <YAxis className="text-xs" />
-                <Tooltip 
-                  contentStyle={{ 
+                <Tooltip
+                  contentStyle={{
                     backgroundColor: 'hsl(var(--background))',
                     borderColor: 'hsl(var(--border))',
                   }}
                   labelStyle={{
-                    color: 'hsl(var(--foreground))'
+                    color: 'hsl(var(--foreground))',
                   }}
                 />
                 <Line
@@ -65,10 +67,10 @@ export const AnalyticsCharts: React.FC<React.HTMLAttributes<HTMLDivElement>> = (
                   stroke="hsl(var(--primary))"
                   activeDot={{ r: 8 }}
                 />
-                <Line 
-                  type="monotone" 
-                  dataKey="uniqueVisitors" 
-                  stroke="hsl(var(--secondary))" 
+                <Line
+                  type="monotone"
+                  dataKey="uniqueVisitors"
+                  stroke="hsl(var(--secondary))"
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -97,13 +99,13 @@ export const AnalyticsCharts: React.FC<React.HTMLAttributes<HTMLDivElement>> = (
                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                 <XAxis dataKey="name" className="text-xs" />
                 <YAxis className="text-xs" />
-                <Tooltip 
-                  contentStyle={{ 
+                <Tooltip
+                  contentStyle={{
                     backgroundColor: 'hsl(var(--background))',
                     borderColor: 'hsl(var(--border))',
                   }}
                   labelStyle={{
-                    color: 'hsl(var(--foreground))'
+                    color: 'hsl(var(--foreground))',
                   }}
                 />
                 <Area
@@ -118,5 +120,5 @@ export const AnalyticsCharts: React.FC<React.HTMLAttributes<HTMLDivElement>> = (
         </CardContent>
       </Card>
     </div>
-  )
-}
+  );
+};

@@ -5,24 +5,28 @@ This directory contains all the admin panel components for managing portfolio da
 ## Components Overview
 
 ### Core Admin Components
+
 - `AdminDashboard` - Main dashboard interface with stats and navigation
 - `OptimizedAdminDashboard` - Enhanced dashboard with additional features
 - `AdminHeader` - Header component with user info and logout functionality
 - `AdminStats` - Statistics display component
 
 ### Data Management Components
+
 - `ProjectsManager` - Full CRUD interface for projects
 - `SkillsManager` - Full CRUD interface for skills
 - `DataExportManager` - Data import/export functionality
 - `DataQualityDashboard` - Data validation and quality checks
 
 ### UI Components
+
 - `AdminDataTable` - Table component for displaying data
 - `AdminNavigation` - Navigation component for admin sections
 - `ActionColumn` - Standardized action buttons for tables (Edit, Delete, etc.)
 - `ImageUpload` - Image upload component with Firebase integration
 
 ### Analytics Components
+
 - `AnalyticsDashboard` - Google Analytics integration
 - `GoogleAnalyticsInfo` - Analytics display component
 - `GoogleAnalyticsVerification` - Verification meta tag generator
@@ -33,6 +37,7 @@ This directory contains all the admin panel components for managing portfolio da
 The `PortfolioDataManager` service provides optimized CRUD operations for both projects and skills:
 
 ### Projects Management
+
 - `getProjects()` - Retrieve all projects
 - `createProject(projectData)` - Create a new project
 - `updateProject(id, updates)` - Update an existing project
@@ -40,6 +45,7 @@ The `PortfolioDataManager` service provides optimized CRUD operations for both p
 - `batchDeleteProjects(ids)` - Delete multiple projects at once
 
 ### Skills Management
+
 - `getSkills()` - Retrieve all skills
 - `createSkill(skillData)` - Create a new skill
 - `updateSkill(id, updates)` - Update an existing skill
@@ -47,6 +53,7 @@ The `PortfolioDataManager` service provides optimized CRUD operations for both p
 - `batchDeleteSkills(ids)` - Delete multiple skills at once
 
 ### Data Validation
+
 - `validateProjectData(project)` - Validate project data before saving
 - `validateSkillData(skill)` - Validate skill data before saving
 
@@ -71,6 +78,7 @@ All admin operations require authentication. The system checks for valid Firebas
 ## Data Structure
 
 ### Project Schema
+
 ```typescript
 interface ProjectInput {
   title: string;
@@ -104,6 +112,7 @@ interface ProjectInput {
 ```
 
 ### Skill Schema
+
 ```typescript
 interface SkillInput {
   name: string;

@@ -25,13 +25,15 @@ export class SimpleErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen flex items-center justify-center bg-background p-8">
+        <div className="flex min-h-screen items-center justify-center bg-background p-8">
           <div className="text-center">
-            <h2 className="text-2xl font-bold mb-4">Something went wrong</h2>
-            <p className="text-muted-foreground mb-6">Please refresh the page to try again.</p>
-            <button 
-              onClick={() => window.location.reload()} 
-              className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+            <h2 className="mb-4 text-2xl font-bold">Something went wrong</h2>
+            <p className="mb-6 text-muted-foreground">
+              Please refresh the page to try again.
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="rounded-md bg-primary px-4 py-2 text-primary-foreground hover:bg-primary/90"
             >
               Refresh Page
             </button>

@@ -1,23 +1,23 @@
-import { useCallback, useEffect, useRef, useState, useId } from "react";
+import { useCallback, useEffect, useRef, useState, useId } from 'react';
 
 // ARIA utilities
 export interface AriaProps {
-  "aria-label"?: string;
-  "aria-labelledby"?: string;
-  "aria-describedby"?: string;
-  "aria-expanded"?: boolean;
-  "aria-hidden"?: boolean;
-  "aria-disabled"?: boolean;
-  "aria-required"?: boolean;
-  "aria-invalid"?: boolean;
-  "aria-live"?: "off" | "polite" | "assertive";
-  "aria-atomic"?: boolean;
-  "aria-busy"?: boolean;
-  "aria-controls"?: string;
-  "aria-current"?: boolean | "page" | "step" | "location" | "date" | "time";
-  "aria-selected"?: boolean;
-  "aria-checked"?: boolean;
-  "aria-pressed"?: boolean;
+  'aria-label'?: string;
+  'aria-labelledby'?: string;
+  'aria-describedby'?: string;
+  'aria-expanded'?: boolean;
+  'aria-hidden'?: boolean;
+  'aria-disabled'?: boolean;
+  'aria-required'?: boolean;
+  'aria-invalid'?: boolean;
+  'aria-live'?: 'off' | 'polite' | 'assertive';
+  'aria-atomic'?: boolean;
+  'aria-busy'?: boolean;
+  'aria-controls'?: string;
+  'aria-current'?: boolean | 'page' | 'step' | 'location' | 'date' | 'time';
+  'aria-selected'?: boolean;
+  'aria-checked'?: boolean;
+  'aria-pressed'?: boolean;
   role?: string;
   tabIndex?: number;
 }
@@ -74,7 +74,7 @@ export const useFocusManagement = () => {
     trapContainerRef.current = container;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key !== "Tab") return;
+      if (e.key !== 'Tab') return;
 
       const focusableElements = getFocusableElements(container);
       if (focusableElements.length === 0) return;
@@ -97,8 +97,8 @@ export const useFocusManagement = () => {
       }
     };
 
-    container.addEventListener("keydown", handleKeyDown);
-    return () => container.removeEventListener("keydown", handleKeyDown);
+    container.addEventListener('keydown', handleKeyDown);
+    return () => container.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   return {
@@ -107,7 +107,7 @@ export const useFocusManagement = () => {
     focusFirst,
     focusLast,
     trapFocus,
-    focusHistory: focusHistoryRef.current
+    focusHistory: focusHistoryRef.current,
   };
 };
 
@@ -121,8 +121,8 @@ function getFocusableElements(container: HTMLElement): HTMLElement[] {
     'textarea:not([disabled])',
     '[tabindex]:not([tabindex="-1"])',
     'details',
-    '[contenteditable="true"]'
-  ].join(",");
+    '[contenteditable="true"]',
+  ].join(',');
 
   return Array.from(container.querySelectorAll<HTMLElement>(selector)).filter(
     element => isVisible(element)
@@ -133,84 +133,89 @@ function getFocusableElements(container: HTMLElement): HTMLElement[] {
 function isVisible(element: HTMLElement): boolean {
   const style = window.getComputedStyle(element);
   return (
-    style.display !== "none" &&
-    style.visibility !== "hidden" &&
-    style.opacity !== "0"
+    style.display !== 'none' &&
+    style.visibility !== 'hidden' &&
+    style.opacity !== '0'
   );
 }
 
 // Keyboard navigation hook
-export const useKeyboardNavigation = (options: {
-  onEscape?: () => void;
-  onEnter?: () => void;
-  onArrowUp?: () => void;
-  onArrowDown?: () => void;
-  onArrowLeft?: () => void;
-  onArrowRight?: () => void;
-  onHome?: () => void;
-  onEnd?: () => void;
-  onTab?: (e: KeyboardEvent) => void;
-  enabled?: boolean;
-} = {}) => {
+export const useKeyboardNavigation = (
+  options: {
+    onEscape?: () => void;
+    onEnter?: () => void;
+    onArrowUp?: () => void;
+    onArrowDown?: () => void;
+    onArrowLeft?: () => void;
+    onArrowRight?: () => void;
+    onHome?: () => void;
+    onEnd?: () => void;
+    onTab?: (e: KeyboardEvent) => void;
+    enabled?: boolean;
+  } = {}
+) => {
   const { enabled = true } = options;
 
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (!enabled) return;
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (!enabled) return;
 
-    switch (e.key) {
-      case "Escape":
-        e.preventDefault();
-        options.onEscape?.();
-        break;
-      case "Enter":
-      case " ":
-        e.preventDefault();
-        options.onEnter?.();
-        break;
-      case "ArrowUp":
-        e.preventDefault();
-        options.onArrowUp?.();
-        break;
-      case "ArrowDown":
-        e.preventDefault();
-        options.onArrowDown?.();
-        break;
-      case "ArrowLeft":
-        e.preventDefault();
-        options.onArrowLeft?.();
-        break;
-      case "ArrowRight":
-        e.preventDefault();
-        options.onArrowRight?.();
-        break;
-      case "Home":
-        e.preventDefault();
-        options.onHome?.();
-        break;
-      case "End":
-        e.preventDefault();
-        options.onEnd?.();
-        break;
-      case "Tab":
-        options.onTab?.(e);
-        break;
-    }
-  }, [enabled, options]);
+      switch (e.key) {
+        case 'Escape':
+          e.preventDefault();
+          options.onEscape?.();
+          break;
+        case 'Enter':
+        case ' ':
+          e.preventDefault();
+          options.onEnter?.();
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          options.onArrowUp?.();
+          break;
+        case 'ArrowDown':
+          e.preventDefault();
+          options.onArrowDown?.();
+          break;
+        case 'ArrowLeft':
+          e.preventDefault();
+          options.onArrowLeft?.();
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          options.onArrowRight?.();
+          break;
+        case 'Home':
+          e.preventDefault();
+          options.onHome?.();
+          break;
+        case 'End':
+          e.preventDefault();
+          options.onEnd?.();
+          break;
+        case 'Tab':
+          options.onTab?.(e);
+          break;
+      }
+    },
+    [enabled, options]
+  );
 
   return { handleKeyDown };
 };
 
 // Screen reader announcements hook
 export const useScreenReader = () => {
-  const [announcement, setAnnouncement] = useState("");
+  const [announcement, setAnnouncement] = useState('');
   const liveRegionRef = useRef<HTMLDivElement | null>(null);
 
   // Create live region for announcements
   useEffect(() => {
-    const liveRegion = document.createElement("div");
-    liveRegion.setAttribute("aria-live", "polite");
-    liveRegion.setAttribute("aria-atomic", "true");
-    liveRegion.className = "sr-only";
+    const liveRegion = document.createElement('div');
+    liveRegion.setAttribute('aria-live', 'polite');
+    liveRegion.setAttribute('aria-atomic', 'true');
+    liveRegion.className = 'sr-only';
     document.body.appendChild(liveRegion);
     liveRegionRef.current = liveRegion;
 
@@ -227,24 +232,36 @@ export const useScreenReader = () => {
     }
   }, [announcement]);
 
-  const announce = useCallback((message: string, priority: "polite" | "assertive" = "polite") => {
-    if (!liveRegionRef.current || !message.trim()) return;
+  const announce = useCallback(
+    (message: string, priority: 'polite' | 'assertive' = 'polite') => {
+      if (!liveRegionRef.current || !message.trim()) return;
 
-    liveRegionRef.current.setAttribute("aria-live", priority);
-    setAnnouncement(message);
-  }, []);
+      liveRegionRef.current.setAttribute('aria-live', priority);
+      setAnnouncement(message);
+    },
+    []
+  );
 
-  const announceError = useCallback((message: string) => {
-    announce(`Error: ${message}`, "assertive");
-  }, [announce]);
+  const announceError = useCallback(
+    (message: string) => {
+      announce(`Error: ${message}`, 'assertive');
+    },
+    [announce]
+  );
 
-  const announceSuccess = useCallback((message: string) => {
-    announce(`Success: ${message}`, "polite");
-  }, [announce]);
+  const announceSuccess = useCallback(
+    (message: string) => {
+      announce(`Success: ${message}`, 'polite');
+    },
+    [announce]
+  );
 
-  const announceLoading = useCallback((message: string = "Loading") => {
-    announce(message, "polite");
-  }, [announce]);
+  const announceLoading = useCallback(
+    (message: string = 'Loading') => {
+      announce(message, 'polite');
+    },
+    [announce]
+  );
 
   return {
     announce,
@@ -257,69 +274,84 @@ export const useScreenReader = () => {
 // ARIA utilities
 export const useAriaAttributes = () => {
   const reactUseId = useId();
-  const generateId = useCallback((prefix: string = "element") => {
-    return `${prefix}-${reactUseId}`;
-  }, [reactUseId]);
+  const generateId = useCallback(
+    (prefix: string = 'element') => {
+      return `${prefix}-${reactUseId}`;
+    },
+    [reactUseId]
+  );
 
-  const createAriaProps = useCallback((config: {
-    label?: string;
-    labelledBy?: string;
-    describedBy?: string;
-    required?: boolean;
-    invalid?: boolean;
-    disabled?: boolean;
-    expanded?: boolean;
-    selected?: boolean;
-    checked?: boolean;
-    pressed?: boolean;
-    current?: AriaProps["aria-current"];
-    controls?: string;
-    live?: AriaProps["aria-live"];
-    role?: string;
-    hidden?: boolean;
-  }): AriaProps => {
-    const props: AriaProps = {};
+  const createAriaProps = useCallback(
+    (config: {
+      label?: string;
+      labelledBy?: string;
+      describedBy?: string;
+      required?: boolean;
+      invalid?: boolean;
+      disabled?: boolean;
+      expanded?: boolean;
+      selected?: boolean;
+      checked?: boolean;
+      pressed?: boolean;
+      current?: AriaProps['aria-current'];
+      controls?: string;
+      live?: AriaProps['aria-live'];
+      role?: string;
+      hidden?: boolean;
+    }): AriaProps => {
+      const props: AriaProps = {};
 
-    if (config.label) props["aria-label"] = config.label;
-    if (config.labelledBy) props["aria-labelledby"] = config.labelledBy;
-    if (config.describedBy) props["aria-describedby"] = config.describedBy;
-    if (config.required !== undefined) props["aria-required"] = config.required;
-    if (config.invalid !== undefined) props["aria-invalid"] = config.invalid;
-    if (config.disabled !== undefined) props["aria-disabled"] = config.disabled;
-    if (config.expanded !== undefined) props["aria-expanded"] = config.expanded;
-    if (config.selected !== undefined) props["aria-selected"] = config.selected;
-    if (config.checked !== undefined) props["aria-checked"] = config.checked;
-    if (config.pressed !== undefined) props["aria-pressed"] = config.pressed;
-    if (config.current !== undefined) props["aria-current"] = config.current;
-    if (config.controls) props["aria-controls"] = config.controls;
-    if (config.live) props["aria-live"] = config.live;
-    if (config.role) props.role = config.role;
-    if (config.hidden !== undefined) props["aria-hidden"] = config.hidden;
+      if (config.label) props['aria-label'] = config.label;
+      if (config.labelledBy) props['aria-labelledby'] = config.labelledBy;
+      if (config.describedBy) props['aria-describedby'] = config.describedBy;
+      if (config.required !== undefined)
+        props['aria-required'] = config.required;
+      if (config.invalid !== undefined) props['aria-invalid'] = config.invalid;
+      if (config.disabled !== undefined)
+        props['aria-disabled'] = config.disabled;
+      if (config.expanded !== undefined)
+        props['aria-expanded'] = config.expanded;
+      if (config.selected !== undefined)
+        props['aria-selected'] = config.selected;
+      if (config.checked !== undefined) props['aria-checked'] = config.checked;
+      if (config.pressed !== undefined) props['aria-pressed'] = config.pressed;
+      if (config.current !== undefined) props['aria-current'] = config.current;
+      if (config.controls) props['aria-controls'] = config.controls;
+      if (config.live) props['aria-live'] = config.live;
+      if (config.role) props.role = config.role;
+      if (config.hidden !== undefined) props['aria-hidden'] = config.hidden;
 
-    return props;
-  }, []);
+      return props;
+    },
+    []
+  );
 
   return {
     generateId,
-    createAriaProps
+    createAriaProps,
   };
 };
 
 // Skip link hook
 export const useSkipLinks = () => {
-  const [skipLinks, setSkipLinks] = useState<Array<{
-    id: string;
-    label: string;
-    target: string;
-  }>>([]);
+  const [skipLinks, setSkipLinks] = useState<
+    Array<{
+      id: string;
+      label: string;
+      target: string;
+    }>
+  >([]);
 
-  const addSkipLink = useCallback((id: string, label: string, target: string) => {
-    setSkipLinks(prev => {
-      const exists = prev.find(link => link.id === id);
-      if (exists) return prev;
-      return [...prev, { id, label, target }];
-    });
-  }, []);
+  const addSkipLink = useCallback(
+    (id: string, label: string, target: string) => {
+      setSkipLinks(prev => {
+        const exists = prev.find(link => link.id === id);
+        if (exists) return prev;
+        return [...prev, { id, label, target }];
+      });
+    },
+    []
+  );
 
   const removeSkipLink = useCallback((id: string) => {
     setSkipLinks(prev => prev.filter(link => link.id !== id));
@@ -329,7 +361,7 @@ export const useSkipLinks = () => {
     const element = document.getElementById(target);
     if (element) {
       element.focus();
-      element.scrollIntoView({ behavior: "smooth" });
+      element.scrollIntoView({ behavior: 'smooth' });
     }
   }, []);
 
@@ -337,7 +369,7 @@ export const useSkipLinks = () => {
     skipLinks,
     addSkipLink,
     removeSkipLink,
-    skipTo
+    skipTo,
   };
 };
 
@@ -346,15 +378,15 @@ export const useReducedMotion = () => {
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     setPrefersReducedMotion(mediaQuery.matches);
 
     const handler = (e: MediaQueryListEvent) => {
       setPrefersReducedMotion(e.matches);
     };
 
-    mediaQuery.addEventListener("change", handler);
-    return () => mediaQuery.removeEventListener("change", handler);
+    mediaQuery.addEventListener('change', handler);
+    return () => mediaQuery.removeEventListener('change', handler);
   }, []);
 
   return prefersReducedMotion;
@@ -365,15 +397,15 @@ export const useHighContrast = () => {
   const [prefersHighContrast, setPrefersHighContrast] = useState(false);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-contrast: high)");
+    const mediaQuery = window.matchMedia('(prefers-contrast: high)');
     setPrefersHighContrast(mediaQuery.matches);
 
     const handler = (e: MediaQueryListEvent) => {
       setPrefersHighContrast(e.matches);
     };
 
-    mediaQuery.addEventListener("change", handler);
-    return () => mediaQuery.removeEventListener("change", handler);
+    mediaQuery.addEventListener('change', handler);
+    return () => mediaQuery.removeEventListener('change', handler);
   }, []);
 
   return prefersHighContrast;
@@ -381,24 +413,28 @@ export const useHighContrast = () => {
 
 // Color scheme preference
 export const useColorScheme = () => {
-  const [colorScheme, setColorScheme] = useState<"light" | "dark" | "auto">("auto");
+  const [colorScheme, setColorScheme] = useState<'light' | 'dark' | 'auto'>(
+    'auto'
+  );
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    setColorScheme(mediaQuery.matches ? "dark" : "light");
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    setColorScheme(mediaQuery.matches ? 'dark' : 'light');
 
     const handler = (e: MediaQueryListEvent) => {
-      setColorScheme(e.matches ? "dark" : "light");
+      setColorScheme(e.matches ? 'dark' : 'light');
     };
 
-    mediaQuery.addEventListener("change", handler);
-    return () => mediaQuery.removeEventListener("change", handler);
+    mediaQuery.addEventListener('change', handler);
+    return () => mediaQuery.removeEventListener('change', handler);
   }, []);
 
   return colorScheme;
 };
 
-export const useRovingTabIndex = (containerRef: React.RefObject<HTMLElement>) => {
+export const useRovingTabIndex = (
+  containerRef: React.RefObject<HTMLElement>
+) => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const handleKeyDown = useCallback(
@@ -408,10 +444,12 @@ export const useRovingTabIndex = (containerRef: React.RefObject<HTMLElement>) =>
       if (focusableElements.length === 0) return;
 
       let newIndex = activeIndex;
-      if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+      if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
         newIndex = (activeIndex + 1) % focusableElements.length;
-      } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
-        newIndex = (activeIndex - 1 + focusableElements.length) % focusableElements.length;
+      } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+        newIndex =
+          (activeIndex - 1 + focusableElements.length) %
+          focusableElements.length;
       }
 
       if (newIndex !== activeIndex) {
@@ -433,7 +471,6 @@ export const useRovingTabIndex = (containerRef: React.RefObject<HTMLElement>) =>
 
   return { activeIndex, handleKeyDown };
 };
-
 
 export default {
   useFocusManagement,

@@ -1,12 +1,12 @@
-import React, { useState, useMemo, useCallback } from "react";
-import { toast } from "@/hooks/use-toast";
-import { useProjects } from "@/hooks/useProjects";
-import { Project, ProjectInput } from "@/lib/schema/projectSchema";
-import { firebaseService } from "@/lib/services/firebaseService";
-import { AdminDataTable } from "@/components/admin/AdminDataTable";
-import { createActionColumnDef } from "@/components/admin/ActionColumn";
-import { ColumnDef } from "@tanstack/react-table";
-import { format } from "date-fns";
+import React, { useState, useMemo, useCallback } from 'react';
+import { toast } from '@/hooks/use-toast';
+import { useProjects } from '@/hooks/useProjects';
+import { Project, ProjectInput } from '@/lib/schema/projectSchema';
+import { firebaseService } from '@/lib/services/firebaseService';
+import { AdminDataTable } from '@/components/admin/AdminDataTable';
+import { createActionColumnDef } from '@/components/admin/ActionColumn';
+import { ColumnDef } from '@tanstack/react-table';
+import { format } from 'date-fns';
 import {
   Calendar,
   Check,
@@ -23,17 +23,17 @@ import {
   Trash,
   AlertCircle,
   Clock,
-} from "lucide-react";
+} from 'lucide-react';
 
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-  CardDescription
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+  CardDescription,
+} from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -43,7 +43,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+} from '@/components/ui/alert-dialog';
 import {
   Dialog,
   DialogContent,
@@ -51,7 +51,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 import {
   Form,
   FormControl,
@@ -60,24 +60,24 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
-} from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { ProjectSchema } from "@/lib/schema/projectSchema";
-import { ProjectCategory, ProjectStatus } from "@/lib/schema/types";
-import { DataExportManager } from "@/components/admin/DataExportManager";
-import { ImageUpload } from "@/components/admin/ImageUpload";
+  SelectValue,
+} from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { ProjectSchema } from '@/lib/schema/projectSchema';
+import { ProjectCategory, ProjectStatus } from '@/lib/schema/types';
+import { DataExportManager } from '@/components/admin/DataExportManager';
+import { ImageUpload } from '@/components/admin/ImageUpload';
 
 export function ProjectsManager() {
   const { projects, loading, refetch } = useProjects();
@@ -88,51 +88,51 @@ export function ProjectsManager() {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [projectToEdit, setProjectToEdit] = useState<Project | null>(null);
-  const [imageUrl, setImageUrl] = useState<string>("");
-  const [imagePath, setImagePath] = useState<string>("");
-  const [logoUrl, setLogoUrl] = useState<string>("");
-  const [logoPath, setLogoPath] = useState<string>("");
+  const [imageUrl, setImageUrl] = useState<string>('');
+  const [imagePath, setImagePath] = useState<string>('');
+  const [logoUrl, setLogoUrl] = useState<string>('');
+  const [logoPath, setLogoPath] = useState<string>('');
 
   // Form setup
   const form = useForm<ProjectInput>({
     resolver: zodResolver(ProjectSchema),
     defaultValues: {
-      title: "",
-      description: "",
-      longDescription: "",
+      title: '',
+      description: '',
+      longDescription: '',
       category: ProjectCategory.WEB_APPLICATION,
       status: ProjectStatus.COMPLETED,
       achievements: [],
       technologies: [],
       tags: [],
-      image: "",
-      logo: "",
-      icon: "",
-      liveUrl: "",
-      githubUrl: "",
-      demoUrl: "",
-      caseStudyUrl: "",
+      image: '',
+      logo: '',
+      icon: '',
+      liveUrl: '',
+      githubUrl: '',
+      demoUrl: '',
+      caseStudyUrl: '',
       featured: false,
       disabled: false,
       priority: 50,
-      startDate: "",
-      endDate: "",
-      duration: "",
+      startDate: '',
+      endDate: '',
+      duration: '',
       teamSize: 1,
-      role: "Full-Stack Developer",
+      role: 'Full-Stack Developer',
       clientInfo: {
-        name: "",
-        industry: "",
-        size: "medium",
-        location: "",
-        website: "",
+        name: '',
+        industry: '',
+        size: 'medium',
+        location: '',
+        website: '',
         isPublic: false,
       },
       metrics: {
         usersReached: 0,
-        performanceImprovement: "",
-        revenueImpact: "",
-        uptime: "",
+        performanceImprovement: '',
+        revenueImpact: '',
+        uptime: '',
         customMetrics: {},
       },
       challenges: [],
@@ -140,24 +140,26 @@ export function ProjectsManager() {
     },
   });
 
-
-
   // Handle form submission with better validation and error handling
   const onSubmit = async (values: ProjectInput) => {
     try {
       // Show loading state
       const loadingToast = toast({
-        title: projectToEdit ? "Updating project..." : "Creating project...",
-        description: "Please wait while we save your project.",
+        title: projectToEdit ? 'Updating project...' : 'Creating project...',
+        description: 'Please wait while we save your project.',
       });
 
       if (projectToEdit) {
         // Check if this is a local project (can't be updated in Firebase)
-        if (projectToEdit.id.startsWith('local-') || projectToEdit.id.startsWith('fallback-')) {
+        if (
+          projectToEdit.id.startsWith('local-') ||
+          projectToEdit.id.startsWith('fallback-')
+        ) {
           toast({
-            title: "Cannot Edit Local Project",
-            description: "This is a local/demo project. Please create a new project instead.",
-            variant: "destructive",
+            title: 'Cannot Edit Local Project',
+            description:
+              'This is a local/demo project. Please create a new project instead.',
+            variant: 'destructive',
           });
           return;
         }
@@ -171,7 +173,7 @@ export function ProjectsManager() {
         });
 
         toast({
-          title: "Project updated successfully",
+          title: 'Project updated successfully',
           description: `"${values.title}" has been updated and synced to Firebase.`,
         });
       } else {
@@ -186,35 +188,37 @@ export function ProjectsManager() {
         await firebaseService.createProject(newProject);
 
         toast({
-          title: "Project created successfully",
+          title: 'Project created successfully',
           description: `"${values.title}" has been added to your portfolio and synced to Firebase.`,
         });
       }
 
       setIsFormOpen(false);
       resetForm();
-      setImageUrl("");
-      setImagePath("");
-      setLogoUrl("");
-      setLogoPath("");
+      setImageUrl('');
+      setImagePath('');
+      setLogoUrl('');
+      setLogoPath('');
       refetch();
     } catch (error) {
-      console.error("Error saving project:", error);
-      let errorMessage = "Unknown error occurred";
+      console.error('Error saving project:', error);
+      let errorMessage = 'Unknown error occurred';
 
       if (error instanceof Error) {
         errorMessage = error.message;
         if (errorMessage.includes('permission')) {
-          errorMessage = "You don't have permission to modify projects. Please check your access rights.";
+          errorMessage =
+            "You don't have permission to modify projects. Please check your access rights.";
         } else if (errorMessage.includes('network')) {
-          errorMessage = "Network error. Please check your internet connection and try again.";
+          errorMessage =
+            'Network error. Please check your internet connection and try again.';
         }
       }
 
       toast({
-        title: "Failed to save project",
+        title: 'Failed to save project',
         description: `Error: ${errorMessage}. Please try again or contact support if the issue persists.`,
-        variant: "destructive",
+        variant: 'destructive',
       });
     }
   };
@@ -222,42 +226,42 @@ export function ProjectsManager() {
   // Reset form
   const resetForm = useCallback(() => {
     form.reset({
-      title: "",
-      description: "",
-      longDescription: "",
+      title: '',
+      description: '',
+      longDescription: '',
       category: ProjectCategory.WEB_APPLICATION,
       status: ProjectStatus.COMPLETED,
       achievements: [],
       technologies: [],
       tags: [],
-      image: "",
-      logo: "",
-      icon: "",
-      liveUrl: "",
-      githubUrl: "",
-      demoUrl: "",
-      caseStudyUrl: "",
+      image: '',
+      logo: '',
+      icon: '',
+      liveUrl: '',
+      githubUrl: '',
+      demoUrl: '',
+      caseStudyUrl: '',
       featured: false,
       disabled: false,
       priority: 50,
-      startDate: "",
-      endDate: "",
-      duration: "",
+      startDate: '',
+      endDate: '',
+      duration: '',
       teamSize: 1,
-      role: "Full-Stack Developer",
+      role: 'Full-Stack Developer',
       clientInfo: {
-        name: "",
-        industry: "",
-        size: "medium",
-        location: "",
-        website: "",
+        name: '',
+        industry: '',
+        size: 'medium',
+        location: '',
+        website: '',
         isPublic: false,
       },
       metrics: {
         usersReached: 0,
-        performanceImprovement: "",
-        revenueImpact: "",
-        uptime: "",
+        performanceImprovement: '',
+        revenueImpact: '',
+        uptime: '',
         customMetrics: {},
       },
       challenges: [],
@@ -266,54 +270,57 @@ export function ProjectsManager() {
   }, [form]);
 
   // Handle edit project
-  const handleEditProject = useCallback((project: Project) => {
-    setProjectToEdit(project);
-    form.reset({
-      title: project.title,
-      description: project.description || "",
-      longDescription: project.longDescription || "",
-      category: project.category,
-      status: project.status,
-      achievements: project.achievements || [],
-      technologies: project.technologies || [],
-      tags: project.tags || [],
-      image: project.image || "",
-      logo: project.logo || "",
-      icon: project.icon || "",
-      liveUrl: project.liveUrl || "",
-      githubUrl: project.githubUrl || "",
-      demoUrl: project.demoUrl || "",
-      caseStudyUrl: project.caseStudyUrl || "",
-      featured: project.featured,
-      disabled: project.disabled,
-      priority: project.priority,
-      startDate: project.startDate || "",
-      endDate: project.endDate || "",
-      duration: project.duration || "",
-      teamSize: project.teamSize || 1,
-      role: project.role || "Full-Stack Developer",
-      clientInfo: {
-        name: project.clientInfo?.name || "",
-        industry: project.clientInfo?.industry || "",
-        size: project.clientInfo?.size || "medium",
-        location: project.clientInfo?.location || "",
-        website: project.clientInfo?.website || "",
-        isPublic: project.clientInfo?.isPublic || false,
-      },
-      metrics: {
-        usersReached: project.metrics?.usersReached || 0,
-        performanceImprovement: project.metrics?.performanceImprovement || "",
-        revenueImpact: project.metrics?.revenueImpact || "",
-        uptime: project.metrics?.uptime || "",
-        customMetrics: project.metrics?.customMetrics || {},
-      },
-      challenges: project.challenges || [],
-      solutions: project.solutions || [],
-    });
-    setImageUrl(project.image || "");
-    setLogoUrl(project.logo || "");
-    setIsFormOpen(true);
-  }, [form]);
+  const handleEditProject = useCallback(
+    (project: Project) => {
+      setProjectToEdit(project);
+      form.reset({
+        title: project.title,
+        description: project.description || '',
+        longDescription: project.longDescription || '',
+        category: project.category,
+        status: project.status,
+        achievements: project.achievements || [],
+        technologies: project.technologies || [],
+        tags: project.tags || [],
+        image: project.image || '',
+        logo: project.logo || '',
+        icon: project.icon || '',
+        liveUrl: project.liveUrl || '',
+        githubUrl: project.githubUrl || '',
+        demoUrl: project.demoUrl || '',
+        caseStudyUrl: project.caseStudyUrl || '',
+        featured: project.featured,
+        disabled: project.disabled,
+        priority: project.priority,
+        startDate: project.startDate || '',
+        endDate: project.endDate || '',
+        duration: project.duration || '',
+        teamSize: project.teamSize || 1,
+        role: project.role || 'Full-Stack Developer',
+        clientInfo: {
+          name: project.clientInfo?.name || '',
+          industry: project.clientInfo?.industry || '',
+          size: project.clientInfo?.size || 'medium',
+          location: project.clientInfo?.location || '',
+          website: project.clientInfo?.website || '',
+          isPublic: project.clientInfo?.isPublic || false,
+        },
+        metrics: {
+          usersReached: project.metrics?.usersReached || 0,
+          performanceImprovement: project.metrics?.performanceImprovement || '',
+          revenueImpact: project.metrics?.revenueImpact || '',
+          uptime: project.metrics?.uptime || '',
+          customMetrics: project.metrics?.customMetrics || {},
+        },
+        challenges: project.challenges || [],
+        solutions: project.solutions || [],
+      });
+      setImageUrl(project.image || '');
+      setLogoUrl(project.logo || '');
+      setIsFormOpen(true);
+    },
+    [form]
+  );
 
   // Handle delete project
   const handleDeleteProject = useCallback(async () => {
@@ -321,11 +328,14 @@ export function ProjectsManager() {
 
     try {
       // Check if this is a local project
-      if (projectToDelete.id.startsWith('local-') || projectToDelete.id.startsWith('fallback-')) {
+      if (
+        projectToDelete.id.startsWith('local-') ||
+        projectToDelete.id.startsWith('fallback-')
+      ) {
         toast({
-          title: "Cannot Delete Local Project",
-          description: "This is a local/demo project and cannot be deleted.",
-          variant: "destructive",
+          title: 'Cannot Delete Local Project',
+          description: 'This is a local/demo project and cannot be deleted.',
+          variant: 'destructive',
         });
         setProjectToDelete(null);
         return;
@@ -333,131 +343,140 @@ export function ProjectsManager() {
 
       await firebaseService.deleteProject(projectToDelete.id);
       toast({
-        title: "Project deleted",
+        title: 'Project deleted',
         description: `${projectToDelete.title} has been deleted successfully.`,
       });
       setProjectToDelete(null);
       refetch();
     } catch (error) {
-      console.error("Error deleting project:", error);
+      console.error('Error deleting project:', error);
       toast({
-        title: "Failed to delete project",
-        description: "An error occurred while deleting the project.",
-        variant: "destructive",
+        title: 'Failed to delete project',
+        description: 'An error occurred while deleting the project.',
+        variant: 'destructive',
       });
     }
   }, [projectToDelete, refetch]);
 
   // Handle bulk delete
-  const handleBulkDelete = useCallback(async (projects: Project[]) => {
-    if (projects.length === 0) return;
+  const handleBulkDelete = useCallback(
+    async (projects: Project[]) => {
+      if (projects.length === 0) return;
 
-    try {
-      const deletableProjects = projects.filter(
-        p => !p.id.startsWith('local-') && !p.id.startsWith('fallback-')
-      );
+      try {
+        const deletableProjects = projects.filter(
+          p => !p.id.startsWith('local-') && !p.id.startsWith('fallback-')
+        );
 
-      if (deletableProjects.length === 0) {
+        if (deletableProjects.length === 0) {
+          toast({
+            title: 'Cannot Delete Local Projects',
+            description: 'Local/demo projects cannot be deleted.',
+            variant: 'destructive',
+          });
+          setBulkDeleteOpen(false);
+          setProjectsToDelete([]);
+          return;
+        }
+
+        await Promise.all(
+          deletableProjects.map(p => firebaseService.deleteProject(p.id))
+        );
+
         toast({
-          title: "Cannot Delete Local Projects",
-          description: "Local/demo projects cannot be deleted.",
-          variant: "destructive",
+          title: 'Projects deleted',
+          description: `${deletableProjects.length} projects have been deleted successfully.`,
         });
+
         setBulkDeleteOpen(false);
         setProjectsToDelete([]);
-        return;
+        refetch();
+      } catch (error) {
+        console.error('Error deleting projects:', error);
+        toast({
+          title: 'Failed to delete projects',
+          description: 'An error occurred while deleting the projects.',
+          variant: 'destructive',
+        });
       }
-
-      await Promise.all(deletableProjects.map(p => firebaseService.deleteProject(p.id)));
-
-      toast({
-        title: "Projects deleted",
-        description: `${deletableProjects.length} projects have been deleted successfully.`,
-      });
-
-      setBulkDeleteOpen(false);
-      setProjectsToDelete([]);
-      refetch();
-    } catch (error) {
-      console.error("Error deleting projects:", error);
-      toast({
-        title: "Failed to delete projects",
-        description: "An error occurred while deleting the projects.",
-        variant: "destructive",
-      });
-    }
-  }, [refetch]);
+    },
+    [refetch]
+  );
 
   // Handle add project
   const handleAddProject = useCallback(() => {
     setProjectToEdit(null);
     resetForm();
-    setImageUrl("");
-    setImagePath("");
-    setLogoUrl("");
-    setLogoPath("");
+    setImageUrl('');
+    setImagePath('');
+    setLogoUrl('');
+    setLogoPath('');
     setIsFormOpen(true);
   }, [resetForm]);
 
   // Columns definition
   const columns: ColumnDef<Project>[] = [
     {
-      accessorKey: "title",
-      header: "Project",
+      accessorKey: 'title',
+      header: 'Project',
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
           {row.original.logo && (
             <img
               src={row.original.logo}
               alt=""
-              className="w-8 h-8 rounded object-contain bg-muted"
+              className="h-8 w-8 rounded bg-muted object-contain"
             />
           )}
-          <span className="font-medium">{row.getValue("title")}</span>
+          <span className="font-medium">{row.getValue('title')}</span>
         </div>
       ),
     },
     {
-      accessorKey: "category",
-      header: "Category",
+      accessorKey: 'category',
+      header: 'Category',
       cell: ({ row }) => (
-        <Badge variant="outline">{row.getValue("category")}</Badge>
+        <Badge variant="outline">{row.getValue('category')}</Badge>
       ),
     },
     {
-      accessorKey: "status",
-      header: "Status",
+      accessorKey: 'status',
+      header: 'Status',
       cell: ({ row }) => {
-        const status = row.getValue("status") as string;
+        const status = row.getValue('status') as string;
         return (
-          <Badge variant={status === "completed" ? "default" : "secondary"}>
-            {status.replace("-", " ")}
+          <Badge variant={status === 'completed' ? 'default' : 'secondary'}>
+            {status.replace('-', ' ')}
           </Badge>
         );
       },
     },
     {
-      accessorKey: "featured",
-      header: "Featured",
-      cell: ({ row }) => (
-        row.getValue("featured") ?
-          <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" /> :
+      accessorKey: 'featured',
+      header: 'Featured',
+      cell: ({ row }) =>
+        row.getValue('featured') ? (
+          <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
+        ) : (
           <Star className="h-4 w-4 text-muted-foreground" />
-      ),
+        ),
     },
     {
-      accessorKey: "disabled",
-      header: "Visibility",
-      cell: ({ row }) => (
-        row.getValue("disabled") ?
-          <Badge variant="destructive">Hidden</Badge> :
-          <Badge variant="default" className="bg-green-500 hover:bg-green-600">Visible</Badge>
-      ),
+      accessorKey: 'disabled',
+      header: 'Visibility',
+      cell: ({ row }) =>
+        row.getValue('disabled') ? (
+          <Badge variant="destructive">Hidden</Badge>
+        ) : (
+          <Badge variant="default" className="bg-green-500 hover:bg-green-600">
+            Visible
+          </Badge>
+        ),
     },
     createActionColumnDef({
       onEdit: handleEditProject,
-      onDelete: (project) => setProjectToDelete(project),
-      onView: (project) => {
+      onDelete: project => setProjectToDelete(project),
+      onView: project => {
         setSelectedProject(project);
         setDetailsOpen(true);
       },
@@ -470,26 +489,31 @@ export function ProjectsManager() {
     return categories.map(cat => ({ label: cat, value: cat }));
   }, []);
 
-  const statusOptions = useMemo(() => [
-    { label: "Visible", value: "false" },
-    { label: "Hidden", value: "true" },
-  ], []);
+  const statusOptions = useMemo(
+    () => [
+      { label: 'Visible', value: 'false' },
+      { label: 'Hidden', value: 'true' },
+    ],
+    []
+  );
 
   return (
     <div className="space-y-6">
       <DataExportManager />
 
-      <Card className="border-0 shadow-medium bg-card text-card-foreground">
+      <Card className="border-0 bg-card text-card-foreground shadow-medium">
         <CardHeader>
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
-              <CardTitle className="text-2xl font-bold font-heading">Projects Management</CardTitle>
+              <CardTitle className="font-heading text-2xl font-bold">
+                Projects Management
+              </CardTitle>
               <CardDescription className="font-sans leading-relaxed">
                 Manage your portfolio projects and case studies
               </CardDescription>
             </div>
             <Button onClick={handleAddProject} className="shadow-glow">
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="mr-2 h-4 w-4" />
               Add Project
             </Button>
           </div>
@@ -497,8 +521,8 @@ export function ProjectsManager() {
         <CardContent>
           {loading ? (
             <div className="space-y-4">
-              <div className="h-10 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-              <div className="h-80 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+              <div className="h-10 w-full animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
+              <div className="h-80 w-full animate-pulse rounded bg-gray-200 dark:bg-gray-700"></div>
             </div>
           ) : (
             <AdminDataTable
@@ -509,18 +533,18 @@ export function ProjectsManager() {
               searchPlaceholder="Search projects..."
               filterFields={[
                 {
-                  key: "category",
-                  title: "Category",
+                  key: 'category',
+                  title: 'Category',
                   options: categoryOptions,
                 },
                 {
-                  key: "disabled",
-                  title: "Visibility",
+                  key: 'disabled',
+                  title: 'Visibility',
                   options: statusOptions,
                 },
               ]}
               onRefresh={refetch}
-              onDelete={(projects) => {
+              onDelete={projects => {
                 setProjectsToDelete(projects);
                 setBulkDeleteOpen(true);
               }}
@@ -531,30 +555,35 @@ export function ProjectsManager() {
       </Card>
 
       {/* Project Form Dialog */}
-      <Dialog open={isFormOpen} onOpenChange={(open) => {
-        setIsFormOpen(open);
-        if (!open && form.formState.isDirty) {
-          resetForm();
-          setImageUrl("");
-          setImagePath("");
-          setLogoUrl("");
-          setLogoPath("");
-        }
-      }}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-background text-foreground">
+      <Dialog
+        open={isFormOpen}
+        onOpenChange={open => {
+          setIsFormOpen(open);
+          if (!open && form.formState.isDirty) {
+            resetForm();
+            setImageUrl('');
+            setImagePath('');
+            setLogoUrl('');
+            setLogoPath('');
+          }
+        }}
+      >
+        <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto bg-background text-foreground">
           <DialogHeader>
-            <DialogTitle>{projectToEdit ? "Edit Project" : "Add Project"}</DialogTitle>
+            <DialogTitle>
+              {projectToEdit ? 'Edit Project' : 'Add Project'}
+            </DialogTitle>
             <DialogDescription>
               {projectToEdit
-                ? "Update the project details below"
-                : "Fill in the details for your new project"}
+                ? 'Update the project details below'
+                : 'Fill in the details for your new project'}
             </DialogDescription>
           </DialogHeader>
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               {/* Basic Information */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <FormField
                   control={form.control}
                   name="title"
@@ -565,7 +594,7 @@ export function ProjectsManager() {
                         <Input
                           placeholder="e.g., E-Commerce Platform"
                           {...field}
-                          className="bg-background text-foreground border-input"
+                          className="border-input bg-background text-foreground"
                         />
                       </FormControl>
                       <FormDescription>
@@ -582,23 +611,24 @@ export function ProjectsManager() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Category</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
                         <FormControl>
-                          <SelectTrigger className="bg-background text-foreground border-input">
+                          <SelectTrigger className="border-input bg-background text-foreground">
                             <SelectValue placeholder="Select category" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent className="bg-popover text-popover-foreground border-border">
-                          {Object.values(ProjectCategory).map((category) => (
+                        <SelectContent className="border-border bg-popover text-popover-foreground">
+                          {Object.values(ProjectCategory).map(category => (
                             <SelectItem key={category} value={category}>
                               {category}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
-                      <FormDescription>
-                        The type of project
-                      </FormDescription>
+                      <FormDescription>The type of project</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -610,16 +640,21 @@ export function ProjectsManager() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Status</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
                         <FormControl>
-                          <SelectTrigger className="bg-background text-foreground border-input">
+                          <SelectTrigger className="border-input bg-background text-foreground">
                             <SelectValue placeholder="Select status" />
                           </SelectTrigger>
                         </FormControl>
-                        <SelectContent className="bg-popover text-popover-foreground border-border">
-                          {Object.values(ProjectStatus).map((status) => (
+                        <SelectContent className="border-border bg-popover text-popover-foreground">
+                          {Object.values(ProjectStatus).map(status => (
                             <SelectItem key={status} value={status}>
-                              {status.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                              {status
+                                .replace(/-/g, ' ')
+                                .replace(/\b\w/g, l => l.toUpperCase())}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -644,8 +679,8 @@ export function ProjectsManager() {
                           min="1"
                           max="100"
                           {...field}
-                          onChange={(e) => field.onChange(Number(e.target.value))}
-                          className="bg-background text-foreground border-input"
+                          onChange={e => field.onChange(Number(e.target.value))}
+                          className="border-input bg-background text-foreground"
                         />
                       </FormControl>
                       <FormDescription>
@@ -667,8 +702,8 @@ export function ProjectsManager() {
                           type="number"
                           min="1"
                           {...field}
-                          onChange={(e) => field.onChange(Number(e.target.value))}
-                          className="bg-background text-foreground border-input"
+                          onChange={e => field.onChange(Number(e.target.value))}
+                          className="border-input bg-background text-foreground"
                         />
                       </FormControl>
                       <FormDescription>
@@ -689,7 +724,7 @@ export function ProjectsManager() {
                     <FormControl>
                       <Textarea
                         placeholder="Brief description of the project..."
-                        className="min-h-[100px] bg-background text-foreground border-input"
+                        className="min-h-[100px] border-input bg-background text-foreground"
                         {...field}
                       />
                     </FormControl>
@@ -710,19 +745,20 @@ export function ProjectsManager() {
                     <FormControl>
                       <Textarea
                         placeholder="Detailed description of the project..."
-                        className="min-h-[150px] bg-background text-foreground border-input"
+                        className="min-h-[150px] border-input bg-background text-foreground"
                         {...field}
                       />
                     </FormControl>
                     <FormDescription>
-                      A comprehensive description of the project, including goals, scope, and outcomes
+                      A comprehensive description of the project, including
+                      goals, scope, and outcomes
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <FormField
                   control={form.control}
                   name="technologies"
@@ -733,9 +769,16 @@ export function ProjectsManager() {
                         <Input
                           placeholder="React, Node.js, Firebase..."
                           {...field}
-                          value={field.value?.join(", ") || ""}
-                          onChange={(e) => field.onChange(e.target.value.split(",").map(t => t.trim()).filter(t => t))}
-                          className="bg-background text-foreground border-input"
+                          value={field.value?.join(', ') || ''}
+                          onChange={e =>
+                            field.onChange(
+                              e.target.value
+                                .split(',')
+                                .map(t => t.trim())
+                                .filter(t => t)
+                            )
+                          }
+                          className="border-input bg-background text-foreground"
                         />
                       </FormControl>
                       <FormDescription>
@@ -756,9 +799,16 @@ export function ProjectsManager() {
                         <Input
                           placeholder="web, backend, frontend..."
                           {...field}
-                          value={field.value?.join(", ") || ""}
-                          onChange={(e) => field.onChange(e.target.value.split(",").map(t => t.trim()).filter(t => t))}
-                          className="bg-background text-foreground border-input"
+                          value={field.value?.join(', ') || ''}
+                          onChange={e =>
+                            field.onChange(
+                              e.target.value
+                                .split(',')
+                                .map(t => t.trim())
+                                .filter(t => t)
+                            )
+                          }
+                          className="border-input bg-background text-foreground"
                         />
                       </FormControl>
                       <FormDescription>
@@ -770,7 +820,7 @@ export function ProjectsManager() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <FormField
                   control={form.control}
                   name="liveUrl"
@@ -781,12 +831,10 @@ export function ProjectsManager() {
                         <Input
                           placeholder="https://project-demo.com"
                           {...field}
-                          className="bg-background text-foreground border-input"
+                          className="border-input bg-background text-foreground"
                         />
                       </FormControl>
-                      <FormDescription>
-                        URL to the live project
-                      </FormDescription>
+                      <FormDescription>URL to the live project</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -802,7 +850,7 @@ export function ProjectsManager() {
                         <Input
                           placeholder="https://github.com/user/project"
                           {...field}
-                          className="bg-background text-foreground border-input"
+                          className="border-input bg-background text-foreground"
                         />
                       </FormControl>
                       <FormDescription>
@@ -823,12 +871,10 @@ export function ProjectsManager() {
                         <Input
                           placeholder="https://demo.project.com"
                           {...field}
-                          className="bg-background text-foreground border-input"
+                          className="border-input bg-background text-foreground"
                         />
                       </FormControl>
-                      <FormDescription>
-                        URL to the project demo
-                      </FormDescription>
+                      <FormDescription>URL to the project demo</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -844,7 +890,7 @@ export function ProjectsManager() {
                         <Input
                           placeholder="https://casestudy.project.com"
                           {...field}
-                          className="bg-background text-foreground border-input"
+                          className="border-input bg-background text-foreground"
                         />
                       </FormControl>
                       <FormDescription>
@@ -866,13 +912,21 @@ export function ProjectsManager() {
                     <FormControl>
                       <Textarea
                         placeholder="List key achievements (one per line)..."
-                        className="min-h-[100px] bg-background text-foreground border-input"
-                        value={field.value?.join("\n") || ""}
-                        onChange={(e) => field.onChange(e.target.value.split("\n").map(a => a.trim()).filter(a => a))}
+                        className="min-h-[100px] border-input bg-background text-foreground"
+                        value={field.value?.join('\n') || ''}
+                        onChange={e =>
+                          field.onChange(
+                            e.target.value
+                              .split('\n')
+                              .map(a => a.trim())
+                              .filter(a => a)
+                          )
+                        }
                       />
                     </FormControl>
                     <FormDescription>
-                      Key accomplishments and results from this project (one per line)
+                      Key accomplishments and results from this project (one per
+                      line)
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -880,7 +934,7 @@ export function ProjectsManager() {
               />
 
               {/* Challenges and Solutions */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <FormField
                   control={form.control}
                   name="challenges"
@@ -890,9 +944,16 @@ export function ProjectsManager() {
                       <FormControl>
                         <Textarea
                           placeholder="List main challenges faced (one per line)..."
-                          className="min-h-[100px] bg-background text-foreground border-input"
-                          value={field.value?.join("\n") || ""}
-                          onChange={(e) => field.onChange(e.target.value.split("\n").map(c => c.trim()).filter(c => c))}
+                          className="min-h-[100px] border-input bg-background text-foreground"
+                          value={field.value?.join('\n') || ''}
+                          onChange={e =>
+                            field.onChange(
+                              e.target.value
+                                .split('\n')
+                                .map(c => c.trim())
+                                .filter(c => c)
+                            )
+                          }
                         />
                       </FormControl>
                       <FormDescription>
@@ -912,9 +973,16 @@ export function ProjectsManager() {
                       <FormControl>
                         <Textarea
                           placeholder="List solutions implemented (one per line)..."
-                          className="min-h-[100px] bg-background text-foreground border-input"
-                          value={field.value?.join("\n") || ""}
-                          onChange={(e) => field.onChange(e.target.value.split("\n").map(s => s.trim()).filter(s => s))}
+                          className="min-h-[100px] border-input bg-background text-foreground"
+                          value={field.value?.join('\n') || ''}
+                          onChange={e =>
+                            field.onChange(
+                              e.target.value
+                                .split('\n')
+                                .map(s => s.trim())
+                                .filter(s => s)
+                            )
+                          }
                         />
                       </FormControl>
                       <FormDescription>
@@ -927,10 +995,10 @@ export function ProjectsManager() {
               </div>
 
               {/* Client Information Section */}
-              <div className="space-y-4 border rounded-lg p-4 bg-muted/20">
+              <div className="space-y-4 rounded-lg border bg-muted/20 p-4">
                 <h3 className="text-lg font-semibold">Client Information</h3>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                   <FormField
                     control={form.control}
                     name="clientInfo.name"
@@ -941,7 +1009,7 @@ export function ProjectsManager() {
                           <Input
                             placeholder="Client or company name"
                             {...field}
-                            className="bg-background text-foreground border-input"
+                            className="border-input bg-background text-foreground"
                           />
                         </FormControl>
                         <FormDescription>
@@ -962,7 +1030,7 @@ export function ProjectsManager() {
                           <Input
                             placeholder="Technology, Healthcare, Finance..."
                             {...field}
-                            className="bg-background text-foreground border-input"
+                            className="border-input bg-background text-foreground"
                           />
                         </FormControl>
                         <FormDescription>
@@ -979,18 +1047,31 @@ export function ProjectsManager() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Company Size</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
                           <FormControl>
-                            <SelectTrigger className="bg-background text-foreground border-input">
+                            <SelectTrigger className="border-input bg-background text-foreground">
                               <SelectValue placeholder="Select company size" />
                             </SelectTrigger>
                           </FormControl>
-                          <SelectContent className="bg-popover text-popover-foreground border-border">
-                            <SelectItem value="startup">Startup (1-10 employees)</SelectItem>
-                            <SelectItem value="small">Small (11-50 employees)</SelectItem>
-                            <SelectItem value="medium">Medium (51-250 employees)</SelectItem>
-                            <SelectItem value="large">Large (251-1000 employees)</SelectItem>
-                            <SelectItem value="enterprise">Enterprise (1000+ employees)</SelectItem>
+                          <SelectContent className="border-border bg-popover text-popover-foreground">
+                            <SelectItem value="startup">
+                              Startup (1-10 employees)
+                            </SelectItem>
+                            <SelectItem value="small">
+                              Small (11-50 employees)
+                            </SelectItem>
+                            <SelectItem value="medium">
+                              Medium (51-250 employees)
+                            </SelectItem>
+                            <SelectItem value="large">
+                              Large (251-1000 employees)
+                            </SelectItem>
+                            <SelectItem value="enterprise">
+                              Enterprise (1000+ employees)
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                         <FormDescription>
@@ -1011,7 +1092,7 @@ export function ProjectsManager() {
                           <Input
                             placeholder="City, Country"
                             {...field}
-                            className="bg-background text-foreground border-input"
+                            className="border-input bg-background text-foreground"
                           />
                         </FormControl>
                         <FormDescription>
@@ -1032,7 +1113,7 @@ export function ProjectsManager() {
                           <Input
                             placeholder="https://client.com"
                             {...field}
-                            className="bg-background text-foreground border-input"
+                            className="border-input bg-background text-foreground"
                           />
                         </FormControl>
                         <FormDescription>
@@ -1068,10 +1149,12 @@ export function ProjectsManager() {
               </div>
 
               {/* Project Metrics Section */}
-              <div className="space-y-4 border rounded-lg p-4 bg-muted/20">
-                <h3 className="text-lg font-semibold">Project Metrics & Impact</h3>
+              <div className="space-y-4 rounded-lg border bg-muted/20 p-4">
+                <h3 className="text-lg font-semibold">
+                  Project Metrics & Impact
+                </h3>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                   <FormField
                     control={form.control}
                     name="metrics.usersReached"
@@ -1083,8 +1166,10 @@ export function ProjectsManager() {
                             type="number"
                             placeholder="10000"
                             {...field}
-                            onChange={(e) => field.onChange(Number(e.target.value) || 0)}
-                            className="bg-background text-foreground border-input"
+                            onChange={e =>
+                              field.onChange(Number(e.target.value) || 0)
+                            }
+                            className="border-input bg-background text-foreground"
                           />
                         </FormControl>
                         <FormDescription>
@@ -1105,7 +1190,7 @@ export function ProjectsManager() {
                           <Input
                             placeholder="50% faster loading times"
                             {...field}
-                            className="bg-background text-foreground border-input"
+                            className="border-input bg-background text-foreground"
                           />
                         </FormControl>
                         <FormDescription>
@@ -1126,7 +1211,7 @@ export function ProjectsManager() {
                           <Input
                             placeholder="$100K+ annual savings"
                             {...field}
-                            className="bg-background text-foreground border-input"
+                            className="border-input bg-background text-foreground"
                           />
                         </FormControl>
                         <FormDescription>
@@ -1147,7 +1232,7 @@ export function ProjectsManager() {
                           <Input
                             placeholder="99.9%"
                             {...field}
-                            className="bg-background text-foreground border-input"
+                            className="border-input bg-background text-foreground"
                           />
                         </FormControl>
                         <FormDescription>
@@ -1160,14 +1245,14 @@ export function ProjectsManager() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+              <div className="grid grid-cols-1 gap-6 pt-4 md:grid-cols-2">
                 <div>
                   <FormLabel>Project Image</FormLabel>
                   <ImageUpload
                     onUploadComplete={(url, path) => {
                       setImageUrl(url);
                       setImagePath(path);
-                      form.setValue("image", url);
+                      form.setValue('image', url);
                     }}
                     currentImageUrl={imageUrl}
                     folder="project-images"
@@ -1180,7 +1265,7 @@ export function ProjectsManager() {
                     onUploadComplete={(url, path) => {
                       setLogoUrl(url);
                       setLogoPath(path);
-                      form.setValue("logo", url);
+                      form.setValue('logo', url);
                     }}
                     currentImageUrl={logoUrl}
                     folder="project-logos"
@@ -1241,12 +1326,12 @@ export function ProjectsManager() {
                   onClick={() => {
                     setIsFormOpen(false);
                     resetForm();
-                    setImageUrl("");
-                    setImagePath("");
-                    setLogoUrl("");
-                    setLogoPath("");
+                    setImageUrl('');
+                    setImagePath('');
+                    setLogoUrl('');
+                    setLogoPath('');
                   }}
-                  className="bg-background text-foreground border-input hover:bg-accent hover:text-accent-foreground"
+                  className="border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground"
                 >
                   Cancel
                 </Button>
@@ -1257,17 +1342,17 @@ export function ProjectsManager() {
                 >
                   {form.formState.isSubmitting ? (
                     <>
-                      <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                      <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
                       Saving...
                     </>
                   ) : projectToEdit ? (
                     <>
-                      <Edit className="h-4 w-4 mr-2" />
+                      <Edit className="mr-2 h-4 w-4" />
                       Update Project
                     </>
                   ) : (
                     <>
-                      <Plus className="h-4 w-4 mr-2" />
+                      <Plus className="mr-2 h-4 w-4" />
                       Add Project
                     </>
                   )}
@@ -1280,22 +1365,25 @@ export function ProjectsManager() {
 
       {/* Project Details Dialog */}
       <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-background text-foreground">
+        <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto bg-background text-foreground">
           {selectedProject && (
             <>
               <DialogHeader>
                 <div className="flex items-start justify-between">
                   <div>
-                    <DialogTitle className="text-2xl">{selectedProject.title}</DialogTitle>
+                    <DialogTitle className="text-2xl">
+                      {selectedProject.title}
+                    </DialogTitle>
                     <DialogDescription>
-                      {selectedProject.category} • {selectedProject.status.replace(/-/g, ' ')}
+                      {selectedProject.category} •{' '}
+                      {selectedProject.status.replace(/-/g, ' ')}
                     </DialogDescription>
                   </div>
                   {selectedProject.logo && (
                     <img
                       src={selectedProject.logo}
                       alt={selectedProject.title}
-                      className="w-16 h-16 object-contain rounded-lg border"
+                      className="h-16 w-16 rounded-lg border object-contain"
                     />
                   )}
                 </div>
@@ -1303,64 +1391,105 @@ export function ProjectsManager() {
 
               <div className="space-y-6">
                 {selectedProject.featured && (
-                  <Badge className="w-fit bg-yellow-500 hover:bg-yellow-600 text-yellow-foreground">
-                    <Star className="h-3 w-3 mr-1 fill-current" />
+                  <Badge className="text-yellow-foreground w-fit bg-yellow-500 hover:bg-yellow-600">
+                    <Star className="mr-1 h-3 w-3 fill-current" />
                     Featured Project
                   </Badge>
                 )}
 
                 {selectedProject.description && (
                   <div>
-                    <h3 className="text-lg font-semibold mb-2">Description</h3>
-                    <p className="text-muted-foreground">{selectedProject.description}</p>
+                    <h3 className="mb-2 text-lg font-semibold">Description</h3>
+                    <p className="text-muted-foreground">
+                      {selectedProject.description}
+                    </p>
                   </div>
                 )}
 
-                {selectedProject.technologies && selectedProject.technologies.length > 0 && (
-                  <div>
-                    <h3 className="text-lg font-semibold mb-2">Technologies</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedProject.technologies.map((tech, index) => (
-                        <Badge key={index} variant="secondary" className="bg-secondary text-secondary-foreground">
-                          {tech}
-                        </Badge>
-                      ))}
+                {selectedProject.technologies &&
+                  selectedProject.technologies.length > 0 && (
+                    <div>
+                      <h3 className="mb-2 text-lg font-semibold">
+                        Technologies
+                      </h3>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedProject.technologies.map((tech, index) => (
+                          <Badge
+                            key={index}
+                            variant="secondary"
+                            className="bg-secondary text-secondary-foreground"
+                          >
+                            {tech}
+                          </Badge>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div>
-                    <h3 className="text-lg font-semibold mb-2">Timeline</h3>
+                    <h3 className="mb-2 text-lg font-semibold">Timeline</h3>
                     <div className="space-y-2 text-muted-foreground">
                       <div className="flex items-center gap-2">
                         <Calendar className="h-4 w-4" />
-                        <span>Started: {selectedProject.startDate ? format(new Date(selectedProject.startDate), 'MMMM yyyy') : 'N/A'}</span>
+                        <span>
+                          Started:{' '}
+                          {selectedProject.startDate
+                            ? format(
+                                new Date(selectedProject.startDate),
+                                'MMMM yyyy'
+                              )
+                            : 'N/A'}
+                        </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Clock className="h-4 w-4" />
                         <span>
-                          Ended: {selectedProject.endDate ? format(new Date(selectedProject.endDate), 'MMMM yyyy') : 'Present'}
+                          Ended:{' '}
+                          {selectedProject.endDate
+                            ? format(
+                                new Date(selectedProject.endDate),
+                                'MMMM yyyy'
+                              )
+                            : 'Present'}
                         </span>
                       </div>
                     </div>
                   </div>
 
                   <div>
-                    <h3 className="text-lg font-semibold mb-2">Links</h3>
+                    <h3 className="mb-2 text-lg font-semibold">Links</h3>
                     <div className="space-y-2">
                       {selectedProject.githubUrl && (
-                        <Button variant="outline" size="sm" asChild className="w-full justify-start bg-background text-foreground border-input hover:bg-accent hover:text-accent-foreground">
-                          <a href={selectedProject.githubUrl} target="_blank" rel="noopener noreferrer">
-                            <Github className="h-4 w-4 mr-2" />
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          asChild
+                          className="w-full justify-start border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground"
+                        >
+                          <a
+                            href={selectedProject.githubUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <Github className="mr-2 h-4 w-4" />
                             GitHub Repository
                           </a>
                         </Button>
                       )}
                       {selectedProject.liveUrl && (
-                        <Button variant="outline" size="sm" asChild className="w-full justify-start bg-background text-foreground border-input hover:bg-accent hover:text-accent-foreground">
-                          <a href={selectedProject.liveUrl} target="_blank" rel="noopener noreferrer">
-                            <Globe className="h-4 w-4 mr-2" />
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          asChild
+                          className="w-full justify-start border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground"
+                        >
+                          <a
+                            href={selectedProject.liveUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <Globe className="mr-2 h-4 w-4" />
                             Live Demo
                           </a>
                         </Button>
@@ -1371,11 +1500,13 @@ export function ProjectsManager() {
 
                 {selectedProject.image && (
                   <div>
-                    <h3 className="text-lg font-semibold mb-2">Project Image</h3>
+                    <h3 className="mb-2 text-lg font-semibold">
+                      Project Image
+                    </h3>
                     <img
                       src={selectedProject.image}
                       alt={selectedProject.title}
-                      className="w-full rounded-lg border object-cover max-h-96"
+                      className="max-h-96 w-full rounded-lg border object-cover"
                     />
                   </div>
                 )}
@@ -1385,7 +1516,7 @@ export function ProjectsManager() {
                 <Button
                   variant="outline"
                   onClick={() => setDetailsOpen(false)}
-                  className="bg-background text-foreground border-input hover:bg-accent hover:text-accent-foreground"
+                  className="border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground"
                 >
                   Close
                 </Button>
@@ -1396,18 +1527,22 @@ export function ProjectsManager() {
       </Dialog>
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={!!projectToDelete} onOpenChange={() => setProjectToDelete(null)}>
+      <AlertDialog
+        open={!!projectToDelete}
+        onOpenChange={() => setProjectToDelete(null)}
+      >
         <AlertDialogContent className="bg-background text-foreground">
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete the project <strong>{projectToDelete?.title}</strong>.
+              This will permanently delete the project{' '}
+              <strong>{projectToDelete?.title}</strong>.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel
               onClick={() => setProjectToDelete(null)}
-              className="bg-background text-foreground border-input hover:bg-accent hover:text-accent-foreground"
+              className="border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground"
             >
               Cancel
             </AlertDialogCancel>
@@ -1427,13 +1562,14 @@ export function ProjectsManager() {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Multiple Projects</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete <strong>{projectsToDelete.length}</strong> projects.
+              This will permanently delete{' '}
+              <strong>{projectsToDelete.length}</strong> projects.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel
               onClick={() => setBulkDeleteOpen(false)}
-              className="bg-background text-foreground border-input hover:bg-accent hover:text-accent-foreground"
+              className="border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground"
             >
               Cancel
             </AlertDialogCancel>

@@ -1,32 +1,38 @@
-import { useEffect, useMemo, useState, useCallback } from "react";
-import { firebaseService } from "@/lib/services/firebaseService";
-import { useOnlineStatus } from "@/hooks/useOnlineStatus";
-import { initialProjects } from "@/data/initial-projects";
+import { useEffect, useMemo, useState, useCallback } from 'react';
+import { firebaseService } from '@/lib/services/firebaseService';
+import { useOnlineStatus } from '@/hooks/useOnlineStatus';
+import { initialProjects } from '@/data/initial-projects';
 
 // Import types from main type file to avoid conflicts
-import type { Project as MainProject, ProjectInput as MainProjectInput } from '@/types/project';
+import type {
+  Project as MainProject,
+  ProjectInput as MainProjectInput,
+} from '@/types/project';
 
 export type Project = MainProject;
 export type ProjectInput = MainProjectInput;
 
-export const PROJECTS_COLLECTION = "projects";
+export const PROJECTS_COLLECTION = 'projects';
 
 // Default project template matching main Project interface
-export const DEFAULT_PROJECT: Omit<ProjectInput, 'title' | 'description' | 'category'> = {
-  role: "Full-Stack Developer",
+export const DEFAULT_PROJECT: Omit<
+  ProjectInput,
+  'title' | 'description' | 'category'
+> = {
+  role: 'Full-Stack Developer',
   technologies: [],
-  status: "completed",
+  status: 'completed',
   priority: 50,
-  startDate: "",
-  endDate: "",
-  githubUrl: "",
-  liveUrl: "",
+  startDate: '',
+  endDate: '',
+  githubUrl: '',
+  liveUrl: '',
   images: [],
   achievements: [],
   challenges: [],
   lessons: [],
   collaborators: [],
-  featured: false
+  featured: false,
 };
 
 export function useProjects() {
@@ -39,10 +45,10 @@ export function useProjects() {
     setLoading(true);
 
     // Subscribe to real-time updates
-    const unsubscribe = firebaseService.subscribeToProjects((updatedProjects) => {
+    const unsubscribe = firebaseService.subscribeToProjects(updatedProjects => {
       // Validate and sanitize data
-      const validProjects = (updatedProjects as Project[]).filter(project =>
-        project.title && project.description && project.category
+      const validProjects = (updatedProjects as Project[]).filter(
+        project => project.title && project.description && project.category
       );
 
       // Deduplicate by normalized title + category
@@ -74,13 +80,15 @@ export function useProjects() {
     };
   }, [isOnline]);
 
-  const featured = useMemo(() =>
-    projects.filter(project => project.featured && !project.disabled)
-    , [projects]);
+  const featured = useMemo(
+    () => projects.filter(project => project.featured && !project.disabled),
+    [projects]
+  );
 
-  const others = useMemo(() =>
-    projects.filter(project => !project.featured && !project.disabled)
-    , [projects]);
+  const others = useMemo(
+    () => projects.filter(project => !project.featured && !project.disabled),
+    [projects]
+  );
 
   // CRUD Operations using firebaseService
   const addProject = useCallback(async (projectData: ProjectInput) => {
@@ -89,31 +97,43 @@ export function useProjects() {
       console.log(`✅ Project added to Firebase with ID: ${id}`);
       return id;
     } catch (error) {
-      console.error("Error adding project:", error);
-      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
-      throw new Error(`Failed to add project: ${errorMessage}. Please try again.`);
+      console.error('Error adding project:', error);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error occurred';
+      throw new Error(
+        `Failed to add project: ${errorMessage}. Please try again.`
+      );
     }
   }, []);
 
-  const updateProject = useCallback(async (id: string, updates: Partial<ProjectInput>) => {
-    try {
-      await firebaseService.updateProject(id, updates);
-      console.log(`✅ Project ${id} updated in Firebase`);
-    } catch (error) {
-      console.error("Error updating project:", error);
-      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
-      throw new Error(`Failed to update project: ${errorMessage}. Please try again.`);
-    }
-  }, []);
+  const updateProject = useCallback(
+    async (id: string, updates: Partial<ProjectInput>) => {
+      try {
+        await firebaseService.updateProject(id, updates);
+        console.log(`✅ Project ${id} updated in Firebase`);
+      } catch (error) {
+        console.error('Error updating project:', error);
+        const errorMessage =
+          error instanceof Error ? error.message : 'Unknown error occurred';
+        throw new Error(
+          `Failed to update project: ${errorMessage}. Please try again.`
+        );
+      }
+    },
+    []
+  );
 
   const deleteProject = useCallback(async (id: string) => {
     try {
       await firebaseService.deleteProject(id);
       console.log(`✅ Project ${id} deleted from Firebase`);
     } catch (error) {
-      console.error("Error deleting project:", error);
-      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
-      throw new Error(`Failed to delete project: ${errorMessage}. Please try again.`);
+      console.error('Error deleting project:', error);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error occurred';
+      throw new Error(
+        `Failed to delete project: ${errorMessage}. Please try again.`
+      );
     }
   }, []);
 
@@ -127,6 +147,6 @@ export function useProjects() {
     updateProject,
     deleteProject,
     isOnline,
-    refetch: () => { }, // No-op as we use real-time subscription
+    refetch: () => {}, // No-op as we use real-time subscription
   };
 }

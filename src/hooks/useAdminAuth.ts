@@ -1,5 +1,11 @@
 import { useState, useEffect } from 'react';
-import { User, signInWithEmailAndPassword, signOut, onAuthStateChanged, signInWithPopup } from 'firebase/auth';
+import {
+  User,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  signInWithPopup,
+} from 'firebase/auth';
 import { auth, isFirebaseEnabled, GithubAuthProvider } from '@/lib/firebase';
 
 interface AuthState {
@@ -23,7 +29,7 @@ export function useAdminAuth() {
   useEffect(() => {
     if (!auth) return;
 
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, user => {
       setAuthState(prev => ({
         ...prev,
         user,
@@ -46,10 +52,17 @@ export function useAdminAuth() {
     }));
 
     try {
-      await signInWithEmailAndPassword(auth, credentials.email, credentials.password);
+      await signInWithEmailAndPassword(
+        auth,
+        credentials.email,
+        credentials.password
+      );
       // User state will be updated by onAuthStateChanged
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Login failed. Please try again.';
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Login failed. Please try again.';
       setAuthState(prev => ({
         ...prev,
         loading: false,
@@ -86,11 +99,14 @@ export function useAdminAuth() {
       // Add scopes if needed
       // provider.addScope('repo');
       // provider.addScope('user:email');
-      
+
       await signInWithPopup(auth, provider);
       // User state will be updated by onAuthStateChanged
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'GitHub login failed. Please try again.';
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'GitHub login failed. Please try again.';
       setAuthState(prev => ({
         ...prev,
         loading: false,

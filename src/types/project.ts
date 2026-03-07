@@ -35,7 +35,7 @@ export interface Project {
   clientInfo?: {
     name: string;
     industry: string;
-    size: "startup" | "small" | "medium" | "large" | "enterprise";
+    size: 'startup' | 'small' | 'medium' | 'large' | 'enterprise';
     location: string;
     website?: string;
     isPublic: boolean;
@@ -85,7 +85,7 @@ export interface ProjectInput {
   clientInfo?: {
     name: string;
     industry: string;
-    size: "startup" | "small" | "medium" | "large" | "enterprise";
+    size: 'startup' | 'small' | 'medium' | 'large' | 'enterprise';
     location: string;
     website?: string;
     isPublic: boolean;

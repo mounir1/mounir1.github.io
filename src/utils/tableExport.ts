@@ -9,7 +9,7 @@ export interface ExportColumn {
 }
 
 export interface ExportOptions {
-  format?: "csv" | "json" | "xlsx";
+  format?: 'csv' | 'json' | 'xlsx';
   filename?: string;
   includeHeaders?: boolean;
   selectedOnly?: boolean;
@@ -24,7 +24,7 @@ export function exportToCSV(
 ): void {
   const {
     filename = `export-${new Date().toISOString().split('T')[0]}.csv`,
-    includeHeaders = true
+    includeHeaders = true,
   } = options;
 
   // Prepare CSV content
@@ -40,7 +40,7 @@ export function exportToCSV(
   data.forEach(row => {
     const rowData = columns.map(col => {
       let value: any;
-      
+
       if (col.accessor) {
         value = col.accessor(row);
       } else if (col.accessorKey) {
@@ -60,7 +60,7 @@ export function exportToCSV(
         return `"${String(value).replace(/"/g, '""')}"`;
       }
     });
-    
+
     csvContent.push(rowData.join(','));
   });
 
@@ -75,17 +75,16 @@ export function exportToJSON(
   columns: ExportColumn[],
   options: ExportOptions = {}
 ): void {
-  const {
-    filename = `export-${new Date().toISOString().split('T')[0]}.json`
-  } = options;
+  const { filename = `export-${new Date().toISOString().split('T')[0]}.json` } =
+    options;
 
   // Transform data using column definitions
   const transformedData = data.map(row => {
     const transformedRow: any = {};
-    
+
     columns.forEach(col => {
       let value: any;
-      
+
       if (col.accessor) {
         value = col.accessor(row);
       } else if (col.accessorKey) {
@@ -93,10 +92,10 @@ export function exportToJSON(
       } else {
         value = null;
       }
-      
+
       transformedRow[col.id] = value;
     });
-    
+
     return transformedRow;
   });
 
@@ -113,12 +112,14 @@ export function exportToXLSX(
 ): void {
   // For a complete XLSX implementation, you would use a library like 'xlsx'
   // For now, we'll export as CSV with .xlsx extension
-  const {
-    filename = `export-${new Date().toISOString().split('T')[0]}.xlsx`
-  } = options;
+  const { filename = `export-${new Date().toISOString().split('T')[0]}.xlsx` } =
+    options;
 
   // Note: XLSX export not fully implemented. Exporting as CSV instead.
-  exportToCSV(data, columns, { ...options, filename: filename.replace('.xlsx', '.csv') });
+  exportToCSV(data, columns, {
+    ...options,
+    filename: filename.replace('.xlsx', '.csv'),
+  });
 }
 
 // Generic export function
@@ -143,19 +144,23 @@ export function exportTable(
 }
 
 // Utility function to download a file
-function downloadFile(content: string, filename: string, mimeType: string): void {
+function downloadFile(
+  content: string,
+  filename: string,
+  mimeType: string
+): void {
   const blob = new Blob([content], { type: mimeType });
   const url = URL.createObjectURL(blob);
-  
+
   const link = document.createElement('a');
   link.href = url;
   link.download = filename;
   link.style.display = 'none';
-  
+
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
-  
+
   // Clean up the URL object
   URL.revokeObjectURL(url);
 }
@@ -170,7 +175,7 @@ export function filterDataForExport(
   if (!selectedOnly || selectedRows.size === 0) {
     return data;
   }
-  
+
   return data.filter((row, index) => selectedRows.has(getRowId(row, index)));
 }
 
@@ -183,9 +188,9 @@ export function filterColumnsForExport(
   if (!visibleOnly) {
     return columns.filter(col => col.id !== 'actions'); // Exclude action columns by default
   }
-  
-  return columns.filter(col => 
-    visibleColumns.has(col.id) && col.id !== 'actions'
+
+  return columns.filter(
+    col => visibleColumns.has(col.id) && col.id !== 'actions'
   );
 }
 
@@ -219,7 +224,7 @@ export function exportToCSVAdvanced(
     quote = '"',
     escape = '"',
     lineBreak = '\n',
-    withBOM = true
+    withBOM = true,
   } = csvOptions;
 
   const csvContent: string[] = [];
@@ -230,8 +235,9 @@ export function exportToCSVAdvanced(
   }
 
   // Add headers
-  const headers = columns.map(col => 
-    `${quote}${col.header.replace(new RegExp(quote, 'g'), escape + quote)}${quote}`
+  const headers = columns.map(
+    col =>
+      `${quote}${col.header.replace(new RegExp(quote, 'g'), escape + quote)}${quote}`
   );
   csvContent.push(headers.join(delimiter));
 
@@ -239,7 +245,7 @@ export function exportToCSVAdvanced(
   data.forEach(row => {
     const rowData = columns.map(col => {
       let value: any;
-      
+
       if (col.accessor) {
         value = col.accessor(row);
       } else if (col.accessorKey) {
@@ -262,7 +268,7 @@ export function exportToCSVAdvanced(
         return `${quote}${stringValue.replace(new RegExp(quote, 'g'), escape + quote)}${quote}`;
       }
     });
-    
+
     csvContent.push(rowData.join(delimiter));
   });
 
@@ -279,5 +285,5 @@ export default {
   exportToCSVAdvanced,
   filterDataForExport,
   filterColumnsForExport,
-  generateExportFilename
+  generateExportFilename,
 };

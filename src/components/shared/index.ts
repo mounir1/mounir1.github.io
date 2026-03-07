@@ -12,7 +12,11 @@ export { ErrorBoundary } from './ErrorBoundary';
 export { EmptyStates } from './EmptyStates';
 
 // Higher-order components
-export { withErrorBoundary, SimpleErrorBoundary, withSimpleErrorBoundary } from './ErrorBoundary.hoc';
+export {
+  withErrorBoundary,
+  SimpleErrorBoundary,
+  withSimpleErrorBoundary,
+} from './ErrorBoundary.hoc';
 
 // Specialized components
 export * from './ConfirmDialog';
@@ -37,5 +41,5 @@ import * as BaseComponents from './BaseComponents';
 export default {
   ErrorBoundary,
   EmptyStates,
-  ...BaseComponents
+  ...BaseComponents,
 };

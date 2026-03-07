@@ -1,24 +1,24 @@
-import React from 'react'
-import { Card } from '@/components/ui/card'
-import { 
-  ArrowDownIcon, 
-  ArrowRightIcon, 
+import React from 'react';
+import { Card } from '@/components/ui/card';
+import {
+  ArrowDownIcon,
+  ArrowRightIcon,
   ArrowUpIcon,
   Users,
   Eye,
   Activity,
-  Clock
-} from 'lucide-react'
-import { cn } from '@/lib/utils'
+  Clock,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface StatCardProps {
-  title: string
-  value: string
-  description: string
-  icon: React.ReactNode
-  change?: number
-  changeTimeframe?: string
-  className?: string
+  title: string;
+  value: string;
+  description: string;
+  icon: React.ReactNode;
+  change?: number;
+  changeTimeframe?: string;
+  className?: string;
 }
 
 const StatCard: React.FC<StatCardProps> = ({
@@ -27,19 +27,17 @@ const StatCard: React.FC<StatCardProps> = ({
   description,
   icon,
   change,
-  changeTimeframe = "from last month",
-  className
+  changeTimeframe = 'from last month',
+  className,
 }) => {
-  const isPositive = change && change > 0
-  const isNegative = change && change < 0
+  const isPositive = change && change > 0;
+  const isNegative = change && change < 0;
 
   return (
-    <Card className={cn("p-6", className)}>
+    <Card className={cn('p-6', className)}>
       <div className="flex items-center justify-between space-x-4">
         <div className="flex items-center space-x-4">
-          <div className="p-2 bg-muted rounded-full">
-            {icon}
-          </div>
+          <div className="rounded-full bg-muted p-2">{icon}</div>
           <div>
             <p className="text-sm font-medium text-muted-foreground">{title}</p>
             <h3 className="text-2xl font-bold">{value}</h3>
@@ -48,17 +46,19 @@ const StatCard: React.FC<StatCardProps> = ({
         {change && (
           <div className="flex items-center space-x-1">
             {isPositive ? (
-              <ArrowUpIcon className="w-4 h-4 text-green-500" />
+              <ArrowUpIcon className="h-4 w-4 text-green-500" />
             ) : isNegative ? (
-              <ArrowDownIcon className="w-4 h-4 text-red-500" />
+              <ArrowDownIcon className="h-4 w-4 text-red-500" />
             ) : (
-              <ArrowRightIcon className="w-4 h-4 text-yellow-500" />
+              <ArrowRightIcon className="h-4 w-4 text-yellow-500" />
             )}
-            <span className={cn(
-              "text-sm font-medium",
-              isPositive && "text-green-500",
-              isNegative && "text-red-500"
-            )}>
+            <span
+              className={cn(
+                'text-sm font-medium',
+                isPositive && 'text-green-500',
+                isNegative && 'text-red-500'
+              )}
+            >
               {Math.abs(change)}%
             </span>
           </div>
@@ -68,8 +68,8 @@ const StatCard: React.FC<StatCardProps> = ({
         {description} {change && changeTimeframe}
       </p>
     </Card>
-  )
-}
+  );
+};
 
 export const DashboardStats: React.FC = () => {
   return (
@@ -78,44 +78,46 @@ export const DashboardStats: React.FC = () => {
         title="Total Users"
         value="2,543"
         description="Active users"
-        icon={<Users className="w-4 h-4" />}
+        icon={<Users className="h-4 w-4" />}
         change={12}
       />
       <StatCard
         title="Page Views"
         value="1.2M"
         description="Total views"
-        icon={<Eye className="w-4 h-4" />}
+        icon={<Eye className="h-4 w-4" />}
         change={-2.5}
       />
       <StatCard
         title="Session Duration"
         value="2.5m"
         description="Average time"
-        icon={<Clock className="w-4 h-4" />}
+        icon={<Clock className="h-4 w-4" />}
         change={0}
       />
       <StatCard
         title="Bounce Rate"
         value="42%"
         description="Page exits"
-        icon={<Activity className="w-4 h-4" />}
+        icon={<Activity className="h-4 w-4" />}
         change={-8}
       />
     </div>
-  )
-}
+  );
+};
 
 export const EnhancedStats: React.FC = () => {
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-2xl font-bold tracking-tight">Welcome back, Mounir!</h2>
+        <h2 className="text-2xl font-bold tracking-tight">
+          Welcome back, Mounir!
+        </h2>
         <p className="text-muted-foreground">
           Here's an overview of your portfolio stats
         </p>
       </div>
       <DashboardStats />
     </div>
-  )
-}
+  );
+};

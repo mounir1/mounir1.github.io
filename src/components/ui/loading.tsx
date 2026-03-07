@@ -10,31 +10,41 @@ interface LoadingProps {
   className?: string;
 }
 
-export function Loading({ 
-  variant = 'spinner', 
-  size = 'md', 
+export function Loading({
+  variant = 'spinner',
+  size = 'md',
   message,
-  className 
+  className,
 }: LoadingProps) {
   const sizeClasses = {
     sm: 'w-4 h-4',
     md: 'w-6 h-6',
-    lg: 'w-8 h-8'
+    lg: 'w-8 h-8',
   };
 
   const containerClasses = {
     sm: 'p-4',
     md: 'p-6',
-    lg: 'p-8'
+    lg: 'p-8',
   };
 
   if (variant === 'spinner') {
     return (
-      <div className={cn('flex items-center justify-center', containerClasses[size], className)}>
+      <div
+        className={cn(
+          'flex items-center justify-center',
+          containerClasses[size],
+          className
+        )}
+      >
         <div className="flex flex-col items-center gap-3">
-          <Loader2 className={cn('animate-spin text-primary', sizeClasses[size])} />
+          <Loader2
+            className={cn('animate-spin text-primary', sizeClasses[size])}
+          />
           {message && (
-            <p className="text-sm text-muted-foreground animate-pulse">{message}</p>
+            <p className="animate-pulse text-sm text-muted-foreground">
+              {message}
+            </p>
           )}
         </div>
       </div>
@@ -43,15 +53,25 @@ export function Loading({
 
   if (variant === 'dots') {
     return (
-      <div className={cn('flex items-center justify-center', containerClasses[size], className)}>
+      <div
+        className={cn(
+          'flex items-center justify-center',
+          containerClasses[size],
+          className
+        )}
+      >
         <div className="flex flex-col items-center gap-3">
           <div className="flex space-x-1">
-            {[0, 1, 2].map((i) => (
+            {[0, 1, 2].map(i => (
               <div
                 key={i}
                 className={cn(
-                  'rounded-full bg-primary animate-bounce',
-                  size === 'sm' ? 'w-2 h-2' : size === 'md' ? 'w-3 h-3' : 'w-4 h-4'
+                  'animate-bounce rounded-full bg-primary',
+                  size === 'sm'
+                    ? 'h-2 w-2'
+                    : size === 'md'
+                      ? 'h-3 w-3'
+                      : 'h-4 w-4'
                 )}
                 style={{ animationDelay: `${i * 0.1}s` }}
               />
@@ -67,14 +87,24 @@ export function Loading({
 
   if (variant === 'pulse') {
     return (
-      <div className={cn('flex items-center justify-center', containerClasses[size], className)}>
+      <div
+        className={cn(
+          'flex items-center justify-center',
+          containerClasses[size],
+          className
+        )}
+      >
         <div className="flex flex-col items-center gap-3">
-          <div className={cn(
-            'rounded-full bg-primary/20 animate-pulse',
-            sizeClasses[size]
-          )} />
+          <div
+            className={cn(
+              'animate-pulse rounded-full bg-primary/20',
+              sizeClasses[size]
+            )}
+          />
           {message && (
-            <p className="text-sm text-muted-foreground animate-pulse">{message}</p>
+            <p className="animate-pulse text-sm text-muted-foreground">
+              {message}
+            </p>
           )}
         </div>
       </div>
@@ -85,13 +115,11 @@ export function Loading({
     return (
       <div className={cn('space-y-3', className)}>
         <div className="animate-pulse space-y-3">
-          <div className="h-4 bg-muted rounded w-3/4"></div>
-          <div className="h-4 bg-muted rounded w-1/2"></div>
-          <div className="h-4 bg-muted rounded w-5/6"></div>
+          <div className="h-4 w-3/4 rounded bg-muted"></div>
+          <div className="h-4 w-1/2 rounded bg-muted"></div>
+          <div className="h-4 w-5/6 rounded bg-muted"></div>
         </div>
-        {message && (
-          <p className="text-sm text-muted-foreground">{message}</p>
-        )}
+        {message && <p className="text-sm text-muted-foreground">{message}</p>}
       </div>
     );
   }
@@ -102,13 +130,15 @@ export function Loading({
         <CardContent className={containerClasses[size]}>
           <div className="flex items-center justify-center">
             <div className="flex flex-col items-center gap-4 text-center">
-              <div className="p-3 bg-primary/10 rounded-xl">
-                <Loader2 className={cn('animate-spin text-primary', sizeClasses[size])} />
+              <div className="rounded-xl bg-primary/10 p-3">
+                <Loader2
+                  className={cn('animate-spin text-primary', sizeClasses[size])}
+                />
               </div>
               {message && (
                 <div>
                   <p className="font-medium text-foreground">{message}</p>
-                  <p className="text-sm text-muted-foreground mt-1">
+                  <p className="mt-1 text-sm text-muted-foreground">
                     This may take a few moments...
                   </p>
                 </div>
@@ -124,16 +154,20 @@ export function Loading({
 }
 
 // Specialized loading components for specific use cases
-export function AdminLoading({ message = "Loading admin dashboard..." }: { message?: string }) {
+export function AdminLoading({
+  message = 'Loading admin dashboard...',
+}: {
+  message?: string;
+}) {
   return (
-    <div className="min-h-[400px] flex items-center justify-center">
+    <div className="flex min-h-[400px] items-center justify-center">
       <div className="flex flex-col items-center gap-4 text-center">
-        <div className="p-4 bg-primary/10 rounded-xl">
-          <Database className="w-8 h-8 animate-pulse text-primary" />
+        <div className="rounded-xl bg-primary/10 p-4">
+          <Database className="h-8 w-8 animate-pulse text-primary" />
         </div>
         <div>
-          <p className="font-medium text-lg">{message}</p>
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="text-lg font-medium">{message}</p>
+          <p className="mt-1 text-sm text-muted-foreground">
             Setting up your workspace...
           </p>
         </div>
@@ -142,27 +176,35 @@ export function AdminLoading({ message = "Loading admin dashboard..." }: { messa
   );
 }
 
-export function DataLoading({ message = "Loading data..." }: { message?: string }) {
+export function DataLoading({
+  message = 'Loading data...',
+}: {
+  message?: string;
+}) {
   return (
     <div className="flex items-center justify-center py-8">
       <div className="flex items-center gap-3">
-        <RefreshCw className="w-5 h-5 animate-spin text-primary" />
+        <RefreshCw className="h-5 w-5 animate-spin text-primary" />
         <span className="text-sm font-medium">{message}</span>
       </div>
     </div>
   );
 }
 
-export function AnalyticsLoading({ message = "Generating analytics..." }: { message?: string }) {
+export function AnalyticsLoading({
+  message = 'Generating analytics...',
+}: {
+  message?: string;
+}) {
   return (
     <div className="flex items-center justify-center py-12">
       <div className="flex flex-col items-center gap-4 text-center">
-        <div className="p-3 bg-blue-500/10 rounded-xl">
-          <BarChart3 className="w-6 h-6 animate-bounce text-blue-600" />
+        <div className="rounded-xl bg-blue-500/10 p-3">
+          <BarChart3 className="h-6 w-6 animate-bounce text-blue-600" />
         </div>
         <div>
           <p className="font-medium">{message}</p>
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="mt-1 text-sm text-muted-foreground">
             Crunching the numbers...
           </p>
         </div>
@@ -172,23 +214,31 @@ export function AnalyticsLoading({ message = "Generating analytics..." }: { mess
 }
 
 // Table loading skeleton
-export function TableLoading({ rows = 5, columns = 4 }: { rows?: number; columns?: number }) {
+export function TableLoading({
+  rows = 5,
+  columns = 4,
+}: {
+  rows?: number;
+  columns?: number;
+}) {
   return (
     <div className="space-y-3">
       {/* Header skeleton */}
-      <div className="flex gap-4 p-4 border-b">
+      <div className="flex gap-4 border-b p-4">
         {Array.from({ length: columns }, (_, i) => (
-          <div key={i} className="h-4 bg-muted rounded animate-pulse flex-1" />
+          <div key={i} className="h-4 flex-1 animate-pulse rounded bg-muted" />
         ))}
       </div>
       {/* Rows skeleton */}
       {Array.from({ length: rows }, (_, rowIndex) => (
         <div key={rowIndex} className="flex gap-4 p-4">
           {Array.from({ length: columns }, (_, colIndex) => (
-            <div 
-              key={colIndex} 
-              className="h-4 bg-muted rounded animate-pulse flex-1"
-              style={{ animationDelay: `${(rowIndex * columns + colIndex) * 0.05}s` }}
+            <div
+              key={colIndex}
+              className="h-4 flex-1 animate-pulse rounded bg-muted"
+              style={{
+                animationDelay: `${(rowIndex * columns + colIndex) * 0.05}s`,
+              }}
             />
           ))}
         </div>

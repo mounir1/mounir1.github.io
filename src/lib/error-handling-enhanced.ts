@@ -1,10 +1,16 @@
-import { toast } from "@/hooks/use-toast";
-import { FirebaseError } from "firebase/app";
-import { z } from "zod";
+import { toast } from '@/hooks/use-toast';
+import { FirebaseError } from 'firebase/app';
+import { z } from 'zod';
 
 // Error types for better error handling
 export type ErrorSeverity = 'low' | 'medium' | 'high' | 'critical';
-export type ErrorCategory = 'validation' | 'network' | 'auth' | 'permission' | 'storage' | 'unknown';
+export type ErrorCategory =
+  | 'validation'
+  | 'network'
+  | 'auth'
+  | 'permission'
+  | 'storage'
+  | 'unknown';
 
 export interface AppError {
   id: string;
@@ -21,93 +27,100 @@ export interface AppError {
 }
 
 // Firebase error code mappings
-const FIREBASE_ERROR_MESSAGES: Record<string, { message: string; severity: ErrorSeverity; recoverable: boolean }> = {
+const FIREBASE_ERROR_MESSAGES: Record<
+  string,
+  { message: string; severity: ErrorSeverity; recoverable: boolean }
+> = {
   'auth/user-not-found': {
     message: 'No user account found with these credentials',
     severity: 'medium',
-    recoverable: true
+    recoverable: true,
   },
   'auth/wrong-password': {
     message: 'Incorrect password. Please try again',
     severity: 'medium',
-    recoverable: true
+    recoverable: true,
   },
   'auth/invalid-email': {
     message: 'Please enter a valid email address',
     severity: 'low',
-    recoverable: true
+    recoverable: true,
   },
   'auth/user-disabled': {
     message: 'This account has been disabled. Please contact support',
     severity: 'high',
-    recoverable: false
+    recoverable: false,
   },
   'auth/too-many-requests': {
     message: 'Too many failed attempts. Please try again later',
     severity: 'medium',
-    recoverable: true
+    recoverable: true,
   },
   'permission-denied': {
-    message: 'You don\'t have permission to perform this action',
+    message: "You don't have permission to perform this action",
     severity: 'high',
-    recoverable: false
+    recoverable: false,
   },
   'not-found': {
     message: 'The requested resource was not found',
     severity: 'medium',
-    recoverable: true
+    recoverable: true,
   },
   'already-exists': {
     message: 'A resource with this identifier already exists',
     severity: 'medium',
-    recoverable: true
+    recoverable: true,
   },
   'resource-exhausted': {
     message: 'Service quota exceeded. Please try again later',
     severity: 'high',
-    recoverable: true
+    recoverable: true,
   },
-  'unavailable': {
+  unavailable: {
     message: 'Service is temporarily unavailable. Please try again',
     severity: 'medium',
-    recoverable: true
+    recoverable: true,
   },
-  'cancelled': {
+  cancelled: {
     message: 'Operation was cancelled',
     severity: 'low',
-    recoverable: true
+    recoverable: true,
   },
   'deadline-exceeded': {
     message: 'Operation timed out. Please try again',
     severity: 'medium',
-    recoverable: true
+    recoverable: true,
   },
   'invalid-argument': {
     message: 'Invalid data provided. Please check your input',
     severity: 'medium',
-    recoverable: true
+    recoverable: true,
   },
   'failed-precondition': {
-    message: 'Operation failed due to system state. Please refresh and try again',
+    message:
+      'Operation failed due to system state. Please refresh and try again',
     severity: 'medium',
-    recoverable: true
-  }
+    recoverable: true,
+  },
 };
 
 // Network error handling
-const NETWORK_ERROR_MESSAGES: Record<string, { message: string; severity: ErrorSeverity }> = {
-  'NetworkError': {
+const NETWORK_ERROR_MESSAGES: Record<
+  string,
+  { message: string; severity: ErrorSeverity }
+> = {
+  NetworkError: {
     message: 'Network connection lost. Please check your internet connection',
-    severity: 'high'
+    severity: 'high',
   },
-  'TimeoutError': {
+  TimeoutError: {
     message: 'Request timed out. Please try again',
-    severity: 'medium'
+    severity: 'medium',
   },
-  'AbortError': {
+  AbortError: {
     message: 'Request was cancelled',
-    severity: 'low'
-  }
+    severity: 'low',
+  },
 };
 
 // Generate unique error ID
@@ -135,9 +148,9 @@ export class ErrorHandler {
 
     // Handle Zod validation errors
     if (error instanceof z.ZodError) {
-      const validationErrors = error.errors.map(err => 
-        `${err.path.join('.')}: ${err.message}`
-      ).join(', ');
+      const validationErrors = error.errors
+        .map(err => `${err.path.join('.')}: ${err.message}`)
+        .join(', ');
 
       return {
         id,
@@ -150,7 +163,7 @@ export class ErrorHandler {
         recoverable: true,
         retryable: false,
         userMessage: 'Please correct the highlighted fields and try again',
-        technicalMessage: validationErrors
+        technicalMessage: validationErrors,
       };
     }
 
@@ -159,7 +172,7 @@ export class ErrorHandler {
       const errorInfo = FIREBASE_ERROR_MESSAGES[error.code] || {
         message: 'An unexpected error occurred',
         severity: 'medium' as ErrorSeverity,
-        recoverable: true
+        recoverable: true,
       };
 
       return {
@@ -173,7 +186,7 @@ export class ErrorHandler {
         recoverable: errorInfo.recoverable,
         retryable: errorInfo.recoverable,
         userMessage: errorInfo.message,
-        technicalMessage: `Firebase Error: ${error.code} - ${error.message}`
+        technicalMessage: `Firebase Error: ${error.code} - ${error.message}`,
       };
     }
 
@@ -192,7 +205,7 @@ export class ErrorHandler {
           recoverable: true,
           retryable: true,
           userMessage: networkError.message,
-          technicalMessage: error.message
+          technicalMessage: error.message,
         };
       }
 
@@ -207,8 +220,8 @@ export class ErrorHandler {
           action: context,
           recoverable: false,
           retryable: false,
-          userMessage: 'You don\'t have permission to perform this action',
-          technicalMessage: error.message
+          userMessage: "You don't have permission to perform this action",
+          technicalMessage: error.message,
         };
       }
 
@@ -223,7 +236,7 @@ export class ErrorHandler {
         recoverable: true,
         retryable: true,
         userMessage: 'Something went wrong. Please try again',
-        technicalMessage: error.message
+        technicalMessage: error.message,
       };
     }
 
@@ -239,7 +252,7 @@ export class ErrorHandler {
         recoverable: true,
         retryable: true,
         userMessage: error,
-        technicalMessage: error
+        technicalMessage: error,
       };
     }
 
@@ -254,7 +267,7 @@ export class ErrorHandler {
       recoverable: true,
       retryable: true,
       userMessage: 'Something unexpected happened. Please try again',
-      technicalMessage: JSON.stringify(error)
+      technicalMessage: JSON.stringify(error),
     };
   }
 
@@ -267,12 +280,16 @@ export class ErrorHandler {
   }
 
   // Handle error with appropriate user feedback
-  handleError(error: unknown, context?: string, options?: {
-    showToast?: boolean;
-    logToConsole?: boolean;
-    retryAction?: () => void;
-    fallbackAction?: () => void;
-  }): AppError {
+  handleError(
+    error: unknown,
+    context?: string,
+    options?: {
+      showToast?: boolean;
+      logToConsole?: boolean;
+      retryAction?: () => void;
+      fallbackAction?: () => void;
+    }
+  ): AppError {
     const appError = this.parseError(error, context);
     this.addToHistory(appError);
 
@@ -280,23 +297,30 @@ export class ErrorHandler {
       showToast = true,
       logToConsole = true,
       retryAction,
-      fallbackAction
+      fallbackAction,
     } = options || {};
 
     // Log to console if requested
     if (logToConsole) {
-      console.error(`[${appError.category.toUpperCase()}] ${appError.message}`, {
-        id: appError.id,
-        context,
-        details: appError.details,
-        technicalMessage: appError.technicalMessage,
-        originalError: error
-      });
+      console.error(
+        `[${appError.category.toUpperCase()}] ${appError.message}`,
+        {
+          id: appError.id,
+          context,
+          details: appError.details,
+          technicalMessage: appError.technicalMessage,
+          originalError: error,
+        }
+      );
     }
 
     // Show toast notification if requested
     if (showToast) {
-      const toastConfig = this.getToastConfig(appError, retryAction, fallbackAction);
+      const toastConfig = this.getToastConfig(
+        appError,
+        retryAction,
+        fallbackAction
+      );
       toast(toastConfig);
     }
 
@@ -304,11 +328,17 @@ export class ErrorHandler {
   }
 
   // Generate toast configuration based on error
-  private getToastConfig(error: AppError, retryAction?: () => void, fallbackAction?: () => void) {
+  private getToastConfig(
+    error: AppError,
+    retryAction?: () => void,
+    fallbackAction?: () => void
+  ) {
     const baseConfig = {
       title: this.getErrorTitle(error),
       description: error.userMessage,
-      variant: this.getToastVariant(error.severity) as "default" | "destructive",
+      variant: this.getToastVariant(error.severity) as
+        | 'default'
+        | 'destructive',
     };
 
     // Add action buttons for recoverable errors
@@ -318,20 +348,20 @@ export class ErrorHandler {
       if (error.retryable && retryAction) {
         actions.push({
           label: 'Retry',
-          onClick: retryAction
+          onClick: retryAction,
         });
       }
 
       if (fallbackAction) {
         actions.push({
           label: 'Continue',
-          onClick: fallbackAction
+          onClick: fallbackAction,
         });
       }
 
       return {
         ...baseConfig,
-        action: actions.length > 0 ? actions[0] : undefined
+        action: actions.length > 0 ? actions[0] : undefined,
       };
     }
 
@@ -429,14 +459,14 @@ export class ErrorHandler {
       auth: 0,
       permission: 0,
       storage: 0,
-      unknown: 0
+      unknown: 0,
     };
 
     const bySeverity: Record<ErrorSeverity, number> = {
       low: 0,
       medium: 0,
       high: 0,
-      critical: 0
+      critical: 0,
     };
 
     let recent = 0;
@@ -453,7 +483,7 @@ export class ErrorHandler {
       total: this.errorHistory.length,
       byCategory,
       bySeverity,
-      recent
+      recent,
     };
   }
 }
@@ -461,7 +491,11 @@ export class ErrorHandler {
 // Convenience functions
 export const errorHandler = ErrorHandler.getInstance();
 
-export const handleError = (error: unknown, context?: string, options?: Parameters<typeof errorHandler.handleError>[2]): AppError => {
+export const handleError = (
+  error: unknown,
+  context?: string,
+  options?: Parameters<typeof errorHandler.handleError>[2]
+): AppError => {
   return errorHandler.handleError(error, context, options);
 };
 
@@ -479,7 +513,7 @@ export const logErrorToBoundary = (error: Error, errorInfo: any): void => {
   console.error('React Error Boundary caught an error:', {
     error: appError,
     errorInfo,
-    componentStack: errorInfo.componentStack
+    componentStack: errorInfo.componentStack,
   });
 };
 

@@ -53,7 +53,13 @@ export interface SizeProps {
  * Props for components with color variants
  */
 export interface VariantProps {
-  variant?: 'default' | 'primary' | 'secondary' | 'destructive' | 'outline' | 'ghost';
+  variant?:
+    | 'default'
+    | 'primary'
+    | 'secondary'
+    | 'destructive'
+    | 'outline'
+    | 'ghost';
 }
 
 /**
@@ -157,7 +163,10 @@ export interface RadioGroupProps extends BaseFieldProps {
 /**
  * Props for button components
  */
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps, SizeProps {
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps,
+    SizeProps {
   loading?: boolean;
   loadingText?: string;
   icon?: React.ReactNode;
@@ -373,7 +382,10 @@ export interface AvatarProps extends BaseComponentProps, SizeProps {
 /**
  * Props for badge components
  */
-export interface BadgeProps extends BaseComponentProps, VariantProps, SizeProps {
+export interface BadgeProps
+  extends BaseComponentProps,
+    VariantProps,
+    SizeProps {
   count?: number;
   max?: number;
   showZero?: boolean;
@@ -497,5 +509,5 @@ export type {
   ErrorBoundaryProps,
   ThemeToggleProps,
   ResponsiveProps,
-  AnimationProps
+  AnimationProps,
 };

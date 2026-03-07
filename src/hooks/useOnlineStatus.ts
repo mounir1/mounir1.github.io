@@ -5,7 +5,9 @@ import { useState, useEffect } from 'react';
  * @returns {boolean} `true` if the browser is online, `false` otherwise.
  */
 export function useOnlineStatus(): boolean {
-  const [isOnline, setIsOnline] = useState(() => typeof navigator !== 'undefined' ? navigator.onLine : true);
+  const [isOnline, setIsOnline] = useState(() =>
+    typeof navigator !== 'undefined' ? navigator.onLine : true
+  );
 
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);

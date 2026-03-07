@@ -69,6 +69,12 @@ export interface SkillFilters {
 }
 
 export interface SkillSorting {
-  field: 'name' | 'category' | 'level' | 'proficiency' | 'createdAt' | 'updatedAt';
+  field:
+    | 'name'
+    | 'category'
+    | 'level'
+    | 'proficiency'
+    | 'createdAt'
+    | 'updatedAt';
   direction: 'asc' | 'desc';
 }

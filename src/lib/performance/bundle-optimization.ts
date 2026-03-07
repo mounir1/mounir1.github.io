@@ -34,7 +34,7 @@ export const createLazyComponent = <T extends ComponentType<any>>(
       console.error('Failed to load component:', error);
       // Return fallback component or empty component
       return {
-        default: fallback || (() => null)
+        default: fallback || (() => null),
       };
     }
   });
@@ -49,20 +49,23 @@ export const preloadComponent = (importFn: () => Promise<any>) => {
 // Bundle analyzer utilities
 export const bundleAnalyzer = {
   // Measure bundle size impact
-  measureBundleSize: async (moduleName: string, importFn: () => Promise<any>) => {
+  measureBundleSize: async (
+    moduleName: string,
+    importFn: () => Promise<any>
+  ) => {
     const startTime = performance.now();
     const startMemory = (performance as any).memory?.usedJSHeapSize || 0;
-    
+
     try {
       await importFn();
       const endTime = performance.now();
       const endMemory = (performance as any).memory?.usedJSHeapSize || 0;
-      
+
       return {
         module: moduleName,
         loadTime: endTime - startTime,
         memoryImpact: endMemory - startMemory,
-        success: true
+        success: true,
       };
     } catch (error) {
       return {
@@ -70,7 +73,7 @@ export const bundleAnalyzer = {
         loadTime: 0,
         memoryImpact: 0,
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
   },
@@ -85,14 +88,14 @@ export const bundleAnalyzer = {
     }> = [];
 
     // Monitor script loading
-    const observer = new PerformanceObserver((list) => {
+    const observer = new PerformanceObserver(list => {
       for (const entry of list.getEntries()) {
         if (entry.name.includes('chunk') || entry.name.includes('js')) {
           chunks.push({
             name: entry.name,
             size: (entry as any).transferSize || 0,
             loadTime: entry.duration,
-            timestamp: entry.startTime
+            timestamp: entry.startTime,
           });
         }
       }
@@ -102,9 +105,9 @@ export const bundleAnalyzer = {
 
     return {
       getChunks: () => chunks,
-      stop: () => observer.disconnect()
+      stop: () => observer.disconnect(),
     };
-  }
+  },
 };
 
 // Modern ES features detection and polyfill loading
@@ -122,7 +125,8 @@ export const modernFeatures = {
           return false;
         }
       })(),
-      asyncAwait: (async () => {})().constructor === (async function() {}).constructor,
+      asyncAwait:
+        (async () => {})().constructor === async function () {}.constructor,
       optionalChaining: (() => {
         try {
           return eval('({})?.test') === undefined;
@@ -138,7 +142,7 @@ export const modernFeatures = {
         }
       })(),
       bigInt: typeof BigInt !== 'undefined',
-      webAssembly: typeof WebAssembly !== 'undefined'
+      webAssembly: typeof WebAssembly !== 'undefined',
     };
 
     return features;
@@ -156,13 +160,11 @@ export const modernFeatures = {
     }
 
     if (!support.bigInt) {
-      polyfills.push(
-        dynamicImport(() => import('big-integer'))
-      );
+      polyfills.push(dynamicImport(() => import('big-integer')));
     }
 
     await Promise.all(polyfills);
-  }
+  },
 };
 
 // Tree shaking utilities
@@ -194,13 +196,15 @@ export const treeShaking = {
       }
     });
     return result;
-  }
+  },
 };
 
 // Code splitting strategies
 export const codeSplitting = {
   // Route-based splitting
-  createRouteComponent: (importFn: () => Promise<{ default: ComponentType<any> }>) => {
+  createRouteComponent: (
+    importFn: () => Promise<{ default: ComponentType<any> }>
+  ) => {
     return createLazyComponent(importFn);
   },
 
@@ -218,7 +222,7 @@ export const codeSplitting = {
     ui: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
     utils: ['date-fns', 'lodash-es'],
     charts: ['recharts', 'd3'],
-    forms: ['react-hook-form', 'zod']
+    forms: ['react-hook-form', 'zod'],
   }),
 
   // Dynamic chunk loading with priorities
@@ -227,13 +231,13 @@ export const codeSplitting = {
     priority: 'high' | 'medium' | 'low' = 'medium'
   ) => {
     const delay = priority === 'high' ? 0 : priority === 'medium' ? 100 : 500;
-    
+
     if (delay > 0) {
       await new Promise(resolve => setTimeout(resolve, delay));
     }
-    
+
     return await dynamicImport(importFn);
-  }
+  },
 };
 
 // Performance monitoring
@@ -243,20 +247,23 @@ export const performanceMonitoring = {
     const metrics = {
       totalBundleSize: 0,
       loadTime: 0,
-      chunks: [] as Array<{ name: string; size: number; loadTime: number }>
+      chunks: [] as Array<{ name: string; size: number; loadTime: number }>,
     };
 
-    const observer = new PerformanceObserver((list) => {
+    const observer = new PerformanceObserver(list => {
       for (const entry of list.getEntries()) {
         if (entry.name.includes('.js') || entry.name.includes('.css')) {
           const size = (entry as any).transferSize || 0;
           metrics.totalBundleSize += size;
-          metrics.loadTime = Math.max(metrics.loadTime, entry.startTime + entry.duration);
-          
+          metrics.loadTime = Math.max(
+            metrics.loadTime,
+            entry.startTime + entry.duration
+          );
+
           metrics.chunks.push({
             name: entry.name.split('/').pop() || entry.name,
             size,
-            loadTime: entry.duration
+            loadTime: entry.duration,
           });
         }
       }
@@ -266,7 +273,7 @@ export const performanceMonitoring = {
 
     return {
       getMetrics: () => metrics,
-      stop: () => observer.disconnect()
+      stop: () => observer.disconnect(),
     };
   },
 
@@ -277,11 +284,11 @@ export const performanceMonitoring = {
       LCP: 0, // Largest Contentful Paint
       FID: 0, // First Input Delay
       CLS: 0, // Cumulative Layout Shift
-      TTFB: 0 // Time to First Byte
+      TTFB: 0, // Time to First Byte
     };
 
     // Track FCP
-    new PerformanceObserver((list) => {
+    new PerformanceObserver(list => {
       for (const entry of list.getEntries()) {
         if (entry.name === 'first-contentful-paint') {
           vitals.FCP = entry.startTime;
@@ -290,14 +297,14 @@ export const performanceMonitoring = {
     }).observe({ entryTypes: ['paint'] });
 
     // Track LCP
-    new PerformanceObserver((list) => {
+    new PerformanceObserver(list => {
       const entries = list.getEntries();
       const lastEntry = entries[entries.length - 1];
       vitals.LCP = lastEntry.startTime;
     }).observe({ entryTypes: ['largest-contentful-paint'] });
 
     // Track FID
-    new PerformanceObserver((list) => {
+    new PerformanceObserver(list => {
       for (const entry of list.getEntries()) {
         vitals.FID = (entry as any).processingStart - entry.startTime;
       }
@@ -305,7 +312,7 @@ export const performanceMonitoring = {
 
     // Track CLS
     let clsValue = 0;
-    new PerformanceObserver((list) => {
+    new PerformanceObserver(list => {
       for (const entry of list.getEntries()) {
         if (!(entry as any).hadRecentInput) {
           clsValue += (entry as any).value;
@@ -315,27 +322,40 @@ export const performanceMonitoring = {
     }).observe({ entryTypes: ['layout-shift'] });
 
     // Track TTFB
-    const navigationEntry = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+    const navigationEntry = performance.getEntriesByType(
+      'navigation'
+    )[0] as PerformanceNavigationTiming;
     if (navigationEntry) {
-      vitals.TTFB = navigationEntry.responseStart - navigationEntry.requestStart;
+      vitals.TTFB =
+        navigationEntry.responseStart - navigationEntry.requestStart;
     }
 
     return vitals;
-  }
+  },
 };
 
 // Export lazy-loaded admin components
 export const AdminComponents = {
-  Dashboard: createLazyComponent(() => import('@/components/admin/AdminDashboard')),
-  Projects: createLazyComponent(() => import('@/components/admin/projects/ProjectsTab')),
-  Skills: createLazyComponent(() => import('@/components/admin/skills/SkillsTab')),
-  Analytics: createLazyComponent(() => import('@/components/admin/analytics/AnalyticsTab'))
+  Dashboard: createLazyComponent(
+    () => import('@/components/admin/AdminDashboard')
+  ),
+  Projects: createLazyComponent(
+    () => import('@/components/admin/projects/ProjectsTab')
+  ),
+  Skills: createLazyComponent(
+    () => import('@/components/admin/skills/SkillsTab')
+  ),
+  Analytics: createLazyComponent(
+    () => import('@/components/admin/analytics/AnalyticsTab')
+  ),
 };
 
 // Export lazy-loaded portfolio components
 export const PortfolioComponents = {
   Hero: createLazyComponent(() => import('@/components/portfolio/Hero')),
-  Projects: createLazyComponent(() => import('@/components/portfolio/Projects')),
+  Projects: createLazyComponent(
+    () => import('@/components/portfolio/Projects')
+  ),
   Skills: createLazyComponent(() => import('@/components/portfolio/Skills')),
-  Contact: createLazyComponent(() => import('@/components/portfolio/Contact'))
+  Contact: createLazyComponent(() => import('@/components/portfolio/Contact')),
 };

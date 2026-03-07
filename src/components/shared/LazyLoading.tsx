@@ -1,22 +1,22 @@
-import React, { Suspense, lazy } from "react";
-import { LoadingState } from "@/components/shared/BaseComponents";
+import React, { Suspense, lazy } from 'react';
+import { LoadingState } from '@/components/shared/BaseComponents';
 
 // Create lazy-loaded components for heavy admin sections
-export const LazyDashboardOverview = lazy(() => 
-  import("@/components/admin/dashboard").then(module => ({ 
-    default: module.DashboardOverview 
+export const LazyDashboardOverview = lazy(() =>
+  import('@/components/admin/dashboard').then(module => ({
+    default: module.DashboardOverview,
   }))
 );
 
-export const LazyProjectsManager = lazy(() => 
-  import("@/components/admin/ProjectsManager").then(module => ({ 
-    default: module.ProjectsManager 
+export const LazyProjectsManager = lazy(() =>
+  import('@/components/admin/ProjectsManager').then(module => ({
+    default: module.ProjectsManager,
   }))
 );
 
-export const LazySkillsTab = lazy(() => 
-  import("@/components/admin/skills").then(module => ({ 
-    default: module.SkillsTab 
+export const LazySkillsTab = lazy(() =>
+  import('@/components/admin/skills').then(module => ({
+    default: module.SkillsTab,
   }))
 );
 
@@ -31,29 +31,19 @@ export interface LazyWrapperProps {
 export const LazyWrapper: React.FC<LazyWrapperProps> = ({
   children,
   fallback,
-  loadingMessage = "Loading component...",
-  errorBoundary = true
+  loadingMessage = 'Loading component...',
+  errorBoundary = true,
 }) => {
   const defaultFallback = (
-    <LoadingState 
-      variant="spinner" 
-      size="lg" 
-      loadingText={loadingMessage}
-    />
+    <LoadingState variant="spinner" size="lg" loadingText={loadingMessage} />
   );
 
   const content = (
-    <Suspense fallback={fallback || defaultFallback}>
-      {children}
-    </Suspense>
+    <Suspense fallback={fallback || defaultFallback}>{children}</Suspense>
   );
 
   if (errorBoundary) {
-    return (
-      <React.Fragment>
-        {content}
-      </React.Fragment>
-    );
+    return <React.Fragment>{content}</React.Fragment>;
   }
 
   return content;
@@ -63,9 +53,9 @@ export const LazyWrapper: React.FC<LazyWrapperProps> = ({
 export const preloadAdminComponents = () => {
   // Preload critical components when user hovers over admin navigation
   const preloadPromises = [
-    import("@/components/admin/dashboard"),
-    import("@/components/admin/ProjectsManager"),
-    import("@/components/admin/skills")
+    import('@/components/admin/dashboard'),
+    import('@/components/admin/ProjectsManager'),
+    import('@/components/admin/skills'),
   ];
 
   return Promise.all(preloadPromises);
@@ -81,7 +71,7 @@ export const usePreloadAdminComponents = () => {
         await preloadAdminComponents();
         setPreloaded(true);
       } catch (error) {
-        console.warn("Failed to preload admin components:", error);
+        console.warn('Failed to preload admin components:', error);
       }
     }
   }, [preloaded]);
@@ -90,7 +80,9 @@ export const usePreloadAdminComponents = () => {
 };
 
 // Component-specific lazy wrappers with optimized loading states
-export const LazyDashboard: React.FC<React.ComponentProps<typeof LazyDashboardOverview>> = (props) => (
+export const LazyDashboard: React.FC<
+  React.ComponentProps<typeof LazyDashboardOverview>
+> = props => (
   <LazyWrapper loadingMessage="Loading dashboard overview...">
     <LazyDashboardOverview {...props} />
   </LazyWrapper>
@@ -119,13 +111,16 @@ export const useIntersectionObserver = (
     const target = targetRef.current;
     if (!target) return;
 
-    const observer = new IntersectionObserver(([entry]) => {
-      setIsIntersecting(entry.isIntersecting);
-    }, {
-      threshold: 0.1,
-      rootMargin: "50px",
-      ...options
-    });
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsIntersecting(entry.isIntersecting);
+      },
+      {
+        threshold: 0.1,
+        rootMargin: '50px',
+        ...options,
+      }
+    );
 
     observer.observe(target);
 
@@ -151,10 +146,13 @@ export const LazyOnScroll: React.FC<LazyOnScrollProps> = ({
   fallback,
   className,
   threshold = 0.1,
-  rootMargin = "50px"
+  rootMargin = '50px',
 }) => {
   const ref = React.useRef<HTMLDivElement>(null);
-  const isIntersecting = useIntersectionObserver(ref, { threshold, rootMargin });
+  const isIntersecting = useIntersectionObserver(ref, {
+    threshold,
+    rootMargin,
+  });
   const [shouldRender, setShouldRender] = React.useState(false);
 
   React.useEffect(() => {

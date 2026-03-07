@@ -10,10 +10,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Mail, 
-  Phone, 
-  MapPin, 
+import {
+  Mail,
+  Phone,
+  MapPin,
   Calendar,
   Download,
   ExternalLink,
@@ -28,7 +28,7 @@ import {
   MessageSquare,
   Clock,
   User,
-  Building2
+  Building2,
 } from 'lucide-react';
 
 // Define type for dataLayer
@@ -105,40 +105,42 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
   onChange,
   required = false,
   error,
-  className
+  className,
 }) => {
   const id = useRef(`input-${Math.random().toString(36).substr(2, 9)}`).current;
   const [focused, setFocused] = useState(false);
 
   return (
-    <div className={cn("relative", className)}>
+    <div className={cn('relative', className)}>
       <Input
         id={id}
         type={type}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={e => onChange(e.target.value)}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         required={required}
         className={cn(
-          "pt-6 pb-2 px-4 transition-all duration-200",
-          error && "border-destructive focus-visible:ring-destructive"
+          'px-4 pb-2 pt-6 transition-all duration-200',
+          error && 'border-destructive focus-visible:ring-destructive'
         )}
       />
       <label
         htmlFor={id}
         className={cn(
-          "absolute left-4 transition-all duration-200 pointer-events-none",
-          "text-muted-foreground",
-          focused || value ? "top-2 text-xs" : "top-1/2 -translate-y-1/2 text-base",
-          error && "text-destructive"
+          'pointer-events-none absolute left-4 transition-all duration-200',
+          'text-muted-foreground',
+          focused || value
+            ? 'top-2 text-xs'
+            : 'top-1/2 -translate-y-1/2 text-base',
+          error && 'text-destructive'
         )}
       >
         {label} {required && <span className="text-destructive">*</span>}
       </label>
       {error && (
-        <div className="flex items-center mt-1 text-destructive text-sm">
-          <AlertCircle className="w-4 h-4 mr-1" />
+        <div className="mt-1 flex items-center text-sm text-destructive">
+          <AlertCircle className="mr-1 h-4 w-4" />
           {error}
         </div>
       )}
@@ -150,56 +152,56 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
 export const ContactSection: React.FC<ContactSectionProps> = ({
   className,
   contactInfo = {
-    email: "mounir.webdev@gmail.com",
-    phone: "+213 555 123 456",
-    location: "Algiers, Algeria",
-    resumeUrl: "/resume.pdf"
+    email: 'mounir.webdev@gmail.com',
+    phone: '+213 555 123 456',
+    location: 'Algiers, Algeria',
+    resumeUrl: '/resume.pdf',
   },
   socialLinks = [
     {
-      platform: "GitHub",
-      url: "https://github.com/mounir",
+      platform: 'GitHub',
+      url: 'https://github.com/mounir',
       icon: Github,
-      username: "@mounir",
+      username: '@mounir',
       followers: 1200,
-      verified: true
+      verified: true,
     },
     {
-      platform: "LinkedIn",
-      url: "https://linkedin.com/in/mounir",
+      platform: 'LinkedIn',
+      url: 'https://linkedin.com/in/mounir',
       icon: Linkedin,
-      username: "Mounir Abderrahmani",
+      username: 'Mounir Abderrahmani',
       followers: 5000,
-      verified: true
+      verified: true,
     },
     {
-      platform: "Twitter",
-      url: "https://twitter.com/mounir",
+      platform: 'Twitter',
+      url: 'https://twitter.com/mounir',
       icon: Twitter,
-      username: "@mounir",
+      username: '@mounir',
       followers: 3200,
-      verified: false
-    }
+      verified: false,
+    },
   ],
   availability = {
     available: true,
-    status: "available",
-    message: "Currently available for new projects",
-    responseTime: "Within 2 hours",
+    status: 'available',
+    message: 'Currently available for new projects',
+    responseTime: 'Within 2 hours',
     workingHours: {
-      timezone: "CET (UTC+1)",
-      start: "09:00",
-      end: "18:00",
-      days: ["Mon-Fri"]
-    }
+      timezone: 'CET (UTC+1)',
+      start: '09:00',
+      end: '18:00',
+      days: ['Mon-Fri'],
+    },
   },
-  onSubmit
+  onSubmit,
 }) => {
   const [formData, setFormData] = useState<ContactFormData>({
-    name: "",
-    email: "",
-    subject: "",
-    message: ""
+    name: '',
+    email: '',
+    subject: '',
+    message: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -209,8 +211,13 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
 
   // Push event to dataLayer if available
   const pushToDataLayer = (eventData: DataLayerEvent) => {
-    if (typeof window !== 'undefined' && (window as unknown as { dataLayer: DataLayerEvent[] }).dataLayer) {
-      (window as unknown as { dataLayer: DataLayerEvent[] }).dataLayer.push(eventData);
+    if (
+      typeof window !== 'undefined' &&
+      (window as unknown as { dataLayer: DataLayerEvent[] }).dataLayer
+    ) {
+      (window as unknown as { dataLayer: DataLayerEvent[] }).dataLayer.push(
+        eventData
+      );
     }
   };
 
@@ -229,31 +236,31 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
   // Validate form
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
-    
+
     if (!formData.name.trim()) {
-      newErrors.name = "Name is required";
+      newErrors.name = 'Name is required';
     } else if (formData.name.trim().split(' ').length < 2) {
-      newErrors.name = "Please enter your full name";
+      newErrors.name = 'Please enter your full name';
     }
-    
+
     if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
+      newErrors.email = 'Email is required';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email address";
+      newErrors.email = 'Please enter a valid email address';
     }
-    
+
     if (!formData.subject.trim()) {
-      newErrors.subject = "Subject is required";
+      newErrors.subject = 'Subject is required';
     } else if (formData.subject.length < 5) {
-      newErrors.subject = "Subject must be at least 5 characters";
+      newErrors.subject = 'Subject must be at least 5 characters';
     }
-    
+
     if (!formData.message.trim()) {
-      newErrors.message = "Message is required";
+      newErrors.message = 'Message is required';
     } else if (formData.message.length < 10) {
-      newErrors.message = "Message must be at least 10 characters";
+      newErrors.message = 'Message must be at least 10 characters';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -261,27 +268,27 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Track form submission event
     pushToDataLayer({
       event: 'contact_form_submit',
-      formType: 'contact_section'
+      formType: 'contact_section',
     });
-    
+
     if (!validateForm()) return;
-    
+
     setIsSubmitting(true);
     try {
       if (onSubmit) {
         await onSubmit(formData);
       }
       setIsSubmitted(true);
-      setFormData({ name: "", email: "", subject: "", message: "" });
-      
+      setFormData({ name: '', email: '', subject: '', message: '' });
+
       // Reset form after successful submission
       setTimeout(() => setIsSubmitted(false), 5000);
     } catch (error) {
-      console.error("Form submission error:", error);
+      console.error('Form submission error:', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -291,59 +298,73 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
   const toggleForm = () => {
     const newShowForm = !showForm;
     setShowForm(newShowForm);
-    
+
     pushToDataLayer({
       event: 'contact_form_toggle',
-      action: newShowForm ? 'open' : 'close'
+      action: newShowForm ? 'open' : 'close',
     });
   };
 
   // Status badge component
   const StatusBadge = () => {
     const statusConfig = {
-      available: { text: "Available", className: "bg-green-100 text-green-800 border-green-200" },
-      busy: { text: "Busy", className: "bg-red-100 text-red-800 border-red-200" },
-      "partially-available": { text: "Partially Available", className: "bg-yellow-100 text-yellow-800 border-yellow-200" },
-      unavailable: { text: "Unavailable", className: "bg-gray-100 text-gray-800 border-gray-200" }
+      available: {
+        text: 'Available',
+        className: 'bg-green-100 text-green-800 border-green-200',
+      },
+      busy: {
+        text: 'Busy',
+        className: 'bg-red-100 text-red-800 border-red-200',
+      },
+      'partially-available': {
+        text: 'Partially Available',
+        className: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+      },
+      unavailable: {
+        text: 'Unavailable',
+        className: 'bg-gray-100 text-gray-800 border-gray-200',
+      },
     };
-    
+
     const config = statusConfig[availability.status] || statusConfig.available;
-    
+
     return (
-      <Badge 
-        className={cn(
-          "px-3 py-1 text-xs font-medium border",
-          config.className
-        )}
+      <Badge
+        className={cn('border px-3 py-1 text-xs font-medium', config.className)}
       >
-        <div className={cn(
-          "w-2 h-2 rounded-full mr-2",
-          availability.status === "available" && "bg-green-500",
-          availability.status === "busy" && "bg-red-500",
-          availability.status === "partially-available" && "bg-yellow-500",
-          availability.status === "unavailable" && "bg-gray-500"
-        )} />
+        <div
+          className={cn(
+            'mr-2 h-2 w-2 rounded-full',
+            availability.status === 'available' && 'bg-green-500',
+            availability.status === 'busy' && 'bg-red-500',
+            availability.status === 'partially-available' && 'bg-yellow-500',
+            availability.status === 'unavailable' && 'bg-gray-500'
+          )}
+        />
         {config.text}
       </Badge>
     );
   };
 
   return (
-    <section id="contact-section" className={cn("py-16 md:py-24", className)}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Let's Work Together</h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Have a project in mind? Let's discuss how we can bring your ideas to life.
+    <section id="contact-section" className={cn('py-16 md:py-24', className)}>
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        <div className="mb-12 text-center">
+          <h2 className="mb-4 text-3xl font-bold md:text-4xl">
+            Let's Work Together
+          </h2>
+          <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+            Have a project in mind? Let's discuss how we can bring your ideas to
+            life.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
           {/* Contact Information */}
-          <Card className="border-0 shadow-lg bg-gradient-to-br from-card to-muted/50">
+          <Card className="border-0 bg-gradient-to-br from-card to-muted/50 shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Mail className="w-5 h-5" />
+                <Mail className="h-5 w-5" />
                 Get in Touch
               </CardTitle>
             </CardHeader>
@@ -352,10 +373,12 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <StatusBadge />
-                  <span className="text-sm text-muted-foreground">{availability.message}</span>
+                  <span className="text-sm text-muted-foreground">
+                    {availability.message}
+                  </span>
                 </div>
                 <div className="flex items-center text-sm text-muted-foreground">
-                  <Clock className="w-4 h-4 mr-1" />
+                  <Clock className="mr-1 h-4 w-4" />
                   {availability.responseTime}
                 </div>
               </div>
@@ -363,15 +386,17 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
               {/* Contact Details */}
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-primary/10 text-primary">
-                    <Mail className="w-5 h-5" />
+                  <div className="rounded-lg bg-primary/10 p-2 text-primary">
+                    <Mail className="h-5 w-5" />
                   </div>
                   <div>
                     <p className="font-medium">Email</p>
-                    <a 
-                      href={`mailto:${contactInfo.email}`} 
-                      className="text-muted-foreground hover:text-primary transition-colors"
-                      onClick={() => pushToDataLayer({ event: 'contact_email_click' })}
+                    <a
+                      href={`mailto:${contactInfo.email}`}
+                      className="text-muted-foreground transition-colors hover:text-primary"
+                      onClick={() =>
+                        pushToDataLayer({ event: 'contact_email_click' })
+                      }
                     >
                       {contactInfo.email}
                     </a>
@@ -380,15 +405,17 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
 
                 {contactInfo.phone && (
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-primary/10 text-primary">
-                      <Phone className="w-5 h-5" />
+                    <div className="rounded-lg bg-primary/10 p-2 text-primary">
+                      <Phone className="h-5 w-5" />
                     </div>
                     <div>
                       <p className="font-medium">Phone</p>
-                      <a 
-                        href={`tel:${contactInfo.phone}`} 
-                        className="text-muted-foreground hover:text-primary transition-colors"
-                        onClick={() => pushToDataLayer({ event: 'contact_phone_click' })}
+                      <a
+                        href={`tel:${contactInfo.phone}`}
+                        className="text-muted-foreground transition-colors hover:text-primary"
+                        onClick={() =>
+                          pushToDataLayer({ event: 'contact_phone_click' })
+                        }
                       >
                         {contactInfo.phone}
                       </a>
@@ -397,19 +424,21 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                 )}
 
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-primary/10 text-primary">
-                    <MapPin className="w-5 h-5" />
+                  <div className="rounded-lg bg-primary/10 p-2 text-primary">
+                    <MapPin className="h-5 w-5" />
                   </div>
                   <div>
                     <p className="font-medium">Location</p>
-                    <p className="text-muted-foreground">{contactInfo.location}</p>
+                    <p className="text-muted-foreground">
+                      {contactInfo.location}
+                    </p>
                   </div>
                 </div>
               </div>
 
               {/* Social Links */}
               <div className="pt-4">
-                <p className="font-medium mb-3">Connect with me</p>
+                <p className="mb-3 font-medium">Connect with me</p>
                 <div className="flex flex-wrap gap-3">
                   {socialLinks.map((link, index) => {
                     const Icon = link.icon;
@@ -423,11 +452,11 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                           pushToDataLayer({
                             event: 'social_link_click',
                             platform: link.platform,
-                            url: link.url
+                            url: link.url,
                           });
                         }}
                       >
-                        <Icon className="w-4 h-4" />
+                        <Icon className="h-4 w-4" />
                         {link.username}
                       </Button>
                     );
@@ -437,16 +466,16 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
 
               {/* Resume Download */}
               {contactInfo.resumeUrl && (
-                <Button 
-                  className="w-full track-click"
+                <Button
+                  className="track-click w-full"
                   onClick={() => {
                     pushToDataLayer({
                       event: 'resume_download',
-                      action: 'click'
+                      action: 'click',
                     });
                   }}
                 >
-                  <Download className="w-4 h-4 mr-2" />
+                  <Download className="mr-2 h-4 w-4" />
                   Download Resume
                 </Button>
               )}
@@ -454,39 +483,41 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
           </Card>
 
           {/* Contact Form */}
-          <Card className="border-0 shadow-lg bg-gradient-to-br from-card to-muted/50">
+          <Card className="border-0 bg-gradient-to-br from-card to-muted/50 shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <MessageSquare className="w-5 h-5" />
+                <MessageSquare className="h-5 w-5" />
                 Send a Message
               </CardTitle>
             </CardHeader>
             <CardContent>
               {!showForm ? (
                 <div className="flex flex-col items-center justify-center py-12">
-                  <MessageSquare className="w-12 h-12 text-muted-foreground mb-4" />
-                  <p className="text-center text-muted-foreground mb-6">
-                    Ready to start a project or have questions? Click below to open the contact form.
+                  <MessageSquare className="mb-4 h-12 w-12 text-muted-foreground" />
+                  <p className="mb-6 text-center text-muted-foreground">
+                    Ready to start a project or have questions? Click below to
+                    open the contact form.
                   </p>
-                  <Button 
-                    onClick={toggleForm}
-                    className="track-click"
-                  >
+                  <Button onClick={toggleForm} className="track-click">
                     Open Contact Form
                   </Button>
                 </div>
               ) : (
-                <div 
+                <div
                   ref={formRef}
                   className={cn(
-                    "contact-form-container",
-                    showForm ? "contact-form-expanded" : "contact-form-collapsed"
+                    'contact-form-container',
+                    showForm
+                      ? 'contact-form-expanded'
+                      : 'contact-form-collapsed'
                   )}
                 >
                   {isSubmitted ? (
-                    <div className="text-center py-8">
-                      <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-                      <h3 className="text-xl font-semibold mb-2">Message Sent!</h3>
+                    <div className="py-8 text-center">
+                      <CheckCircle className="mx-auto mb-4 h-16 w-16 text-green-500" />
+                      <h3 className="mb-2 text-xl font-semibold">
+                        Message Sent!
+                      </h3>
                       <p className="text-muted-foreground">
                         Thank you for reaching out. I'll get back to you soon.
                       </p>
@@ -496,70 +527,73 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                       <FloatingLabelInput
                         label="Full Name"
                         value={formData.name}
-                        onChange={(value) => handleInputChange("name", value)}
+                        onChange={value => handleInputChange('name', value)}
                         required
                         error={errors.name}
                       />
-                      
+
                       <FloatingLabelInput
                         label="Email Address"
                         type="email"
                         value={formData.email}
-                        onChange={(value) => handleInputChange("email", value)}
+                        onChange={value => handleInputChange('email', value)}
                         required
                         error={errors.email}
                       />
-                      
+
                       <FloatingLabelInput
                         label="Subject"
                         value={formData.subject}
-                        onChange={(value) => handleInputChange("subject", value)}
+                        onChange={value => handleInputChange('subject', value)}
                         required
                         error={errors.subject}
                       />
-                      
+
                       <div className="space-y-2">
                         <label className="text-sm font-medium text-muted-foreground">
                           Message <span className="text-destructive">*</span>
                         </label>
                         <Textarea
                           value={formData.message}
-                          onChange={(e) => handleInputChange("message", e.target.value)}
+                          onChange={e =>
+                            handleInputChange('message', e.target.value)
+                          }
                           placeholder="Tell me about your project, goals, or any questions you have..."
                           rows={5}
                           className={cn(
-                            "min-h-[120px]",
-                            errors.message && "border-destructive focus-visible:ring-destructive"
+                            'min-h-[120px]',
+                            errors.message &&
+                              'border-destructive focus-visible:ring-destructive'
                           )}
                         />
                         {errors.message && (
-                          <div className="flex items-center text-destructive text-sm">
-                            <AlertCircle className="w-4 h-4 mr-1" />
+                          <div className="flex items-center text-sm text-destructive">
+                            <AlertCircle className="mr-1 h-4 w-4" />
                             {errors.message}
                           </div>
                         )}
                       </div>
-                      
-                      <div className="flex flex-col sm:flex-row gap-3 pt-4">
-                        <Button 
-                          type="submit" 
+
+                      <div className="flex flex-col gap-3 pt-4 sm:flex-row">
+                        <Button
+                          type="submit"
                           disabled={isSubmitting}
                           className="track-click flex-1"
                         >
                           {isSubmitting ? (
                             <>
-                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                               Sending...
                             </>
                           ) : (
                             <>
-                              <Send className="w-4 h-4 mr-2" />
+                              <Send className="mr-2 h-4 w-4" />
                               Send Message
                             </>
                           )}
                         </Button>
-                        <Button 
-                          type="button" 
+                        <Button
+                          type="button"
                           variant="outline"
                           onClick={toggleForm}
                           className="track-click flex-1"

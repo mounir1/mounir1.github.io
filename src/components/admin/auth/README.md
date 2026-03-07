@@ -5,6 +5,7 @@ This directory contains the authentication components for the admin dashboard, e
 ## Components
 
 ### AdminAuth
+
 The main authentication wrapper component that provides authentication context and guards admin routes.
 
 ```tsx
@@ -20,19 +21,19 @@ function App() {
 ```
 
 ### LoginForm
+
 A standalone login form component with Firebase authentication integration.
 
 ```tsx
 import { LoginForm } from '@/components/admin/auth';
 
 function LoginPage() {
-  return (
-    <LoginForm onSuccess={() => console.log('Login successful')} />
-  );
+  return <LoginForm onSuccess={() => console.log('Login successful')} />;
 }
 ```
 
 ### AuthGuard
+
 A route protection component that shows login form for unauthenticated users.
 
 ```tsx
@@ -50,21 +51,22 @@ function ProtectedRoute() {
 ## Hook
 
 ### useAdminAuth
+
 A custom hook that provides authentication state and methods.
 
 ```tsx
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 
 function MyComponent() {
-  const { 
-    user, 
-    loading, 
-    error, 
-    isAuthenticated, 
-    canUseAdmin, 
-    login, 
-    logout, 
-    clearError 
+  const {
+    user,
+    loading,
+    error,
+    isAuthenticated,
+    canUseAdmin,
+    login,
+    logout,
+    clearError,
   } = useAdminAuth();
 
   // Use authentication state and methods
@@ -95,9 +97,7 @@ import { AdminLayout } from '@/components/admin/layout';
 export default function Admin() {
   return (
     <AdminAuth>
-      <AdminLayout>
-        {/* Your admin content here */}
-      </AdminLayout>
+      <AdminLayout>{/* Your admin content here */}</AdminLayout>
     </AdminAuth>
   );
 }
@@ -106,12 +106,14 @@ export default function Admin() {
 ## Testing
 
 The components include unit tests to verify:
+
 - Hook initialization and state management
 - Authentication flow
 - Error handling
 - Component rendering
 
 Run tests with:
+
 ```bash
 npm test src/components/admin/auth
 ```

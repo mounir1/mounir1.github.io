@@ -141,7 +141,7 @@ export enum ProjectStatus {
   ON_HOLD = 'on-hold',
   CANCELLED = 'cancelled',
   MAINTENANCE = 'maintenance',
-  ARCHIVED = 'archived'
+  ARCHIVED = 'archived',
 }
 
 export enum ProjectCategory {
@@ -159,14 +159,14 @@ export enum ProjectCategory {
   DATA_PIPELINE = 'Data Pipeline',
   UI_UX_DESIGN = 'UI/UX Design',
   DEVOPS_TOOL = 'DevOps Tool',
-  OTHER = 'Other'
+  OTHER = 'Other',
 }
 
 export enum ProjectPriority {
   LOW = 'low',
   MEDIUM = 'medium',
   HIGH = 'high',
-  CRITICAL = 'critical'
+  CRITICAL = 'critical',
 }
 
 export enum SkillCategory {
@@ -186,14 +186,14 @@ export enum SkillCategory {
   TOOLS = 'Tools',
   LMS_EDUCATION = 'LMS & Education',
   HOSPITALITY_SOLUTIONS = 'Hospitality Solutions',
-  OTHER = 'Other'
+  OTHER = 'Other',
 }
 
 export enum SkillLevel {
   BEGINNER = 'beginner',
   INTERMEDIATE = 'intermediate',
   ADVANCED = 'advanced',
-  EXPERT = 'expert'
+  EXPERT = 'expert',
 }
 
 // Utility types
@@ -203,4 +203,5 @@ export type DeepPartial<T> = {
 
 export type RequiredFields<T, K extends keyof T> = T & Required<Pick<T, K>>;
 
-export type OptionalFields<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+export type OptionalFields<T, K extends keyof T> = Omit<T, K> &
+  Partial<Pick<T, K>>;

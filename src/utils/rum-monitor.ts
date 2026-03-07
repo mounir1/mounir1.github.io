@@ -35,14 +35,18 @@ class RealUserMonitoring {
   private performanceData: PerformanceData;
   private metricsCollected: Set<string> = new Set();
   private customMetrics: { [key: string]: any } = {};
-  private errors: Array<{ message: string; stack?: string; timestamp: number }> = [];
+  private errors: Array<{
+    message: string;
+    stack?: string;
+    timestamp: number;
+  }> = [];
 
   constructor(config: RUMConfig = {}) {
     this.config = {
       sampleRate: 1.0,
       enableConsoleLogging: false,
       enableLocalStorage: true,
-      ...config
+      ...config,
     };
 
     this.sessionId = this.config.sessionId || this.generateSessionId();
@@ -72,12 +76,15 @@ class RealUserMonitoring {
       deviceMemory: this.getDeviceMemory(),
       metrics: {},
       customMetrics: {},
-      errors: []
+      errors: [],
     };
   }
 
   private getConnectionType(): string | undefined {
-    const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection;
+    const connection =
+      (navigator as any).connection ||
+      (navigator as any).mozConnection ||
+      (navigator as any).webkitConnection;
     return connection?.effectiveType;
   }
 
@@ -153,8 +160,10 @@ class RealUserMonitoring {
 
   private measureTimeToInteractive(): void {
     const navigationStart = performance.timeOrigin;
-    const loadEventEnd = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
-    
+    const loadEventEnd = performance.getEntriesByType(
+      'navigation'
+    )[0] as PerformanceNavigationTiming;
+
     if (loadEventEnd?.loadEventEnd) {
       const tti = loadEventEnd.loadEventEnd - navigationStart;
       this.recordMetric('TTI', tti);
@@ -162,15 +171,17 @@ class RealUserMonitoring {
   }
 
   private collectResourceMetrics(): void {
-    const resources = performance.getEntriesByType('resource') as PerformanceResourceTiming[];
-    
+    const resources = performance.getEntriesByType(
+      'resource'
+    ) as PerformanceResourceTiming[];
+
     let totalSize = 0;
     let totalDuration = 0;
     const resourceTypes: { [key: string]: number } = {};
 
     resources.forEach(resource => {
       totalDuration += resource.duration;
-      
+
       // Estimate transfer size (not always available)
       const size = (resource as any).transferSize || 0;
       totalSize += size;
@@ -183,7 +194,7 @@ class RealUserMonitoring {
     this.recordMetric('ResourceCount', resources.length);
     this.recordMetric('ResourceTotalSize', totalSize);
     this.recordMetric('ResourceTotalDuration', totalDuration);
-    
+
     Object.entries(resourceTypes).forEach(([type, count]) => {
       this.recordMetric(`Resource${type}Count`, count);
     });
@@ -199,9 +210,14 @@ class RealUserMonitoring {
 
   private collectDOMMetrics(): void {
     // DOM content loaded
-    const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+    const navigation = performance.getEntriesByType(
+      'navigation'
+    )[0] as PerformanceNavigationTiming;
     if (navigation?.domContentLoadedEventEnd) {
-      this.recordMetric('DOMContentLoaded', navigation.domContentLoadedEventEnd - navigation.navigationStart);
+      this.recordMetric(
+        'DOMContentLoaded',
+        navigation.domContentLoadedEventEnd - navigation.navigationStart
+      );
     }
 
     // DOM size metrics
@@ -211,36 +227,36 @@ class RealUserMonitoring {
 
   private calculateDOMDepth(): number {
     let maxDepth = 0;
-    
+
     function traverse(element: Element, depth: number) {
       maxDepth = Math.max(maxDepth, depth);
       for (const child of element.children) {
         traverse(child, depth + 1);
       }
     }
-    
+
     if (document.body) {
       traverse(document.body, 1);
     }
-    
+
     return maxDepth;
   }
 
   private setupErrorTracking(): void {
     // JavaScript errors
-    window.addEventListener('error', (event) => {
+    window.addEventListener('error', event => {
       this.recordError({
         message: event.message,
         stack: event.error?.stack,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
     });
 
     // Unhandled promise rejections
-    window.addEventListener('unhandledrejection', (event) => {
+    window.addEventListener('unhandledrejection', event => {
       this.recordError({
         message: `Unhandled Promise Rejection: ${event.reason}`,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
     });
   }
@@ -264,11 +280,14 @@ class RealUserMonitoring {
   private setupNavigationTracking(): void {
     // Track single-page app navigation
     let lastUrl = window.location.href;
-    
+
     const trackNavigation = () => {
       const currentUrl = window.location.href;
       if (currentUrl !== lastUrl) {
-        this.recordCustomMetric('NavigationCount', (this.customMetrics.NavigationCount || 0) + 1);
+        this.recordCustomMetric(
+          'NavigationCount',
+          (this.customMetrics.NavigationCount || 0) + 1
+        );
         this.recordCustomMetric('LastNavigationTime', Date.now());
         lastUrl = currentUrl;
       }
@@ -276,17 +295,17 @@ class RealUserMonitoring {
 
     // Listen for history changes
     window.addEventListener('popstate', trackNavigation);
-    
+
     // Override pushState and replaceState
     const originalPushState = history.pushState;
     const originalReplaceState = history.replaceState;
-    
-    history.pushState = function(...args) {
+
+    history.pushState = function (...args) {
       originalPushState.apply(history, args);
       trackNavigation();
     };
-    
-    history.replaceState = function(...args) {
+
+    history.replaceState = function (...args) {
       originalReplaceState.apply(history, args);
       trackNavigation();
     };
@@ -323,7 +342,11 @@ class RealUserMonitoring {
     this.log(`Custom metric recorded: ${name} = ${value}`);
   }
 
-  public recordError(error: { message: string; stack?: string; timestamp: number }): void {
+  public recordError(error: {
+    message: string;
+    stack?: string;
+    timestamp: number;
+  }): void {
     this.errors.push(error);
     this.performanceData.errors = [...this.errors];
     this.log(`Error recorded: ${error.message}`);
@@ -334,7 +357,7 @@ class RealUserMonitoring {
 
     const data = {
       ...this.performanceData,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
 
     try {
@@ -356,28 +379,38 @@ class RealUserMonitoring {
     try {
       const key = `rum_data_${this.sessionId}`;
       localStorage.setItem(key, JSON.stringify(data));
-      
+
       // Clean up old entries (keep last 10)
-      const keys = Object.keys(localStorage).filter(k => k.startsWith('rum_data_'));
+      const keys = Object.keys(localStorage).filter(k =>
+        k.startsWith('rum_data_')
+      );
       if (keys.length > 10) {
-        keys.sort().slice(0, keys.length - 10).forEach(k => {
-          localStorage.removeItem(k);
-        });
+        keys
+          .sort()
+          .slice(0, keys.length - 10)
+          .forEach(k => {
+            localStorage.removeItem(k);
+          });
       }
     } catch (error) {
       this.log(`Failed to save to localStorage: ${error}`);
     }
   }
 
-  private async sendToAPI(data: PerformanceData, isBeacon: boolean): Promise<void> {
+  private async sendToAPI(
+    data: PerformanceData,
+    isBeacon: boolean
+  ): Promise<void> {
     const payload = {
       ...data,
-      apiKey: this.config.apiKey
+      apiKey: this.config.apiKey,
     };
 
     if (isBeacon && navigator.sendBeacon) {
       // Use sendBeacon for reliable delivery during page unload
-      const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+      const blob = new Blob([JSON.stringify(payload)], {
+        type: 'application/json',
+      });
       navigator.sendBeacon(this.config.apiEndpoint!, blob);
     } else {
       // Use fetch for regular transmission
@@ -387,7 +420,7 @@ class RealUserMonitoring {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(payload),
-        keepalive: isBeacon
+        keepalive: isBeacon,
       });
     }
   }

@@ -18,24 +18,23 @@ interface LoadingScreenProps {
 }
 
 // Animated logo component
-const AnimatedLogo: React.FC<{ logo?: string; name?: string }> = ({ logo, name }) => {
+const AnimatedLogo: React.FC<{ logo?: string; name?: string }> = ({
+  logo,
+  name,
+}) => {
   return (
     <div className="flex flex-col items-center gap-4">
       {logo ? (
         <div className="relative">
-          <img
-            src={logo}
-            alt="Logo"
-            className="w-16 h-16 animate-pulse"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-full animate-ping" />
+          <img src={logo} alt="Logo" className="h-16 w-16 animate-pulse" />
+          <div className="absolute inset-0 animate-ping rounded-full bg-gradient-to-r from-primary/20 to-secondary/20" />
         </div>
       ) : (
-        <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-full animate-pulse" />
+        <div className="h-16 w-16 animate-pulse rounded-full bg-gradient-to-br from-primary to-secondary" />
       )}
-      
+
       {name && (
-        <h1 className="text-2xl font-bold text-foreground animate-fade-in">
+        <h1 className="animate-fade-in text-2xl font-bold text-foreground">
           {name}
         </h1>
       )}
@@ -46,7 +45,7 @@ const AnimatedLogo: React.FC<{ logo?: string; name?: string }> = ({ logo, name }
 // Progress bar component
 const ProgressBar: React.FC<{ progress: number }> = ({ progress }) => {
   return (
-    <div className="w-64 h-1 bg-muted rounded-full overflow-hidden">
+    <div className="h-1 w-64 overflow-hidden rounded-full bg-muted">
       <div
         className="h-full bg-gradient-to-r from-primary to-secondary transition-all duration-300 ease-out"
         style={{ width: `${progress}%` }}
@@ -61,15 +60,15 @@ const ParticleAnimation: React.FC = () => {
 
   return (
     <div className="absolute inset-0 overflow-hidden">
-      {particles.map((particle) => (
+      {particles.map(particle => (
         <div
           key={particle}
-          className="absolute w-2 h-2 bg-primary/30 rounded-full animate-float"
+          className="absolute h-2 w-2 animate-float rounded-full bg-primary/30"
           style={{
             left: `${Math.random() * 100}%`,
             top: `${Math.random() * 100}%`,
             animationDelay: `${Math.random() * 2}s`,
-            animationDuration: `${3 + Math.random() * 2}s`
+            animationDuration: `${3 + Math.random() * 2}s`,
           }}
         />
       ))}
@@ -81,34 +80,45 @@ const ParticleAnimation: React.FC = () => {
 const MinimalLoading: React.FC = () => {
   return (
     <div className="flex items-center gap-2">
-      <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-      <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-      <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+      <div
+        className="h-2 w-2 animate-bounce rounded-full bg-primary"
+        style={{ animationDelay: '0ms' }}
+      />
+      <div
+        className="h-2 w-2 animate-bounce rounded-full bg-primary"
+        style={{ animationDelay: '150ms' }}
+      />
+      <div
+        className="h-2 w-2 animate-bounce rounded-full bg-primary"
+        style={{ animationDelay: '300ms' }}
+      />
     </div>
   );
 };
 
 // Brand loading variant
-const BrandLoading: React.FC<{ logo?: string; name?: string; progress?: number }> = ({ 
-  logo, 
-  name, 
-  progress 
-}) => {
+const BrandLoading: React.FC<{
+  logo?: string;
+  name?: string;
+  progress?: number;
+}> = ({ logo, name, progress }) => {
   return (
     <div className="flex flex-col items-center gap-8">
       <AnimatedLogo logo={logo} name={name} />
-      
+
       {progress !== undefined && (
         <div className="flex flex-col items-center gap-2">
           <ProgressBar progress={progress} />
-          <span className="text-sm text-muted-foreground">{Math.round(progress)}%</span>
+          <span className="text-sm text-muted-foreground">
+            {Math.round(progress)}%
+          </span>
         </div>
       )}
-      
+
       <div className="flex items-center gap-2 text-muted-foreground">
-        <div className="w-1 h-1 bg-current rounded-full animate-pulse" />
+        <div className="h-1 w-1 animate-pulse rounded-full bg-current" />
         <span className="text-sm">Loading amazing content</span>
-        <div className="w-1 h-1 bg-current rounded-full animate-pulse" />
+        <div className="h-1 w-1 animate-pulse rounded-full bg-current" />
       </div>
     </div>
   );
@@ -121,15 +131,19 @@ const ProgressLoading: React.FC<{ progress: number }> = ({ progress }) => {
     { label: 'Loading assets', threshold: 40 },
     { label: 'Preparing interface', threshold: 70 },
     { label: 'Almost ready', threshold: 90 },
-    { label: 'Complete', threshold: 100 }
+    { label: 'Complete', threshold: 100 },
   ];
 
-  const currentStep = steps.find(step => progress <= step.threshold) || steps[steps.length - 1];
+  const currentStep =
+    steps.find(step => progress <= step.threshold) || steps[steps.length - 1];
 
   return (
-    <div className="flex flex-col items-center gap-6 w-80">
-      <div className="w-20 h-20 relative">
-        <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+    <div className="flex w-80 flex-col items-center gap-6">
+      <div className="relative h-20 w-20">
+        <svg
+          className="h-full w-full -rotate-90 transform"
+          viewBox="0 0 100 100"
+        >
           <circle
             cx="50"
             cy="50"
@@ -153,20 +167,29 @@ const ProgressLoading: React.FC<{ progress: number }> = ({ progress }) => {
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-lg font-semibold text-foreground">{Math.round(progress)}%</span>
+          <span className="text-lg font-semibold text-foreground">
+            {Math.round(progress)}%
+          </span>
         </div>
       </div>
-      
+
       <div className="text-center">
-        <h3 className="text-lg font-medium text-foreground mb-1">{currentStep.label}</h3>
-        <p className="text-sm text-muted-foreground">Please wait while we prepare everything for you</p>
+        <h3 className="mb-1 text-lg font-medium text-foreground">
+          {currentStep.label}
+        </h3>
+        <p className="text-sm text-muted-foreground">
+          Please wait while we prepare everything for you
+        </p>
       </div>
     </div>
   );
 };
 
 // Particles loading variant
-const ParticlesLoading: React.FC<{ logo?: string; name?: string }> = ({ logo, name }) => {
+const ParticlesLoading: React.FC<{ logo?: string; name?: string }> = ({
+  logo,
+  name,
+}) => {
   return (
     <div className="relative flex flex-col items-center gap-8">
       <ParticleAnimation />
@@ -174,8 +197,8 @@ const ParticlesLoading: React.FC<{ logo?: string; name?: string }> = ({ logo, na
         <AnimatedLogo logo={logo} name={name} />
       </div>
       <div className="relative z-10 text-center">
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-background/80 backdrop-blur-sm rounded-full border">
-          <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+        <div className="inline-flex items-center gap-2 rounded-full border bg-background/80 px-4 py-2 backdrop-blur-sm">
+          <div className="h-2 w-2 animate-pulse rounded-full bg-primary" />
           <span className="text-sm text-muted-foreground">Creating magic</span>
         </div>
       </div>
@@ -191,7 +214,7 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({
   showProgress = true,
   brandLogo,
   brandName,
-  className
+  className,
 }) => {
   const [progress, setProgress] = useState(0);
   const [isVisible, setIsVisible] = useState(isLoading);
@@ -217,7 +240,7 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({
       setProgress(prev => {
         const increment = Math.random() * 15 + 5; // Random increment between 5-20
         const newProgress = Math.min(prev + increment, 100);
-        
+
         if (newProgress >= 100) {
           clearInterval(interval);
           setTimeout(() => {
@@ -225,7 +248,7 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({
             onComplete?.();
           }, 500);
         }
-        
+
         return newProgress;
       });
     }, duration / 20); // Update 20 times during the duration
@@ -241,10 +264,10 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({
         return <MinimalLoading />;
       case 'brand':
         return (
-          <BrandLoading 
-            logo={brandLogo} 
-            name={brandName} 
-            progress={showProgress ? progress : undefined} 
+          <BrandLoading
+            logo={brandLogo}
+            name={brandName}
+            progress={showProgress ? progress : undefined}
           />
         );
       case 'progress':
@@ -264,7 +287,7 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({
         className
       )}
     >
-      <div className="flex flex-col items-center justify-center min-h-screen p-8">
+      <div className="flex min-h-screen flex-col items-center justify-center p-8">
         {renderLoadingVariant()}
       </div>
     </div>
@@ -282,6 +305,6 @@ export const useLoadingScreen = (initialLoading = true) => {
     isLoading,
     startLoading,
     stopLoading,
-    setIsLoading
+    setIsLoading,
   };
 };

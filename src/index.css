@@ -82,23 +82,31 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
-    font-feature-settings: "rlig" 1, "calt" 1, "kern" 1;
+    @apply bg-background font-sans text-foreground antialiased;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1,
+      'kern' 1;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-  
-  h1, h2, h3, h4, h5, h6 {
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-semibold tracking-tight;
   }
-  
+
   /* Smooth scrolling */
   html {
     scroll-behavior: smooth;
     color-scheme: light;
   }
-  
+
   .dark html {
     color-scheme: dark;
   }
@@ -107,31 +115,31 @@
   .container {
     @apply w-full max-w-full px-4;
   }
-  
+
   @media (min-width: 640px) {
     .container {
       @apply px-6;
     }
   }
-  
+
   @media (min-width: 1024px) {
     .container {
       @apply px-8;
     }
   }
-  
+
   @media (min-width: 1280px) {
     .container {
       @apply px-10;
     }
   }
-  
+
   @media (min-width: 1536px) {
     .container {
       @apply px-12;
     }
   }
-  
+
   /* Enhanced responsive grid */
   .grid-container {
     display: grid;
@@ -139,25 +147,25 @@
     gap: 1rem;
     width: 100%;
   }
-  
+
   .grid-col-full {
     grid-column: 1 / -1;
   }
-  
+
   .grid-col-main {
     grid-column: 1 / -1;
   }
-  
+
   .grid-col-sidebar {
     grid-column: 1 / -1;
   }
-  
+
   /* Responsive adjustments for larger screens */
   @media (min-width: 1024px) {
     .grid-col-main {
       grid-column: 1 / span 8;
     }
-    
+
     .grid-col-sidebar {
       grid-column: 9 / -1;
     }
@@ -167,49 +175,55 @@
 @layer components {
   /* Professional glass morphism */
   .glass {
-    @apply backdrop-blur-lg bg-white/90 dark:bg-gray-900/90 border border-white/30 dark:border-white/10 shadow-xl;
+    @apply border border-white/30 bg-white/90 shadow-xl backdrop-blur-lg dark:border-white/10 dark:bg-gray-900/90;
   }
-  
+
   .glass-card {
     @apply glass rounded-xl p-6 transition-all duration-300 hover:bg-white/95 dark:hover:bg-gray-900/95;
   }
-  
+
   /* Professional buttons */
   .btn-gradient {
-    @apply bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground shadow-lg hover:shadow-xl;
+    @apply bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-lg hover:from-primary/90 hover:to-primary/70 hover:shadow-xl;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  
+
   /* Professional signature */
   .signature {
-    @apply text-xs text-muted-foreground font-mono tracking-wider opacity-70 hover:opacity-100 transition-opacity;
+    @apply font-mono text-xs tracking-wider text-muted-foreground opacity-70 transition-opacity hover:opacity-100;
   }
-  
+
   /* Modern cards */
   .modern-card {
-    @apply bg-card backdrop-blur-md border border-border/50 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300;
+    @apply rounded-2xl border border-border/50 bg-card shadow-lg backdrop-blur-md transition-all duration-300 hover:shadow-xl;
   }
-  
+
   /* Contact form improvements */
   .contact-form-container {
     width: 100%;
     max-width: 100%;
   }
-  
+
   .contact-form-expanded {
     display: block;
     animation: fadeIn 0.3s ease-in-out;
   }
-  
+
   .contact-form-collapsed {
     display: none;
   }
-  
+
   @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
-  
+
   /* Admin dashboard full width */
   .admin-dashboard {
     width: 100vw;
@@ -217,7 +231,7 @@
     margin: 0;
     padding: 0;
   }
-  
+
   .admin-dashboard-grid {
     display: grid;
     grid-template-columns: repeat(12, 1fr);
@@ -225,39 +239,39 @@
     width: 100%;
     padding: 1rem;
   }
-  
+
   .admin-card-full {
     grid-column: 1 / -1;
   }
-  
+
   .admin-card-half {
     grid-column: 1 / -1;
   }
-  
+
   .admin-card-third {
     grid-column: 1 / -1;
   }
-  
+
   /* Responsive adjustments for admin dashboard */
   @media (min-width: 768px) {
     .admin-card-half {
       grid-column: 1 / span 6;
     }
-    
+
     .admin-card-third {
       grid-column: 1 / span 4;
     }
-    
+
     .admin-dashboard-grid {
       padding: 1.5rem;
     }
   }
-  
+
   @media (min-width: 1024px) {
     .admin-card-half {
       grid-column: 1 / span 6;
     }
-    
+
     .admin-card-third {
       grid-column: 1 / span 4;
     }
@@ -281,7 +295,7 @@
   .grid-container {
     gap: 0.75rem;
   }
-  
+
   .admin-dashboard-grid {
     gap: 1rem;
     padding: 0.75rem;

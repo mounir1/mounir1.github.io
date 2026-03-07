@@ -30,11 +30,14 @@ const THRESHOLDS = {
   FID: { good: 100, poor: 300 },
   CLS: { good: 0.1, poor: 0.25 },
   TTFB: { good: 800, poor: 1800 },
-  INP: { good: 200, poor: 500 }
+  INP: { good: 200, poor: 500 },
 };
 
 // Rate performance based on thresholds
-const ratePerformance = (metric: keyof typeof THRESHOLDS, value: number): 'good' | 'needs-improvement' | 'poor' => {
+const ratePerformance = (
+  metric: keyof typeof THRESHOLDS,
+  value: number
+): 'good' | 'needs-improvement' | 'poor' => {
   const threshold = THRESHOLDS[metric];
   if (value <= threshold.good) return 'good';
   if (value <= threshold.poor) return 'needs-improvement';
@@ -54,26 +57,26 @@ export class WebVitalsTracker {
   private initializeTracking() {
     // Track First Contentful Paint (FCP)
     this.trackFCP();
-    
+
     // Track Largest Contentful Paint (LCP)
     this.trackLCP();
-    
+
     // Track First Input Delay (FID)
     this.trackFID();
-    
+
     // Track Cumulative Layout Shift (CLS)
     this.trackCLS();
-    
+
     // Track Time to First Byte (TTFB)
     this.trackTTFB();
-    
+
     // Track Interaction to Next Paint (INP) - experimental
     this.trackINP();
   }
 
   private trackFCP() {
     try {
-      const observer = new PerformanceObserver((list) => {
+      const observer = new PerformanceObserver(list => {
         for (const entry of list.getEntries()) {
           if (entry.name === 'first-contentful-paint') {
             const value = entry.startTime;
@@ -82,7 +85,7 @@ export class WebVitalsTracker {
           }
         }
       });
-      
+
       observer.observe({ entryTypes: ['paint'] });
       this.observers.push(observer);
     } catch (error) {
@@ -92,15 +95,15 @@ export class WebVitalsTracker {
 
   private trackLCP() {
     try {
-      const observer = new PerformanceObserver((list) => {
+      const observer = new PerformanceObserver(list => {
         const entries = list.getEntries();
         const lastEntry = entries[entries.length - 1];
         const value = lastEntry.startTime;
-        
+
         this.metrics.LCP = value;
         this.reportMetric('LCP', value, (lastEntry as any).id);
       });
-      
+
       observer.observe({ entryTypes: ['largest-contentful-paint'] });
       this.observers.push(observer);
     } catch (error) {
@@ -110,14 +113,14 @@ export class WebVitalsTracker {
 
   private trackFID() {
     try {
-      const observer = new PerformanceObserver((list) => {
+      const observer = new PerformanceObserver(list => {
         for (const entry of list.getEntries()) {
           const value = (entry as any).processingStart - entry.startTime;
           this.metrics.FID = value;
           this.reportMetric('FID', value);
         }
       });
-      
+
       observer.observe({ entryTypes: ['first-input'] });
       this.observers.push(observer);
     } catch (error) {
@@ -128,8 +131,8 @@ export class WebVitalsTracker {
   private trackCLS() {
     try {
       let clsValue = 0;
-      
-      const observer = new PerformanceObserver((list) => {
+
+      const observer = new PerformanceObserver(list => {
         for (const entry of list.getEntries()) {
           if (!(entry as any).hadRecentInput) {
             clsValue += (entry as any).value;
@@ -138,7 +141,7 @@ export class WebVitalsTracker {
           }
         }
       });
-      
+
       observer.observe({ entryTypes: ['layout-shift'] });
       this.observers.push(observer);
     } catch (error) {
@@ -148,9 +151,12 @@ export class WebVitalsTracker {
 
   private trackTTFB() {
     try {
-      const navigationEntry = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+      const navigationEntry = performance.getEntriesByType(
+        'navigation'
+      )[0] as PerformanceNavigationTiming;
       if (navigationEntry) {
-        const value = navigationEntry.responseStart - navigationEntry.requestStart;
+        const value =
+          navigationEntry.responseStart - navigationEntry.requestStart;
         this.metrics.TTFB = value;
         this.reportMetric('TTFB', value);
       }
@@ -163,14 +169,14 @@ export class WebVitalsTracker {
     try {
       // INP is still experimental, so we'll track it if available
       if ('PerformanceEventTiming' in window) {
-        const observer = new PerformanceObserver((list) => {
+        const observer = new PerformanceObserver(list => {
           for (const entry of list.getEntries()) {
             const value = (entry as any).processingEnd - entry.startTime;
             this.metrics.INP = Math.max(this.metrics.INP || 0, value);
             this.reportMetric('INP', value);
           }
         });
-        
+
         observer.observe({ entryTypes: ['event'] });
         this.observers.push(observer);
       }
@@ -185,7 +191,7 @@ export class WebVitalsTracker {
       value,
       rating: ratePerformance(name as keyof typeof THRESHOLDS, value),
       timestamp: Date.now(),
-      id
+      id,
     };
 
     // Call all registered callbacks
@@ -211,29 +217,36 @@ export class WebVitalsTracker {
     const scores = Object.entries(this.metrics).map(([metric, value]) => {
       const rating = ratePerformance(metric as keyof typeof THRESHOLDS, value);
       switch (rating) {
-        case 'good': return 100;
-        case 'needs-improvement': return 50;
-        case 'poor': return 0;
-        default: return 0;
+        case 'good':
+          return 100;
+        case 'needs-improvement':
+          return 50;
+        case 'poor':
+          return 0;
+        default:
+          return 0;
       }
     });
 
-    return scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
+    return scores.length > 0
+      ? scores.reduce((a, b) => a + b, 0) / scores.length
+      : 0;
   }
 
   public generateReport(): string {
     const metrics = this.getMetrics();
     const score = this.getPerformanceScore();
-    
+
     let report = `Performance Report (Score: ${score.toFixed(1)}/100)\n`;
     report += '='.repeat(50) + '\n\n';
-    
+
     Object.entries(metrics).forEach(([metric, value]) => {
       const rating = ratePerformance(metric as keyof typeof THRESHOLDS, value);
-      const emoji = rating === 'good' ? '✅' : rating === 'needs-improvement' ? '⚠️' : '❌';
+      const emoji =
+        rating === 'good' ? '✅' : rating === 'needs-improvement' ? '⚠️' : '❌';
       report += `${emoji} ${metric}: ${value.toFixed(2)}ms (${rating})\n`;
     });
-    
+
     report += '\nRecommendations:\n';
     Object.entries(metrics).forEach(([metric, value]) => {
       const rating = ratePerformance(metric as keyof typeof THRESHOLDS, value);
@@ -241,7 +254,7 @@ export class WebVitalsTracker {
         report += `- Improve ${metric}: ${this.getRecommendation(metric as keyof typeof THRESHOLDS)}\n`;
       }
     });
-    
+
     return report;
   }
 
@@ -252,9 +265,9 @@ export class WebVitalsTracker {
       FID: 'Reduce JavaScript execution time, break up long tasks, use web workers',
       CLS: 'Include size attributes on images and videos, avoid inserting content above existing content',
       TTFB: 'Optimize server response time, use CDN, enable compression',
-      INP: 'Optimize event handlers, reduce JavaScript execution time, use requestIdleCallback'
+      INP: 'Optimize event handlers, reduce JavaScript execution time, use requestIdleCallback',
     };
-    
+
     return recommendations[metric] || 'Optimize performance';
   }
 
@@ -268,7 +281,12 @@ export class WebVitalsTracker {
 // Performance budget monitoring
 export class PerformanceBudget {
   private budgets: Record<string, number>;
-  private violations: Array<{ metric: string; actual: number; budget: number; timestamp: number }> = [];
+  private violations: Array<{
+    metric: string;
+    actual: number;
+    budget: number;
+    timestamp: number;
+  }> = [];
 
   constructor(budgets: Record<string, number>) {
     this.budgets = budgets;
@@ -281,7 +299,7 @@ export class PerformanceBudget {
         metric,
         actual: value,
         budget,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
       return false;
     }
@@ -305,15 +323,17 @@ export class RealUserMonitoring {
 
   constructor(budgets?: Record<string, number>) {
     this.tracker = new WebVitalsTracker();
-    this.budget = new PerformanceBudget(budgets || {
-      FCP: 2000,
-      LCP: 3000,
-      FID: 150,
-      CLS: 0.15,
-      TTFB: 1000
-    });
+    this.budget = new PerformanceBudget(
+      budgets || {
+        FCP: 2000,
+        LCP: 3000,
+        FID: 150,
+        CLS: 0.15,
+        TTFB: 1000,
+      }
+    );
     this.sessionId = this.generateSessionId();
-    
+
     this.setupTracking();
   }
 
@@ -322,17 +342,17 @@ export class RealUserMonitoring {
   }
 
   private setupTracking() {
-    this.tracker.onMetric((entry) => {
+    this.tracker.onMetric(entry => {
       // Check performance budget
       const withinBudget = this.budget.checkBudget(entry.name, entry.value);
-      
+
       // Send to analytics (replace with your analytics service)
       this.sendToAnalytics({
         ...entry,
         sessionId: this.sessionId,
         withinBudget,
         userAgent: navigator.userAgent,
-        url: window.location.href
+        url: window.location.href,
       });
     });
   }
@@ -347,8 +367,8 @@ export class RealUserMonitoring {
         custom_map: {
           metric_rating: data.rating,
           session_id: data.sessionId,
-          within_budget: data.withinBudget
-        }
+          within_budget: data.withinBudget,
+        },
       });
     }
 
@@ -357,7 +377,7 @@ export class RealUserMonitoring {
       fetch('/api/analytics/web-vitals', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
       }).catch(error => console.warn('Failed to send analytics:', error));
     }
   }
@@ -367,7 +387,7 @@ export class RealUserMonitoring {
       sessionId: this.sessionId,
       metrics: this.tracker.getMetrics(),
       score: this.tracker.getPerformanceScore(),
-      violations: this.budget.getViolations()
+      violations: this.budget.getViolations(),
     };
   }
 
@@ -395,7 +415,7 @@ export const useWebVitals = () => {
 
   React.useEffect(() => {
     const tracker = new WebVitalsTracker();
-    
+
     tracker.onMetric(() => {
       setMetrics(tracker.getMetrics());
       setScore(tracker.getPerformanceScore());
@@ -425,7 +445,7 @@ export const PerformanceMonitor: React.FC<{
   if (!showDebugInfo) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 bg-black/80 text-white p-4 rounded-lg text-xs font-mono z-50">
+    <div className="fixed bottom-4 right-4 z-50 rounded-lg bg-black/80 p-4 font-mono text-xs text-white">
       <div className="mb-2">Performance Score: {score.toFixed(1)}/100</div>
       {Object.entries(metrics).map(([metric, value]) => (
         <div key={metric} className="flex justify-between gap-4">

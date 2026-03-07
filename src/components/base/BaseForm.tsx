@@ -8,7 +8,12 @@ import { cn } from '@/lib/utils';
 import { ALIGN_CLASSES } from '@/lib/shared/ui-utils';
 import { BaseFormProps } from '@/lib/shared/types';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
 
 export interface FormSectionProps {
@@ -26,13 +31,13 @@ export const FormSection: React.FC<FormSectionProps> = ({
   children,
   collapsible = false,
   defaultExpanded = true,
-  className
+  className,
 }) => {
   const [expanded, setExpanded] = React.useState(defaultExpanded);
 
   return (
     <div className={cn('space-y-4', className)}>
-      <div 
+      <div
         className={cn(
           'flex items-center justify-between',
           collapsible && 'cursor-pointer'
@@ -42,7 +47,7 @@ export const FormSection: React.FC<FormSectionProps> = ({
         <div>
           <h3 className="text-lg font-medium text-foreground">{title}</h3>
           {description && (
-            <p className="text-sm text-muted-foreground mt-1">{description}</p>
+            <p className="mt-1 text-sm text-muted-foreground">{description}</p>
           )}
         </div>
         {collapsible && (
@@ -51,11 +56,9 @@ export const FormSection: React.FC<FormSectionProps> = ({
           </Button>
         )}
       </div>
-      
+
       {(!collapsible || expanded) && (
-        <div className="space-y-4">
-          {children}
-        </div>
+        <div className="space-y-4">{children}</div>
       )}
     </div>
   );
@@ -82,7 +85,7 @@ export const BaseFormLayout: React.FC<BaseFormLayoutProps> = ({
   cancelText = 'Cancel',
   showCancel = true,
   sections = false,
-  className
+  className,
 }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,7 +95,7 @@ export const BaseFormLayout: React.FC<BaseFormLayoutProps> = ({
   };
 
   return (
-    <Card className={cn('w-full max-w-2xl mx-auto', className)}>
+    <Card className={cn('mx-auto w-full max-w-2xl', className)}>
       {(title || description) && (
         <CardHeader>
           {title && <h2 className="text-xl font-semibold">{title}</h2>}
@@ -101,12 +104,12 @@ export const BaseFormLayout: React.FC<BaseFormLayoutProps> = ({
           )}
         </CardHeader>
       )}
-      
+
       <form onSubmit={handleSubmit}>
         <CardContent className={cn(sections && 'space-y-8')}>
           {children}
         </CardContent>
-        
+
         <CardFooter className="flex justify-end gap-3">
           {showCancel && onCancel && (
             <Button
@@ -148,24 +151,22 @@ export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
   error,
   description,
   children,
-  className
+  className,
 }) => {
   return (
     <div className={cn('space-y-2', className)}>
       <label className="text-sm font-medium text-foreground">
         {label}
-        {required && <span className="text-destructive ml-1">*</span>}
+        {required && <span className="ml-1 text-destructive">*</span>}
       </label>
-      
+
       {description && (
         <p className="text-xs text-muted-foreground">{description}</p>
       )}
-      
+
       {children}
-      
-      {error && (
-        <p className="text-xs text-destructive">{error}</p>
-      )}
+
+      {error && <p className="text-xs text-destructive">{error}</p>}
     </div>
   );
 };
@@ -180,12 +181,12 @@ export interface FormGridProps {
 export const FormGrid: React.FC<FormGridProps> = ({
   children,
   columns = 2,
-  className
+  className,
 }) => {
   const gridClasses = {
     1: 'grid-cols-1',
     2: 'grid-cols-1 md:grid-cols-2',
-    3: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+    3: 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
   };
 
   return (
@@ -205,7 +206,7 @@ export interface FormActionsProps {
 export const FormActions: React.FC<FormActionsProps> = ({
   children,
   align = 'right',
-  className
+  className,
 }) => {
   const alignClasses = ALIGN_CLASSES;
 

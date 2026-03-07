@@ -13,7 +13,12 @@ import {
   validateProjectsBulk,
   validateSkillsBulk,
 } from '../validators';
-import { ProjectStatus, ProjectCategory, SkillCategory, SkillLevel } from '../types';
+import {
+  ProjectStatus,
+  ProjectCategory,
+  SkillCategory,
+  SkillLevel,
+} from '../types';
 
 describe('Project Validation', () => {
   const validProject = {
@@ -84,7 +89,8 @@ describe('Project Validation', () => {
     const featuredProject = {
       ...validProject,
       featured: true,
-      description: 'This is a very detailed description for a featured project that meets the minimum length requirement',
+      description:
+        'This is a very detailed description for a featured project that meets the minimum length requirement',
     };
 
     const result = validateProject(featuredProject);
@@ -206,7 +212,8 @@ describe('Bulk Validation', () => {
     },
     {
       title: 'Project 2',
-      description: 'This is the second test project with sufficient description',
+      description:
+        'This is the second test project with sufficient description',
       category: ProjectCategory.MOBILE_APPLICATION,
       status: ProjectStatus.IN_PROGRESS,
       technologies: ['React Native'],

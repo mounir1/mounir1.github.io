@@ -3,8 +3,16 @@
  */
 
 import { z } from 'zod';
-import { ProjectSchema, ProjectUpdateSchema, ProjectCreateSchema } from './projectSchema';
-import { SkillSchema, SkillUpdateSchema, SkillCreateSchema } from './skillSchema';
+import {
+  ProjectSchema,
+  ProjectUpdateSchema,
+  ProjectCreateSchema,
+} from './projectSchema';
+import {
+  SkillSchema,
+  SkillUpdateSchema,
+  SkillCreateSchema,
+} from './skillSchema';
 import {
   ValidationResult,
   ValidationError,
@@ -23,11 +31,11 @@ export function validateWithDetails<T>(
   context: ValidationContext = {}
 ): ValidationResult<T> {
   const startTime = performance.now();
-  
+
   try {
     const validatedData = schema.parse(data);
     const endTime = performance.now();
-    
+
     return {
       success: true,
       data: validatedData,
@@ -36,7 +44,7 @@ export function validateWithDetails<T>(
     };
   } catch (error) {
     const endTime = performance.now();
-    
+
     if (error instanceof z.ZodError) {
       const errors: ValidationError[] = error.errors.map(err => ({
         field: err.path.join('.'),
@@ -54,12 +62,14 @@ export function validateWithDetails<T>(
 
     return {
       success: false,
-      errors: [{
-        field: 'root',
-        message: 'Unknown validation error',
-        code: 'unknown',
-        value: data,
-      }],
+      errors: [
+        {
+          field: 'root',
+          message: 'Unknown validation error',
+          code: 'unknown',
+          value: data,
+        },
+      ],
       warnings: [],
     };
   }
@@ -68,44 +78,65 @@ export function validateWithDetails<T>(
 /**
  * Generate warnings for valid data that might need attention
  */
-function generateWarnings<T>(data: T, context: ValidationContext): ValidationWarning[] {
+function generateWarnings<T>(
+  data: T,
+  context: ValidationContext
+): ValidationWarning[] {
   const warnings: ValidationWarning[] = [];
-  
+
   // Add context-specific warnings here
   if (context.strict) {
     // Add strict mode warnings
   }
-  
+
   return warnings;
 }
 
 /**
  * Project validation functions
  */
-export const validateProject = (data: unknown, context?: ValidationContext): ValidationResult<any> => {
+export const validateProject = (
+  data: unknown,
+  context?: ValidationContext
+): ValidationResult<any> => {
   return validateWithDetails(ProjectSchema, data, context);
 };
 
-export const validateProjectUpdate = (data: unknown, context?: ValidationContext): ValidationResult<any> => {
+export const validateProjectUpdate = (
+  data: unknown,
+  context?: ValidationContext
+): ValidationResult<any> => {
   return validateWithDetails(ProjectUpdateSchema, data, context);
 };
 
-export const validateProjectCreate = (data: unknown, context?: ValidationContext): ValidationResult<any> => {
+export const validateProjectCreate = (
+  data: unknown,
+  context?: ValidationContext
+): ValidationResult<any> => {
   return validateWithDetails(ProjectCreateSchema, data, context);
 };
 
 /**
  * Skill validation functions
  */
-export const validateSkill = (data: unknown, context?: ValidationContext): ValidationResult<any> => {
+export const validateSkill = (
+  data: unknown,
+  context?: ValidationContext
+): ValidationResult<any> => {
   return validateWithDetails(SkillSchema, data, context);
 };
 
-export const validateSkillUpdate = (data: unknown, context?: ValidationContext): ValidationResult<any> => {
+export const validateSkillUpdate = (
+  data: unknown,
+  context?: ValidationContext
+): ValidationResult<any> => {
   return validateWithDetails(SkillUpdateSchema, data, context);
 };
 
-export const validateSkillCreate = (data: unknown, context?: ValidationContext): ValidationResult<any> => {
+export const validateSkillCreate = (
+  data: unknown,
+  context?: ValidationContext
+): ValidationResult<any> => {
   return validateWithDetails(SkillCreateSchema, data, context);
 };
 
@@ -127,7 +158,7 @@ export function validateBulk<T>(
 
   items.forEach((item, index) => {
     const result = validateWithDetails(schema, item, context);
-    
+
     if (result.success && result.data) {
       valid.push(result.data);
     } else {
@@ -184,21 +215,23 @@ export function validateField<T>(
   try {
     // Extract the field schema from the main schema
     const fieldSchema = getFieldSchema(schema, fieldPath);
-    
+
     if (!fieldSchema) {
       return {
         success: false,
-        errors: [{
-          field: fieldPath,
-          message: 'Field not found in schema',
-          code: 'field_not_found',
-          value,
-        }],
+        errors: [
+          {
+            field: fieldPath,
+            message: 'Field not found in schema',
+            code: 'field_not_found',
+            value,
+          },
+        ],
       };
     }
 
     const validatedValue = fieldSchema.parse(value);
-    
+
     return {
       success: true,
       data: validatedValue,
@@ -219,12 +252,14 @@ export function validateField<T>(
 
     return {
       success: false,
-      errors: [{
-        field: fieldPath,
-        message: 'Unknown validation error',
-        code: 'unknown',
-        value,
-      }],
+      errors: [
+        {
+          field: fieldPath,
+          message: 'Unknown validation error',
+          code: 'unknown',
+          value,
+        },
+      ],
     };
   }
 }
@@ -232,7 +267,10 @@ export function validateField<T>(
 /**
  * Extract field schema from a complex schema
  */
-function getFieldSchema(schema: z.ZodSchema<any>, fieldPath: string): z.ZodSchema<any> | null {
+function getFieldSchema(
+  schema: z.ZodSchema<any>,
+  fieldPath: string
+): z.ZodSchema<any> | null {
   const pathParts = fieldPath.split('.');
   let currentSchema = schema;
 
@@ -260,14 +298,20 @@ function getFieldSchema(schema: z.ZodSchema<any>, fieldPath: string): z.ZodSchem
 /**
  * Project field validation
  */
-export const validateProjectField = (fieldPath: string, value: unknown): ValidationResult<unknown> => {
+export const validateProjectField = (
+  fieldPath: string,
+  value: unknown
+): ValidationResult<unknown> => {
   return validateField(ProjectSchema, fieldPath, value);
 };
 
 /**
  * Skill field validation
  */
-export const validateSkillField = (fieldPath: string, value: unknown): ValidationResult<unknown> => {
+export const validateSkillField = (
+  fieldPath: string,
+  value: unknown
+): ValidationResult<unknown> => {
   return validateField(SkillSchema, fieldPath, value);
 };
 
@@ -295,7 +339,7 @@ export function collectValidationMetrics<T>(
 ): ValidationMetrics {
   const startTime = performance.now();
   const startMemory = performance.memory?.usedJSHeapSize || 0;
-  
+
   let errorCount = 0;
   const warningCount = 0;
   let fieldCount = 0;
@@ -346,7 +390,9 @@ export function checkSchemaCompatibility<T>(
       const newResult = newSchema.safeParse(data);
 
       if (oldResult.success && !newResult.success) {
-        issues.push(`Data item ${index}: Valid in old schema but invalid in new schema`);
+        issues.push(
+          `Data item ${index}: Valid in old schema but invalid in new schema`
+        );
       } else if (oldResult.success && newResult.success) {
         successCount++;
       }
@@ -366,29 +412,36 @@ export function checkSchemaCompatibility<T>(
  * Validation error formatting utilities
  */
 export function formatValidationErrors(errors: ValidationError[]): string {
-  return errors
-    .map(error => `${error.field}: ${error.message}`)
-    .join('; ');
+  return errors.map(error => `${error.field}: ${error.message}`).join('; ');
 }
 
-export function groupValidationErrorsByField(errors: ValidationError[]): Record<string, ValidationError[]> {
-  return errors.reduce((acc, error) => {
-    if (!acc[error.field]) {
-      acc[error.field] = [];
-    }
-    acc[error.field].push(error);
-    return acc;
-  }, {} as Record<string, ValidationError[]>);
+export function groupValidationErrorsByField(
+  errors: ValidationError[]
+): Record<string, ValidationError[]> {
+  return errors.reduce(
+    (acc, error) => {
+      if (!acc[error.field]) {
+        acc[error.field] = [];
+      }
+      acc[error.field].push(error);
+      return acc;
+    },
+    {} as Record<string, ValidationError[]>
+  );
 }
 
 /**
  * Validation result utilities
  */
-export function isValidationSuccess<T>(result: ValidationResult<T>): result is ValidationResult<T> & { success: true; data: T } {
+export function isValidationSuccess<T>(
+  result: ValidationResult<T>
+): result is ValidationResult<T> & { success: true; data: T } {
   return result.success && result.data !== undefined;
 }
 
-export function getValidationErrorMessage(result: ValidationResult<any>): string {
+export function getValidationErrorMessage(
+  result: ValidationResult<any>
+): string {
   if (result.success) return '';
   return formatValidationErrors(result.errors || []);
 }

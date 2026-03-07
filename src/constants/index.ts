@@ -74,10 +74,10 @@ export const UI_COMPONENT_CONFIG = {
     borderRadius: 6, // rounded-md
     padding: {
       x: 12, // px-3
-      y: 8,  // py-2
+      y: 8, // py-2
     },
   },
-  
+
   // Textarea constants
   textarea: {
     minHeight: 80, // min-h-[80px]
@@ -87,13 +87,13 @@ export const UI_COMPONENT_CONFIG = {
       y: 8,
     },
   },
-  
+
   // Touch target constants
   touch: {
     minTarget: 44, // Minimum touch target size for mobile
     swipeThreshold: 50, // Minimum distance for swipe gesture
   },
-  
+
   // Animation constants
   animation: {
     duration: {
@@ -103,20 +103,20 @@ export const UI_COMPONENT_CONFIG = {
     },
     easing: 'ease-in-out',
   },
-  
+
   // Virtual scroll constants
   virtualScroll: {
     itemHeight: 60,
     overscan: 5,
     threshold: 100,
   },
-  
+
   // Performance monitoring
   performance: {
     updateInterval: 5000, // 5 seconds
     renderCountThreshold: 100,
   },
-  
+
   // Easter eggs
   easterEgg: {
     clickTarget: 5, // Number of clicks to trigger
@@ -124,7 +124,7 @@ export const UI_COMPONENT_CONFIG = {
     matrixCharacters: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()',
     fontSize: 14,
   },
-  
+
   // Loading and progress
   loading: {
     particleCount: 20,
@@ -141,14 +141,16 @@ export const MOBILE_BREAKPOINT = 768;
 // Common CSS class patterns
 export const CSS_CLASSES = {
   // Base input classes
-  inputBase: "flex h-10 w-full rounded-md px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm transition-all duration-200",
-  
+  inputBase:
+    'flex h-10 w-full rounded-md px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm transition-all duration-200',
+
   // Base textarea classes
-  textareaBase: "flex min-h-[80px] w-full rounded-md px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200 resize-none",
-  
+  textareaBase:
+    'flex min-h-[80px] w-full rounded-md px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200 resize-none',
+
   // Button base classes
-  buttonBase: "rounded-lg font-medium transition-colors touch-manipulation",
-  
+  buttonBase: 'rounded-lg font-medium transition-colors touch-manipulation',
+
   // Card base classes
-  cardBase: "rounded-lg border bg-card text-card-foreground shadow-sm",
+  cardBase: 'rounded-lg border bg-card text-card-foreground shadow-sm',
 } as const;

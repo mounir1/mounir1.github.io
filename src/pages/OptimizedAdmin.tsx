@@ -23,7 +23,7 @@ export default function OptimizedAdmin() {
 
   useEffect(() => {
     if (!auth) return;
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, currentUser => {
       setUser(currentUser);
       setError(null);
     });
@@ -55,21 +55,26 @@ export default function OptimizedAdmin() {
   // If Firebase is not configured
   if (!isFirebaseEnabled) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-6">
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 p-6 dark:from-slate-900 dark:to-slate-800">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
-            <div className="mx-auto mb-4 w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
-              <AlertCircle className="w-6 h-6 text-red-600" />
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
+              <AlertCircle className="h-6 w-6 text-red-600" />
             </div>
             <CardTitle className="text-xl text-slate-900 dark:text-white">
               Configuration Required
             </CardTitle>
           </CardHeader>
-          <CardContent className="text-center space-y-4">
+          <CardContent className="space-y-4 text-center">
             <p className="text-slate-600 dark:text-slate-400">
-              Firebase configuration is missing or incomplete. Please check your environment variables.
+              Firebase configuration is missing or incomplete. Please check your
+              environment variables.
             </p>
-            <Button onClick={() => window.location.reload()} variant="outline" className="w-full">
+            <Button
+              onClick={() => window.location.reload()}
+              variant="outline"
+              className="w-full"
+            >
               Retry Connection
             </Button>
           </CardContent>
@@ -85,37 +90,38 @@ export default function OptimizedAdmin() {
 
   // Login form
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-6">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 p-6 dark:from-slate-900 dark:to-slate-800">
       <div className="w-full max-w-md">
         {/* Professional Branding */}
-        <div className="text-center mb-8">
+        <div className="mb-8 text-center">
           <div className="mb-4">
-            <img 
-              src="/mounir-signature.svg" 
-              alt="Mounir Signature" 
-              className="h-12 w-auto mx-auto"
-              onError={(e) => {
+            <img
+              src="/mounir-signature.svg"
+              alt="Mounir Signature"
+              className="mx-auto h-12 w-auto"
+              onError={e => {
                 e.currentTarget.style.display = 'none';
-                const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                const fallback = e.currentTarget
+                  .nextElementSibling as HTMLElement;
                 if (fallback) fallback.style.display = 'block';
               }}
             />
-            <div className="text-2xl font-bold text-slate-900 dark:text-white hidden">
+            <div className="hidden text-2xl font-bold text-slate-900 dark:text-white">
               Mounir Abderrahmani
             </div>
           </div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <h1 className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-3xl font-bold text-transparent">
             Professional Admin
           </h1>
-          <p className="text-slate-600 dark:text-slate-400 mt-2">
+          <p className="mt-2 text-slate-600 dark:text-slate-400">
             Portfolio Management System
           </p>
         </div>
 
-        <Card className="shadow-xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-0">
-          <CardHeader className="text-center pb-8">
-            <div className="mx-auto mb-4 w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center">
-              <Shield className="w-8 h-8 text-white" />
+        <Card className="border-0 bg-white/80 shadow-xl backdrop-blur-lg dark:bg-slate-900/80">
+          <CardHeader className="pb-8 text-center">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600">
+              <Shield className="h-8 w-8 text-white" />
             </div>
             <CardTitle className="text-2xl text-slate-900 dark:text-white">
               Secure Access
@@ -143,11 +149,11 @@ export default function OptimizedAdmin() {
                 <Input
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={e => setEmail(e.target.value)}
                   placeholder="admin@example.com"
                   required
                   disabled={loading}
-                  className="h-12 bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700"
+                  className="h-12 border-slate-200 bg-white/50 dark:border-slate-700 dark:bg-slate-800/50"
                 />
               </div>
 
@@ -158,34 +164,34 @@ export default function OptimizedAdmin() {
                 <Input
                   type="password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={e => setPassword(e.target.value)}
                   placeholder="••••••••••"
                   required
                   disabled={loading}
-                  className="h-12 bg-white/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700"
+                  className="h-12 border-slate-200 bg-white/50 dark:border-slate-700 dark:bg-slate-800/50"
                 />
               </div>
 
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+                className="h-12 w-full bg-gradient-to-r from-blue-600 to-purple-600 font-semibold text-white shadow-lg transition-all duration-300 hover:from-blue-700 hover:to-purple-700 hover:shadow-xl"
               >
                 {loading ? (
                   <>
-                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                     Authenticating...
                   </>
                 ) : (
                   <>
-                    <Zap className="w-5 h-5 mr-2" />
+                    <Zap className="mr-2 h-5 w-5" />
                     Access Dashboard
                   </>
                 )}
               </Button>
             </form>
 
-            <div className="text-center pt-4">
+            <div className="pt-4 text-center">
               <p className="text-xs text-slate-500 dark:text-slate-400">
                 Protected by Firebase Authentication
               </p>
@@ -196,7 +202,8 @@ export default function OptimizedAdmin() {
         {/* Professional Footer */}
         <div className="mt-8 text-center">
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            © {new Date().getFullYear()} Mounir Abderrahmani. All rights reserved.
+            © {new Date().getFullYear()} Mounir Abderrahmani. All rights
+            reserved.
           </p>
         </div>
       </div>

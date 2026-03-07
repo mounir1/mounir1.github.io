@@ -10,7 +10,7 @@ export const APP_CONFIG = {
   author: 'Mounir Bahije',
   description: 'Modern portfolio management system',
   url: 'https://mounirbahije.com',
-  email: 'contact@mounirbahije.com'
+  email: 'contact@mounirbahije.com',
 } as const;
 
 // API configuration
@@ -24,8 +24,8 @@ export const API_CONFIG = {
     skills: '/skills',
     experiences: '/experiences',
     auth: '/auth',
-    analytics: '/analytics'
-  }
+    analytics: '/analytics',
+  },
 } as const;
 
 // UI constants
@@ -36,17 +36,17 @@ export const UI_CONFIG = {
     md: 768,
     lg: 1024,
     xl: 1280,
-    '2xl': 1536
+    '2xl': 1536,
   },
-  
+
   // Animation durations
   animations: {
     fast: 150,
     normal: 300,
     slow: 500,
-    slower: 1000
+    slower: 1000,
   },
-  
+
   // Z-index layers
   zIndex: {
     dropdown: 1000,
@@ -55,22 +55,22 @@ export const UI_CONFIG = {
     modal: 1040,
     popover: 1050,
     tooltip: 1060,
-    toast: 1070
+    toast: 1070,
   },
-  
+
   // Common sizes
   sizes: {
     sidebar: {
       collapsed: 64,
-      expanded: 256
+      expanded: 256,
     },
     header: 64,
     footer: 80,
     card: {
       minHeight: 200,
-      maxWidth: 400
-    }
-  }
+      maxWidth: 400,
+    },
+  },
 } as const;
 
 // Form validation constants
@@ -84,28 +84,28 @@ export const VALIDATION_CONFIG = {
     email: { min: 5, max: 254 },
     url: { min: 10, max: 2048 },
     tag: { min: 1, max: 30 },
-    company: { min: 1, max: 100 }
+    company: { min: 1, max: 100 },
   },
-  
+
   // Numeric limits
   numbers: {
     skill: {
       level: { min: 0, max: 100 },
-      experience: { min: 0, max: 50 }
+      experience: { min: 0, max: 50 },
     },
     project: {
       priority: { min: 1, max: 5 },
-      progress: { min: 0, max: 100 }
-    }
+      progress: { min: 0, max: 100 },
+    },
   },
-  
+
   // Array limits
   arrays: {
     technologies: { min: 1, max: 20 },
     tags: { min: 0, max: 10 },
     images: { min: 0, max: 10 },
-    links: { min: 0, max: 5 }
-  }
+    links: { min: 0, max: 5 },
+  },
 } as const;
 
 // Data table constants
@@ -113,53 +113,53 @@ export const TABLE_CONFIG = {
   pagination: {
     defaultPageSize: 10,
     pageSizeOptions: [5, 10, 20, 50, 100],
-    maxPageSize: 100
+    maxPageSize: 100,
   },
-  
+
   sorting: {
     defaultDirection: 'asc' as const,
-    multiSort: true
+    multiSort: true,
   },
-  
+
   filtering: {
     debounceDelay: 300,
-    minSearchLength: 2
+    minSearchLength: 2,
   },
-  
+
   virtualization: {
     itemHeight: 60,
     overscan: 5,
-    threshold: 100
-  }
+    threshold: 100,
+  },
 } as const;
 
 // Theme constants
 export const THEME_CONFIG = {
   default: 'light' as const,
   storageKey: 'portfolio-theme',
-  
+
   colors: {
     primary: {
       light: '#3b82f6',
-      dark: '#60a5fa'
+      dark: '#60a5fa',
     },
     secondary: {
       light: '#6b7280',
-      dark: '#9ca3af'
+      dark: '#9ca3af',
     },
     success: {
       light: '#10b981',
-      dark: '#34d399'
+      dark: '#34d399',
     },
     warning: {
       light: '#f59e0b',
-      dark: '#fbbf24'
+      dark: '#fbbf24',
     },
     error: {
       light: '#ef4444',
-      dark: '#f87171'
-    }
-  }
+      dark: '#f87171',
+    },
+  },
 } as const;
 
 // File upload constants
@@ -167,12 +167,12 @@ export const UPLOAD_CONFIG = {
   maxFileSize: 5 * 1024 * 1024, // 5MB
   allowedImageTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'],
   allowedDocumentTypes: ['application/pdf', 'text/plain', 'application/msword'],
-  
+
   image: {
     maxWidth: 1920,
     maxHeight: 1080,
-    quality: 0.8
-  }
+    quality: 0.8,
+  },
 } as const;
 
 // Analytics constants
@@ -184,17 +184,17 @@ export const ANALYTICS_CONFIG = {
     skillInteraction: 'skill_interaction',
     projectInteraction: 'project_interaction',
     adminAction: 'admin_action',
-    error: 'error'
+    error: 'error',
   },
-  
+
   categories: {
     navigation: 'navigation',
     engagement: 'engagement',
     skills: 'skills',
     projects: 'projects',
     admin: 'admin',
-    error: 'error'
-  }
+    error: 'error',
+  },
 } as const;
 
 // Status constants
@@ -204,20 +204,20 @@ export const STATUS_CONFIG = {
     active: 'active',
     completed: 'completed',
     archived: 'archived',
-    cancelled: 'cancelled'
+    cancelled: 'cancelled',
   } as const,
-  
+
   skill: {
     learning: 'learning',
     intermediate: 'intermediate',
     proficient: 'proficient',
-    expert: 'expert'
+    expert: 'expert',
   } as const,
-  
+
   experience: {
     current: 'current',
-    past: 'past'
-  } as const
+    past: 'past',
+  } as const,
 } as const;
 
 // Category constants
@@ -230,9 +230,9 @@ export const CATEGORY_CONFIG = {
     'DevOps',
     'Data Science',
     'Design',
-    'Other'
+    'Other',
   ] as const,
-  
+
   skill: [
     'Frontend Development',
     'Backend Development',
@@ -244,8 +244,8 @@ export const CATEGORY_CONFIG = {
     'Project Management',
     'Languages',
     'Tools',
-    'Other'
-  ] as const
+    'Other',
+  ] as const,
 } as const;
 
 // Performance constants
@@ -255,28 +255,28 @@ export const PERFORMANCE_CONFIG = {
     search: 300,
     resize: 100,
     scroll: 16,
-    input: 500
+    input: 500,
   },
-  
+
   // Cache durations (in milliseconds)
   cache: {
-    short: 5 * 60 * 1000,      // 5 minutes
-    medium: 30 * 60 * 1000,    // 30 minutes
+    short: 5 * 60 * 1000, // 5 minutes
+    medium: 30 * 60 * 1000, // 30 minutes
     long: 24 * 60 * 60 * 1000, // 24 hours
   },
-  
+
   // Lazy loading
   lazyLoading: {
     rootMargin: '50px',
-    threshold: 0.1
+    threshold: 0.1,
   },
-  
+
   // Virtual scrolling
   virtualScrolling: {
     itemHeight: 60,
     overscan: 5,
-    threshold: 100
-  }
+    threshold: 100,
+  },
 } as const;
 
 // Error messages
@@ -288,7 +288,7 @@ export const ERROR_MESSAGES = {
   notFound: 'The requested resource was not found.',
   validation: 'Please check your input and try again.',
   server: 'Server error. Please try again later.',
-  unknown: 'An unexpected error occurred.'
+  unknown: 'An unexpected error occurred.',
 } as const;
 
 // Success messages
@@ -298,7 +298,7 @@ export const SUCCESS_MESSAGES = {
   deleted: 'Successfully deleted!',
   saved: 'Changes saved successfully!',
   uploaded: 'File uploaded successfully!',
-  exported: 'Data exported successfully!'
+  exported: 'Data exported successfully!',
 } as const;
 
 // Local storage keys
@@ -309,5 +309,5 @@ export const STORAGE_KEYS = {
   tableColumns: 'table-columns',
   userPreferences: 'user-preferences',
   authToken: 'auth-token',
-  lastVisit: 'last-visit'
+  lastVisit: 'last-visit',
 } as const;

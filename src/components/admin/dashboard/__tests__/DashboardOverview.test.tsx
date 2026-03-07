@@ -15,11 +15,11 @@ jest.mock('@/hooks/useProjects', () => ({
         featured: true,
         disabled: false,
         createdAt: Date.now(),
-        updatedAt: Date.now()
-      }
+        updatedAt: Date.now(),
+      },
     ],
-    loading: false
-  })
+    loading: false,
+  }),
 }));
 
 jest.mock('@/hooks/useSkills', () => ({
@@ -33,24 +33,26 @@ jest.mock('@/hooks/useSkills', () => ({
         level: 5,
         featured: true,
         createdAt: Date.now(),
-        updatedAt: Date.now()
-      }
+        updatedAt: Date.now(),
+      },
     ],
-    loading: false
-  })
+    loading: false,
+  }),
 }));
 
 describe('DashboardOverview', () => {
   it('renders dashboard overview with header', () => {
     render(<DashboardOverview />);
-    
+
     expect(screen.getByText('Dashboard Overview')).toBeInTheDocument();
-    expect(screen.getByText('Monitor your portfolio performance and manage content')).toBeInTheDocument();
+    expect(
+      screen.getByText('Monitor your portfolio performance and manage content')
+    ).toBeInTheDocument();
   });
 
   it('renders stats grid', () => {
     render(<DashboardOverview />);
-    
+
     // Should show project stats
     expect(screen.getByText('Total Projects')).toBeInTheDocument();
     expect(screen.getByText('Featured Projects')).toBeInTheDocument();
@@ -58,14 +60,14 @@ describe('DashboardOverview', () => {
 
   it('renders quick actions', () => {
     render(<DashboardOverview />);
-    
+
     expect(screen.getByText('Quick Actions')).toBeInTheDocument();
     expect(screen.getByText('Add New Project')).toBeInTheDocument();
   });
 
   it('renders recent activity', () => {
     render(<DashboardOverview />);
-    
+
     expect(screen.getByText('Recent Activity')).toBeInTheDocument();
   });
 
@@ -75,7 +77,7 @@ describe('DashboardOverview', () => {
     const mockQuickAction = jest.fn();
 
     render(
-      <DashboardOverview 
+      <DashboardOverview
         onNavigateToTab={mockNavigate}
         onStatClick={mockStatClick}
         onQuickAction={mockQuickAction}

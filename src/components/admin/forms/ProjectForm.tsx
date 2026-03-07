@@ -72,7 +72,7 @@ export function ProjectForm({ onSuccess }: { onSuccess?: () => void }) {
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
+    <Card className="mx-auto w-full max-w-2xl">
       <CardHeader>
         <CardTitle>Add New Project</CardTitle>
       </CardHeader>
@@ -100,7 +100,7 @@ export function ProjectForm({ onSuccess }: { onSuccess?: () => void }) {
                 <FormItem>
                   <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Textarea 
+                    <Textarea
                       placeholder="Enter project description"
                       {...field}
                     />
@@ -131,7 +131,7 @@ export function ProjectForm({ onSuccess }: { onSuccess?: () => void }) {
                 <FormItem>
                   <FormLabel>Technologies</FormLabel>
                   <FormControl>
-                    <Input 
+                    <Input
                       placeholder="Enter technologies (comma-separated)"
                       {...field}
                     />
@@ -148,7 +148,7 @@ export function ProjectForm({ onSuccess }: { onSuccess?: () => void }) {
                 <FormItem>
                   <FormLabel>Achievements</FormLabel>
                   <FormControl>
-                    <Textarea 
+                    <Textarea
                       placeholder="Enter achievements (comma-separated)"
                       {...field}
                     />
@@ -179,7 +179,10 @@ export function ProjectForm({ onSuccess }: { onSuccess?: () => void }) {
                 <FormItem>
                   <FormLabel>GitHub URL (optional)</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter GitHub repository URL" {...field} />
+                    <Input
+                      placeholder="Enter GitHub repository URL"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

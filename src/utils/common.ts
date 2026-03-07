@@ -40,10 +40,11 @@ export const domUtils = {
    * Scroll to element smoothly
    */
   scrollToElement: (element: HTMLElement | string, offset = 0) => {
-    const target = typeof element === 'string' 
-      ? document.querySelector(element) as HTMLElement
-      : element;
-    
+    const target =
+      typeof element === 'string'
+        ? (document.querySelector(element) as HTMLElement)
+        : element;
+
     if (target) {
       const targetPosition = target.offsetTop - offset;
       window.scrollTo({
@@ -131,11 +132,11 @@ export const performanceUtils = {
     const start = performance.now();
     const result = await func();
     const duration = performance.now() - start;
-    
+
     if (label) {
       console.log(`${label}: ${duration.toFixed(2)}ms`);
     }
-    
+
     return { result, duration };
   },
 
@@ -152,18 +153,18 @@ export const performanceUtils = {
     return {
       add: (item: T) => {
         queue.push(item);
-        
+
         if (queue.length >= batchSize) {
           return queue.splice(0, batchSize);
         }
-        
+
         clearTimeout(timeoutId);
         timeoutId = setTimeout(() => {
           if (queue.length > 0) {
             return queue.splice(0);
           }
         }, delay);
-        
+
         return null;
       },
       flush: () => queue.splice(0),
@@ -196,7 +197,8 @@ export const animationUtils = {
    * Easing functions
    */
   easing: {
-    easeInOut: (t: number): number => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t,
+    easeInOut: (t: number): number =>
+      t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t,
     easeIn: (t: number): number => t * t,
     easeOut: (t: number): number => t * (2 - t),
     bounce: (t: number): number => {
@@ -223,11 +225,14 @@ export const dataUtils = {
   deepClone: <T>(obj: T): T => {
     if (obj === null || typeof obj !== 'object') return obj;
     if (obj instanceof Date) return new Date(obj.getTime()) as unknown as T;
-    if (obj instanceof Array) return obj.map(item => dataUtils.deepClone(item)) as unknown as T;
+    if (obj instanceof Array)
+      return obj.map(item => dataUtils.deepClone(item)) as unknown as T;
     if (typeof obj === 'object') {
       const cloned = {} as Record<string, unknown>;
       Object.keys(obj).forEach(key => {
-        cloned[key] = dataUtils.deepClone((obj as Record<string, unknown>)[key]);
+        cloned[key] = dataUtils.deepClone(
+          (obj as Record<string, unknown>)[key]
+        );
       });
       return cloned as T;
     }
@@ -238,14 +243,17 @@ export const dataUtils = {
    * Group array by key
    */
   groupBy: <T, K extends keyof T>(array: T[], key: K): Record<string, T[]> => {
-    return array.reduce((groups, item) => {
-      const groupKey = String(item[key]);
-      if (!groups[groupKey]) {
-        groups[groupKey] = [];
-      }
-      groups[groupKey].push(item);
-      return groups;
-    }, {} as Record<string, T[]>);
+    return array.reduce(
+      (groups, item) => {
+        const groupKey = String(item[key]);
+        if (!groups[groupKey]) {
+          groups[groupKey] = [];
+        }
+        groups[groupKey].push(item);
+        return groups;
+      },
+      {} as Record<string, T[]>
+    );
   },
 
   /**
@@ -262,7 +270,7 @@ export const dataUtils = {
       for (const { key, direction = 'asc' } of criteria) {
         const aVal = a[key];
         const bVal = b[key];
-        
+
         if (aVal < bVal) return direction === 'asc' ? -1 : 1;
         if (aVal > bVal) return direction === 'asc' ? 1 : -1;
       }
@@ -300,7 +308,7 @@ export const formUtils = {
    */
   extractFormData: (formData: FormData): Record<string, any> => {
     const data: Record<string, any> = {};
-    
+
     for (const [key, value] of formData.entries()) {
       if (data[key]) {
         // Handle multiple values (arrays)
@@ -313,7 +321,7 @@ export const formUtils = {
         data[key] = value;
       }
     }
-    
+
     return data;
   },
 
@@ -401,19 +409,19 @@ export const errorUtils = {
     delay = 1000
   ): Promise<T> => {
     let lastError: Error;
-    
+
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
         return await asyncFn();
       } catch (error) {
         lastError = error as Error;
-        
+
         if (attempt < maxAttempts) {
           await new Promise(resolve => setTimeout(resolve, delay * attempt));
         }
       }
     }
-    
+
     throw lastError!;
   },
 };
@@ -427,12 +435,12 @@ export const storageUtils = {
     get: <T>(key: string, defaultValue?: T): T | null => {
       try {
         const item = localStorage.getItem(key);
-        return item ? JSON.parse(item) : defaultValue ?? null;
+        return item ? JSON.parse(item) : (defaultValue ?? null);
       } catch {
         return defaultValue ?? null;
       }
     },
-    
+
     set: (key: string, value: any): boolean => {
       try {
         localStorage.setItem(key, JSON.stringify(value));
@@ -441,7 +449,7 @@ export const storageUtils = {
         return false;
       }
     },
-    
+
     remove: (key: string): boolean => {
       try {
         localStorage.removeItem(key);
@@ -459,12 +467,12 @@ export const storageUtils = {
     get: <T>(key: string, defaultValue?: T): T | null => {
       try {
         const item = sessionStorage.getItem(key);
-        return item ? JSON.parse(item) : defaultValue ?? null;
+        return item ? JSON.parse(item) : (defaultValue ?? null);
       } catch {
         return defaultValue ?? null;
       }
     },
-    
+
     set: (key: string, value: any): boolean => {
       try {
         sessionStorage.setItem(key, JSON.stringify(value));
@@ -473,7 +481,7 @@ export const storageUtils = {
         return false;
       }
     },
-    
+
     remove: (key: string): boolean => {
       try {
         sessionStorage.removeItem(key);

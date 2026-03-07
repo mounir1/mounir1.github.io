@@ -13,22 +13,31 @@ export const KonamiCode: React.FC<{
 }> = ({ onActivate, children }) => {
   const [sequence, setSequence] = useState<string[]>([]);
   const konamiCode = [
-    'ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown',
-    'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight',
-    'KeyB', 'KeyA'
+    'ArrowUp',
+    'ArrowUp',
+    'ArrowDown',
+    'ArrowDown',
+    'ArrowLeft',
+    'ArrowRight',
+    'ArrowLeft',
+    'ArrowRight',
+    'KeyB',
+    'KeyA',
   ];
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       setSequence(prev => {
         const newSequence = [...prev, event.code].slice(-konamiCode.length);
-        
-        if (newSequence.length === konamiCode.length &&
-            newSequence.every((key, index) => key === konamiCode[index])) {
+
+        if (
+          newSequence.length === konamiCode.length &&
+          newSequence.every((key, index) => key === konamiCode[index])
+        ) {
           onActivate();
           return [];
         }
-        
+
         return newSequence;
       });
     };
@@ -53,21 +62,21 @@ export const ClickCounter: React.FC<{
   const handleClick = () => {
     setClicks(prev => {
       const newCount = prev + 1;
-      
+
       if (newCount === target) {
         onReach();
         return 0;
       }
-      
+
       // Reset counter after inactivity
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
-      
+
       timeoutRef.current = setTimeout(() => {
         setClicks(0);
       }, resetAfter);
-      
+
       return newCount;
     });
   };
@@ -92,13 +101,13 @@ export const SecretMessage: React.FC<{
     const handleKeyPress = (event: KeyboardEvent) => {
       setInputSequence(prev => {
         const newSequence = (prev + event.key).slice(-trigger.length);
-        
+
         if (newSequence.toLowerCase() === trigger.toLowerCase()) {
           setIsVisible(true);
           setTimeout(() => setIsVisible(false), duration);
           return '';
         }
-        
+
         return newSequence;
       });
     };
@@ -110,7 +119,7 @@ export const SecretMessage: React.FC<{
   if (!isVisible) return null;
 
   return (
-    <div className="fixed top-4 right-4 z-50 bg-primary text-primary-foreground px-4 py-2 rounded-lg shadow-lg animate-in slide-in-from-right">
+    <div className="fixed right-4 top-4 z-50 rounded-lg bg-primary px-4 py-2 text-primary-foreground shadow-lg animate-in slide-in-from-right">
       {message}
     </div>
   );
@@ -183,7 +192,7 @@ export const MatrixRain: React.FC<{
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 z-50 pointer-events-none"
+      className="pointer-events-none fixed inset-0 z-50"
       style={{ background: 'rgba(0, 0, 0, 0.8)' }}
     />
   );
@@ -203,7 +212,7 @@ export const FloatingCat: React.FC<{
       setPosition(prev => {
         let newX = prev.x + direction.x * 0.5;
         let newY = prev.y + direction.y * 0.3;
-        
+
         let newDirectionX = direction.x;
         let newDirectionY = direction.y;
 
@@ -211,7 +220,7 @@ export const FloatingCat: React.FC<{
           newDirectionX = -direction.x;
           newX = Math.max(0, Math.min(95, newX));
         }
-        
+
         if (newY <= 0 || newY >= 90) {
           newDirectionY = -direction.y;
           newY = Math.max(0, Math.min(90, newY));
@@ -229,11 +238,11 @@ export const FloatingCat: React.FC<{
 
   return (
     <div
-      className="fixed z-50 text-4xl animate-bounce pointer-events-none"
+      className="pointer-events-none fixed z-50 animate-bounce text-4xl"
       style={{
         left: `${position.x}%`,
         top: `${position.y}%`,
-        transform: 'translate(-50%, -50%)'
+        transform: 'translate(-50%, -50%)',
       }}
     >
       🐱
@@ -247,24 +256,24 @@ export const ConsoleMessages: React.FC = () => {
     const messages = [
       {
         text: '🎉 Hey there, fellow developer!',
-        style: 'color: #ff6b6b; font-size: 16px; font-weight: bold;'
+        style: 'color: #ff6b6b; font-size: 16px; font-weight: bold;',
       },
       {
         text: '👋 Thanks for checking out the console!',
-        style: 'color: #4ecdc4; font-size: 14px;'
+        style: 'color: #4ecdc4; font-size: 14px;',
       },
       {
         text: '🚀 This portfolio was built with React, TypeScript, and lots of ☕',
-        style: 'color: #45b7d1; font-size: 14px;'
+        style: 'color: #45b7d1; font-size: 14px;',
       },
       {
-        text: '💼 Interested in working together? Let\'s connect!',
-        style: 'color: #96ceb4; font-size: 14px;'
+        text: "💼 Interested in working together? Let's connect!",
+        style: 'color: #96ceb4; font-size: 14px;',
       },
       {
         text: '🎨 Try the Konami code for a surprise: ↑↑↓↓←→←→BA',
-        style: 'color: #feca57; font-size: 12px; font-style: italic;'
-      }
+        style: 'color: #feca57; font-size: 12px; font-style: italic;',
+      },
     ];
 
     messages.forEach((message, index) => {
@@ -274,8 +283,10 @@ export const ConsoleMessages: React.FC = () => {
     });
 
     // ASCII Art
-    setTimeout(() => {
-      console.log(`%c
+    setTimeout(
+      () => {
+        console.log(
+          `%c
     ╔══════════════════════════════════════╗
     ║           DEVELOPER MODE             ║
     ║                                      ║
@@ -285,8 +296,12 @@ export const ConsoleMessages: React.FC = () => {
     ║                                      ║
     ║  Keep exploring and happy coding!    ║
     ╚══════════════════════════════════════╝
-      `, 'color: #ff9ff3; font-family: monospace;');
-    }, messages.length * 1000 + 500);
+      `,
+          'color: #ff9ff3; font-family: monospace;'
+        );
+      },
+      messages.length * 1000 + 500
+    );
   }, []);
 
   return null;
@@ -318,7 +333,7 @@ export const EasterEggs: React.FC<{
   return (
     <>
       <ConsoleMessages />
-      
+
       <KonamiCode onActivate={activateMatrix}>
         <ClickCounter target={10} onReach={activateCat}>
           <SecretMessage
@@ -334,9 +349,9 @@ export const EasterEggs: React.FC<{
 
       {showSecret && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-          <div className="bg-card p-8 rounded-lg shadow-xl text-center animate-in zoom-in-95">
-            <h2 className="text-2xl font-bold mb-4">🎊 Congratulations!</h2>
-            <p className="text-muted-foreground mb-4">
+          <div className="rounded-lg bg-card p-8 text-center shadow-xl animate-in zoom-in-95">
+            <h2 className="mb-4 text-2xl font-bold">🎊 Congratulations!</h2>
+            <p className="mb-4 text-muted-foreground">
               You've discovered one of the hidden easter eggs!
             </p>
             <p className="text-sm text-muted-foreground">
@@ -354,9 +369,7 @@ export const useEasterEggs = () => {
   const [discoveredEggs, setDiscoveredEggs] = useState<string[]>([]);
 
   const discoverEgg = (eggId: string) => {
-    setDiscoveredEggs(prev => 
-      prev.includes(eggId) ? prev : [...prev, eggId]
-    );
+    setDiscoveredEggs(prev => (prev.includes(eggId) ? prev : [...prev, eggId]));
   };
 
   const resetEggs = () => {
@@ -367,6 +380,6 @@ export const useEasterEggs = () => {
     discoveredEggs,
     discoverEgg,
     resetEggs,
-    totalDiscovered: discoveredEggs.length
+    totalDiscovered: discoveredEggs.length,
   };
 };

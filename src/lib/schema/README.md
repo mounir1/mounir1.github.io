@@ -89,45 +89,45 @@ interface Project {
   title: string;
   description: string;
   longDescription?: string;
-  
+
   // Classification
   category: ProjectCategory;
   status: ProjectStatus;
   priority: ProjectPriority;
-  
+
   // Technical Details
   technologies: string[];
   achievements: string[];
   challenges: string[];
   solutions: string[];
   tags: string[];
-  
+
   // Media and Links
   images: ProjectImage[];
   links: ProjectLink[];
   icon?: string;
-  
+
   // Project Details
   featured: boolean;
   disabled: boolean;
   visibility: 'public' | 'private' | 'draft';
-  
+
   // Timeline
   startDate?: Date;
   endDate?: Date;
   duration?: string;
-  
+
   // Team and Role
   teamSize: number;
   role: string;
-  
+
   // Client and Business
   clientInfo?: ClientInfo;
   metrics?: ProjectMetrics;
-  
+
   // SEO and Metadata
   seo?: ProjectSEO;
-  
+
   // System Fields
   createdAt: number;
   updatedAt: number;
@@ -142,38 +142,38 @@ interface Project {
 interface Skill {
   // Basic Information
   name: string;
-  
+
   // Classification
   category: SkillCategory;
   level: SkillLevel;
   proficiency: number; // 0-100
-  
+
   // Experience
   experience: SkillExperience;
-  
+
   // Description and Details
   description?: string;
-  
+
   // Certifications and Learning
   certifications: Certification[];
   learningResources: LearningResource[];
   learningPath: LearningPath;
-  
+
   // Related Data
   projects: string[];
   relatedSkills: string[];
-  
+
   // Visual and Metadata
   icon?: string;
   color?: string;
-  
+
   // Status and Organization
   featured: boolean;
   disabled: boolean;
   visibility: 'public' | 'private';
   priority: number;
   tags: string[];
-  
+
   // System Fields
   createdAt: number;
   updatedAt: number;
@@ -210,6 +210,7 @@ The system supports automatic migration between schema versions:
 ### Available Versions
 
 **Projects:**
+
 - `0.1.0`: Initial legacy format
 - `0.2.0`: Added client info and metrics
 - `0.3.0`: Converted single image/logo to images array
@@ -217,6 +218,7 @@ The system supports automatic migration between schema versions:
 - `1.0.0`: Full schema compliance
 
 **Skills:**
+
 - `0.1.0`: Initial legacy format
 - `0.2.0`: Added proficiency separate from level
 - `0.3.0`: Converted yearsOfExperience to experience object
@@ -231,7 +233,12 @@ const currentVersion = MigrationUtils.detectDataVersion(data, 'project');
 const result = await MigrationUtils.autoMigrate(data, 'project', '1.0.0');
 
 // Manual migration between specific versions
-const result = await migrationExecutor.migrate('project', data, '0.3.0', '1.0.0');
+const result = await migrationExecutor.migrate(
+  'project',
+  data,
+  '0.3.0',
+  '1.0.0'
+);
 ```
 
 ## React Hooks
@@ -239,7 +246,8 @@ const result = await migrationExecutor.migrate('project', data, '0.3.0', '1.0.0'
 ### useProjectValidation / useSkillValidation
 
 ```typescript
-const { validate, validateField, validateBulk, autoMigrate } = useProjectValidation('create');
+const { validate, validateField, validateBulk, autoMigrate } =
+  useProjectValidation('create');
 ```
 
 ### useFormValidation
@@ -252,43 +260,28 @@ const {
   markFieldTouched,
   reset,
   submit,
-  validate
+  validate,
 } = useFormValidation(schema, initialData);
 ```
 
 ### useFieldValidation
 
 ```typescript
-const {
-  value,
-  validationState,
-  updateValue,
-  markTouched,
-  reset,
-  validate
-} = useFieldValidation(fieldSchema, initialValue);
+const { value, validationState, updateValue, markTouched, reset, validate } =
+  useFieldValidation(fieldSchema, initialValue);
 ```
 
 ### useBatchValidation
 
 ```typescript
-const {
-  results,
-  isValidating,
-  validateBatch,
-  reset
-} = useBatchValidation();
+const { results, isValidating, validateBatch, reset } = useBatchValidation();
 ```
 
 ### useSchemaMigration
 
 ```typescript
-const {
-  migrationState,
-  migrateData,
-  migrateBatch,
-  reset
-} = useSchemaMigration();
+const { migrationState, migrateData, migrateBatch, reset } =
+  useSchemaMigration();
 ```
 
 ## Error Handling
@@ -297,17 +290,20 @@ The system provides detailed error information:
 
 ```typescript
 interface ValidationError {
-  field: string;      // Field path (e.g., 'clientInfo.name')
-  message: string;    // Human-readable error message
-  code: string;       // Error code for programmatic handling
-  value?: unknown;    // The invalid value
+  field: string; // Field path (e.g., 'clientInfo.name')
+  message: string; // Human-readable error message
+  code: string; // Error code for programmatic handling
+  value?: unknown; // The invalid value
 }
 ```
 
 ### Error Formatting
 
 ```typescript
-import { formatValidationErrors, groupValidationErrorsByField } from '@/lib/schema';
+import {
+  formatValidationErrors,
+  groupValidationErrorsByField,
+} from '@/lib/schema';
 
 // Format errors as a single string
 const errorMessage = formatValidationErrors(result.errors);
@@ -335,6 +331,7 @@ const errorsByField = groupValidationErrorsByField(result.errors);
 ## Examples
 
 See `examples.ts` for comprehensive usage examples including:
+
 - Basic validation
 - Form integration
 - Legacy data transformation
@@ -351,6 +348,7 @@ npm test src/lib/schema/__tests__/
 ```
 
 The test suite covers:
+
 - Schema validation rules
 - Edge cases and error conditions
 - Migration functionality

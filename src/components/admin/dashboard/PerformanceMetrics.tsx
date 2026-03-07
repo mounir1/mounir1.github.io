@@ -1,17 +1,17 @@
-import React from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
-import { cn } from '@/lib/utils'
-import { Gauge } from 'lucide-react'
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { cn } from '@/lib/utils';
+import { Gauge } from 'lucide-react';
 
 interface PerformanceMetric {
-  name: string
-  value: number
-  target: number
-  unit: string
-  trend: 'up' | 'down' | 'stable'
-  category: string
+  name: string;
+  value: number;
+  target: number;
+  unit: string;
+  trend: 'up' | 'down' | 'stable';
+  category: string;
 }
 
 const metrics: PerformanceMetric[] = [
@@ -21,7 +21,7 @@ const metrics: PerformanceMetric[] = [
     target: 1.5,
     unit: 's',
     trend: 'down',
-    category: 'Performance'
+    category: 'Performance',
   },
   {
     name: 'First Contentful Paint',
@@ -29,7 +29,7 @@ const metrics: PerformanceMetric[] = [
     target: 1.0,
     unit: 's',
     trend: 'down',
-    category: 'Performance'
+    category: 'Performance',
   },
   {
     name: 'Time to Interactive',
@@ -37,7 +37,7 @@ const metrics: PerformanceMetric[] = [
     target: 2.5,
     unit: 's',
     trend: 'down',
-    category: 'Performance'
+    category: 'Performance',
   },
   {
     name: 'Server Response Time',
@@ -45,34 +45,41 @@ const metrics: PerformanceMetric[] = [
     target: 0.5,
     unit: 's',
     trend: 'stable',
-    category: 'Server'
-  }
-]
+    category: 'Server',
+  },
+];
 
-const getTrendColor = (trend: PerformanceMetric['trend'], value: number, target: number) => {
+const getTrendColor = (
+  trend: PerformanceMetric['trend'],
+  value: number,
+  target: number
+) => {
   if (trend === 'down') {
-    return value <= target ? 'text-green-500' : 'text-red-500'
+    return value <= target ? 'text-green-500' : 'text-red-500';
   }
   if (trend === 'up') {
-    return value >= target ? 'text-green-500' : 'text-red-500'
+    return value >= target ? 'text-green-500' : 'text-red-500';
   }
-  return 'text-yellow-500'
-}
+  return 'text-yellow-500';
+};
 
-const getProgressColor = (value: number, target: number, trend: PerformanceMetric['trend']) => {
+const getProgressColor = (
+  value: number,
+  target: number,
+  trend: PerformanceMetric['trend']
+) => {
   if (trend === 'down') {
-    return value <= target ? 'bg-green-500' : 'bg-red-500'
+    return value <= target ? 'bg-green-500' : 'bg-red-500';
   }
   if (trend === 'up') {
-    return value >= target ? 'bg-green-500' : 'bg-red-500'
+    return value >= target ? 'bg-green-500' : 'bg-red-500';
   }
-  return 'bg-yellow-500'
-}
+  return 'bg-yellow-500';
+};
 
-export const PerformanceMetrics: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
-  className,
-  ...props
-}) => {
+export const PerformanceMetrics: React.FC<
+  React.HTMLAttributes<HTMLDivElement>
+> = ({ className, ...props }) => {
   return (
     <Card className={className} {...props}>
       <CardHeader>
@@ -85,49 +92,56 @@ export const PerformanceMetrics: React.FC<React.HTMLAttributes<HTMLDivElement>> 
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
-          {metrics.map((metric) => {
-            const progress = metric.trend === 'down'
-              ? ((metric.target - metric.value) / metric.target) * 100
-              : (metric.value / metric.target) * 100
-            
+          {metrics.map(metric => {
+            const progress =
+              metric.trend === 'down'
+                ? ((metric.target - metric.value) / metric.target) * 100
+                : (metric.value / metric.target) * 100;
+
             return (
               <div key={metric.name} className="space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium">
-                        {metric.name}
-                      </span>
+                      <span className="text-sm font-medium">{metric.name}</span>
                       <Badge variant="secondary" className="text-xs">
                         {metric.category}
                       </Badge>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className={cn(
-                        "text-sm font-bold",
-                        getTrendColor(metric.trend, metric.value, metric.target)
-                      )}>
-                        {metric.value}{metric.unit}
+                      <span
+                        className={cn(
+                          'text-sm font-bold',
+                          getTrendColor(
+                            metric.trend,
+                            metric.value,
+                            metric.target
+                          )
+                        )}
+                      >
+                        {metric.value}
+                        {metric.unit}
                       </span>
                       <span className="text-xs text-muted-foreground">
-                        Target: {metric.target}{metric.unit}
+                        Target: {metric.target}
+                        {metric.unit}
                       </span>
                     </div>
                   </div>
                 </div>
-                <Progress 
-                  value={progress} 
+                <Progress
+                  value={progress}
                   className="h-2"
                   indicatorClassName={cn(
                     getProgressColor(metric.value, metric.target, metric.trend),
-                    "transition-all duration-300"
+                    'transition-all duration-300'
                   )}
                 />
               </div>
-            )
+            );
           })}
         </div>
       </CardContent>
     </Card>
-  )
-}
+  );
+};

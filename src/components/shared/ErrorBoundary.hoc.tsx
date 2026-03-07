@@ -4,7 +4,7 @@ import { ErrorBoundary, type ErrorBoundaryProps } from './ErrorBoundary';
 // Higher-order component for wrapping components with error boundary
 export const withErrorBoundary = <P extends object>(
   Component: React.ComponentType<P>,
-  errorBoundaryProps?: Omit<ErrorBoundaryProps, "children">
+  errorBoundaryProps?: Omit<ErrorBoundaryProps, 'children'>
 ) => {
   const WrappedComponent = (props: P) => (
     <ErrorBoundary {...errorBoundaryProps}>
@@ -13,9 +13,12 @@ export const withErrorBoundary = <P extends object>(
   );
 
   WrappedComponent.displayName = `withErrorBoundary(${Component.displayName || Component.name})`;
-  
+
   return WrappedComponent;
 };
 
 // Backward compatibility exports
-export { ErrorBoundary as SimpleErrorBoundary, withErrorBoundary as withSimpleErrorBoundary };
+export {
+  ErrorBoundary as SimpleErrorBoundary,
+  withErrorBoundary as withSimpleErrorBoundary,
+};

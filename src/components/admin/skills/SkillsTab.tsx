@@ -1,5 +1,5 @@
-import React from "react";
-import { SkillsManager } from "@/components/admin/SkillsManager";
+import React from 'react';
+import { SkillsManager } from '@/components/admin/SkillsManager';
 
 // Container component for skills management tab
 // Currently composes the existing SkillsManager to avoid duplication.

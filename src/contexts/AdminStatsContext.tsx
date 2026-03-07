@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useReducer, useEffect, useCallback } from "react";
+import React, {
+  createContext,
+  useContext,
+  useReducer,
+  useEffect,
+  useCallback,
+} from 'react';
 
 // Types for admin statistics
 export interface ProjectStats {
@@ -35,13 +41,13 @@ export interface AdminStats {
 
 // Actions for the stats reducer
 type StatsAction =
-  | { type: "FETCH_STATS_START" }
-  | { type: "FETCH_STATS_SUCCESS"; payload: Partial<AdminStats> }
-  | { type: "FETCH_STATS_ERROR"; payload: string }
-  | { type: "UPDATE_PROJECT_STATS"; payload: Partial<ProjectStats> }
-  | { type: "UPDATE_SKILL_STATS"; payload: Partial<SkillStats> }
-  | { type: "UPDATE_SYSTEM_STATS"; payload: Partial<SystemStats> }
-  | { type: "RESET_STATS" };
+  | { type: 'FETCH_STATS_START' }
+  | { type: 'FETCH_STATS_SUCCESS'; payload: Partial<AdminStats> }
+  | { type: 'FETCH_STATS_ERROR'; payload: string }
+  | { type: 'UPDATE_PROJECT_STATS'; payload: Partial<ProjectStats> }
+  | { type: 'UPDATE_SKILL_STATS'; payload: Partial<SkillStats> }
+  | { type: 'UPDATE_SYSTEM_STATS'; payload: Partial<SystemStats> }
+  | { type: 'RESET_STATS' };
 
 // Initial state
 const initialStats: AdminStats = {
@@ -50,83 +56,83 @@ const initialStats: AdminStats = {
     published: 0,
     draft: 0,
     featured: 0,
-    recentlyUpdated: 0
+    recentlyUpdated: 0,
   },
   skills: {
     total: 0,
     byCategory: {},
     byLevel: {},
-    recentlyAdded: 0
+    recentlyAdded: 0,
   },
   system: {
     totalViews: 0,
     uniqueVisitors: 0,
     bounceRate: 0,
     avgSessionDuration: 0,
-    popularPages: []
+    popularPages: [],
   },
   lastUpdated: null,
   isLoading: false,
-  error: null
+  error: null,
 };
 
 // Stats reducer
 function statsReducer(state: AdminStats, action: StatsAction): AdminStats {
   switch (action.type) {
-    case "FETCH_STATS_START":
+    case 'FETCH_STATS_START':
       return {
         ...state,
         isLoading: true,
-        error: null
+        error: null,
       };
 
-    case "FETCH_STATS_SUCCESS":
+    case 'FETCH_STATS_SUCCESS':
       return {
         ...state,
         ...action.payload,
         isLoading: false,
         error: null,
-        lastUpdated: new Date()
+        lastUpdated: new Date(),
       };
 
-    case "FETCH_STATS_ERROR":
+    case 'FETCH_STATS_ERROR':
       return {
         ...state,
         isLoading: false,
-        error: action.payload
+        error: action.payload,
       };
 
-    case "UPDATE_PROJECT_STATS":
+    case 'UPDATE_PROJECT_STATS':
       return {
         ...state,
         projects: {
           ...state.projects,
-          ...action.payload
+          ...action.payload,
         },
-        lastUpdated: new Date()
+        lastUpdated: new Date(),
       };
 
-    case "UPDATE_SKILL_STATS":
+    case 'UPDATE_SKILL_STATS':
       return {
         ...state,
         skills: {
           ...state.skills,
-          ...action.payload
+          ...action.payload,
         },
-        lastUpdated: new Date()
+        lastUpdated: new Date(),
       };
 
-    case "UPDATE_SYSTEM_STATS":
+    case 'UPDATE_SYSTEM_STATS':
       return {
         ...state,
         system: {
           ...state.system,
-          ...action.payload
+          ...action.payload,
         },
-        lastUpdated: new Date()
+        lastUpdated: new Date(),
       };
 
-    case "RESET_STATS":
+    case 'RESET_STATS':
       return initialStats;
 
     default:
@@ -161,54 +167,54 @@ interface AdminStatsProviderProps {
 const fetchProjectStats = async (): Promise<ProjectStats> => {
   // Simulate API call
   await new Promise(resolve => setTimeout(resolve, 500));
-  
+
   return {
     total: 12,
     published: 10,
     draft: 2,
     featured: 3,
-    recentlyUpdated: 1
+    recentlyUpdated: 1,
   };
 };
 
 const fetchSkillStats = async (): Promise<SkillStats> => {
   // Simulate API call
   await new Promise(resolve => setTimeout(resolve, 300));
-  
+
   return {
     total: 25,
     byCategory: {
-      "Frontend": 8,
-      "Backend": 6,
-      "Database": 4,
-      "DevOps": 3,
-      "Design": 4
+      Frontend: 8,
+      Backend: 6,
+      Database: 4,
+      DevOps: 3,
+      Design: 4,
     },
     byLevel: {
-      "Expert": 8,
-      "Advanced": 10,
-      "Intermediate": 7
+      Expert: 8,
+      Advanced: 10,
+      Intermediate: 7,
     },
-    recentlyAdded: 2
+    recentlyAdded: 2,
   };
 };
 
 const fetchSystemStats = async (): Promise<SystemStats> => {
   // Simulate API call
   await new Promise(resolve => setTimeout(resolve, 400));
-  
+
   return {
     totalViews: 15420,
     uniqueVisitors: 8930,
     bounceRate: 0.32,
     avgSessionDuration: 245,
     popularPages: [
-      { path: "/", views: 5430 },
-      { path: "/projects", views: 3210 },
-      { path: "/about", views: 2890 },
-      { path: "/contact", views: 1650 },
-      { path: "/blog", views: 1240 }
-    ]
+      { path: '/', views: 5430 },
+      { path: '/projects', views: 3210 },
+      { path: '/about', views: 2890 },
+      { path: '/contact', views: 1650 },
+      { path: '/blog', views: 1240 },
+    ],
   };
 };
 
@@ -216,48 +222,52 @@ const fetchSystemStats = async (): Promise<SystemStats> => {
 export const AdminStatsProvider: React.FC<AdminStatsProviderProps> = ({
   children,
   autoRefresh = true,
-  refreshInterval = 300000 // 5 minutes
+  refreshInterval = 300000, // 5 minutes
 }) => {
   const [stats, dispatch] = useReducer(statsReducer, initialStats);
 
   // Fetch all stats
   const fetchStats = useCallback(async () => {
-    dispatch({ type: "FETCH_STATS_START" });
-    
+    dispatch({ type: 'FETCH_STATS_START' });
+
     try {
       const [projectStats, skillStats, systemStats] = await Promise.all([
         fetchProjectStats(),
         fetchSkillStats(),
-        fetchSystemStats()
+        fetchSystemStats(),
       ]);
 
       dispatch({
-        type: "FETCH_STATS_SUCCESS",
+        type: 'FETCH_STATS_SUCCESS',
         payload: {
           projects: projectStats,
           skills: skillStats,
-          system: systemStats
-        }
+          system: systemStats,
+        },
       });
     } catch (error) {
       dispatch({
-        type: "FETCH_STATS_ERROR",
-        payload: error instanceof Error ? error.message : "Failed to fetch stats"
+        type: 'FETCH_STATS_ERROR',
+        payload:
+          error instanceof Error ? error.message : 'Failed to fetch stats',
       });
     }
   }, []);
 
   // Update individual stat sections
-  const updateProjectStats = useCallback((projectStats: Partial<ProjectStats>) => {
-    dispatch({ type: "UPDATE_PROJECT_STATS", payload: projectStats });
-  }, []);
+  const updateProjectStats = useCallback(
+    (projectStats: Partial<ProjectStats>) => {
+      dispatch({ type: 'UPDATE_PROJECT_STATS', payload: projectStats });
+    },
+    []
+  );
 
   const updateSkillStats = useCallback((skillStats: Partial<SkillStats>) => {
-    dispatch({ type: "UPDATE_SKILL_STATS", payload: skillStats });
+    dispatch({ type: 'UPDATE_SKILL_STATS', payload: skillStats });
   }, []);
 
   const updateSystemStats = useCallback((systemStats: Partial<SystemStats>) => {
-    dispatch({ type: "UPDATE_SYSTEM_STATS", payload: systemStats });
+    dispatch({ type: 'UPDATE_SYSTEM_STATS', payload: systemStats });
   }, []);
 
   const refreshStats = useCallback(async () => {
@@ -265,7 +275,7 @@ export const AdminStatsProvider: React.FC<AdminStatsProviderProps> = ({
   }, [fetchStats]);
 
   const resetStats = useCallback(() => {
-    dispatch({ type: "RESET_STATS" });
+    dispatch({ type: 'RESET_STATS' });
   }, []);
 
   // Auto-refresh effect
@@ -288,8 +298,8 @@ export const AdminStatsProvider: React.FC<AdminStatsProviderProps> = ({
       updateSkillStats,
       updateSystemStats,
       refreshStats,
-      resetStats
-    }
+      resetStats,
+    },
   };
 
   return (
@@ -302,11 +312,11 @@ export const AdminStatsProvider: React.FC<AdminStatsProviderProps> = ({
 // Hook to use the admin stats context
 export const useAdminStats = (): AdminStatsContextType => {
   const context = useContext(AdminStatsContext);
-  
+
   if (!context) {
-    throw new Error("useAdminStats must be used within an AdminStatsProvider");
+    throw new Error('useAdminStats must be used within an AdminStatsProvider');
   }
-  
+
   return context;
 };
 
@@ -316,7 +326,7 @@ export const useProjectStats = () => {
   return {
     ...stats.projects,
     updateStats: actions.updateProjectStats,
-    isLoading: stats.isLoading
+    isLoading: stats.isLoading,
   };
 };
 
@@ -325,7 +335,7 @@ export const useSkillStats = () => {
   return {
     ...stats.skills,
     updateStats: actions.updateSkillStats,
-    isLoading: stats.isLoading
+    isLoading: stats.isLoading,
   };
 };
 
@@ -334,7 +344,7 @@ export const useSystemStats = () => {
   return {
     ...stats.system,
     updateStats: actions.updateSystemStats,
-    isLoading: stats.isLoading
+    isLoading: stats.isLoading,
   };
 };
 

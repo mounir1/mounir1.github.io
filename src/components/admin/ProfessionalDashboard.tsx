@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { 
-  LayoutDashboard, 
-  FolderOpen, 
-  Award, 
+import {
+  LayoutDashboard,
+  FolderOpen,
+  Award,
   BarChart3,
   Plus,
   Download,
@@ -10,7 +10,7 @@ import {
   Search,
   Filter,
   User,
-  LogOut
+  LogOut,
 } from 'lucide-react';
 import { AnalyticsCharts } from './dashboard/AnalyticsCharts';
 import { PerformanceMetrics } from './dashboard/PerformanceMetrics';
@@ -37,8 +37,16 @@ interface ProfessionalDashboardProps {
 export function ProfessionalDashboard({ user }: ProfessionalDashboardProps) {
   const [activeTab, setActiveTab] = useState('overview');
   const [searchQuery, setSearchQuery] = useState('');
-  const { projects, loading: projectsLoading, refetch: refetchProjects } = useProjects();
-  const { skills, loading: skillsLoading, refetch: refetchSkills } = useSkills();
+  const {
+    projects,
+    loading: projectsLoading,
+    refetch: refetchProjects,
+  } = useProjects();
+  const {
+    skills,
+    loading: skillsLoading,
+    refetch: refetchSkills,
+  } = useSkills();
 
   const handleLogout = async () => {
     try {
@@ -52,13 +60,13 @@ export function ProfessionalDashboard({ user }: ProfessionalDashboardProps) {
   const handleExportData = async () => {
     try {
       if (!db) throw new Error('Firestore not initialized');
-      
+
       // Export projects
       const projectsRef = collection(db, 'projects');
       const projectsSnap = await getDocs(projectsRef);
       const projectsData = projectsSnap.docs.map(doc => ({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       }));
 
       // Export skills
@@ -66,19 +74,19 @@ export function ProfessionalDashboard({ user }: ProfessionalDashboardProps) {
       const skillsSnap = await getDocs(skillsRef);
       const skillsData = skillsSnap.docs.map(doc => ({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       }));
 
       // Create export data
       const exportData = {
         projects: projectsData,
         skills: skillsData,
-        exportDate: new Date().toISOString()
+        exportDate: new Date().toISOString(),
       };
 
       // Create and download file
       const blob = new Blob([JSON.stringify(exportData, null, 2)], {
-        type: 'application/json'
+        type: 'application/json',
       });
       saveAs(blob, `portfolio-data-${new Date().toISOString()}.json`);
     } catch (error) {
@@ -92,8 +100,8 @@ export function ProfessionalDashboard({ user }: ProfessionalDashboardProps) {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json';
-    
-    input.onchange = async (e) => {
+
+    input.onchange = async e => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (!file) return;
 
@@ -137,7 +145,7 @@ export function ProfessionalDashboard({ user }: ProfessionalDashboardProps) {
             <span className="text-sm">{user.email}</span>
           </div>
           <Button variant="outline" size="sm" onClick={handleLogout}>
-            <LogOut className="h-4 w-4 mr-2" />
+            <LogOut className="mr-2 h-4 w-4" />
             Logout
           </Button>
         </div>
@@ -146,7 +154,7 @@ export function ProfessionalDashboard({ user }: ProfessionalDashboardProps) {
       {/* Main Content */}
       <div className="space-y-6">
         <Tabs defaultValue={activeTab} onValueChange={setActiveTab}>
-          <div className="flex items-center justify-between mb-6">
+          <div className="mb-6 flex items-center justify-between">
             <TabsList>
               <TabsTrigger value="overview" className="flex items-center gap-2">
                 <LayoutDashboard className="h-4 w-4" />
@@ -160,7 +168,10 @@ export function ProfessionalDashboard({ user }: ProfessionalDashboardProps) {
                 <Award className="h-4 w-4" />
                 <span>Skills</span>
               </TabsTrigger>
-              <TabsTrigger value="analytics" className="flex items-center gap-2">
+              <TabsTrigger
+                value="analytics"
+                className="flex items-center gap-2"
+              >
                 <BarChart3 className="h-4 w-4" />
                 <span>Analytics</span>
               </TabsTrigger>
@@ -169,11 +180,11 @@ export function ProfessionalDashboard({ user }: ProfessionalDashboardProps) {
             <div className="flex items-center gap-4">
               <div className="flex gap-2">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     placeholder="Search..."
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={e => setSearchQuery(e.target.value)}
                     className="w-64 pl-9"
                   />
                 </div>
@@ -184,26 +195,20 @@ export function ProfessionalDashboard({ user }: ProfessionalDashboardProps) {
 
               <div className="flex items-center gap-2">
                 <Button variant="outline" onClick={handleImportData}>
-                  <Upload className="h-4 w-4 mr-2" />
+                  <Upload className="mr-2 h-4 w-4" />
                   Import
                 </Button>
                 <Button variant="outline" onClick={handleExportData}>
-                  <Download className="h-4 w-4 mr-2" />
+                  <Download className="mr-2 h-4 w-4" />
                   Export
                 </Button>
               </div>
 
               {activeTab === 'projects' && (
-                <AddItemDialog
-                  type="project"
-                  onSuccess={refetchProjects}
-                />
+                <AddItemDialog type="project" onSuccess={refetchProjects} />
               )}
               {activeTab === 'skills' && (
-                <AddItemDialog
-                  type="skill"
-                  onSuccess={refetchSkills}
-                />
+                <AddItemDialog type="skill" onSuccess={refetchSkills} />
               )}
             </div>
           </div>
@@ -211,7 +216,7 @@ export function ProfessionalDashboard({ user }: ProfessionalDashboardProps) {
           <TabsContent value="overview">
             <div className="space-y-6">
               <StatsGrid />
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 <Card>
                   <CardHeader>
                     <CardTitle>Recent Projects</CardTitle>
@@ -220,16 +225,24 @@ export function ProfessionalDashboard({ user }: ProfessionalDashboardProps) {
                     {projectsLoading ? (
                       <div className="animate-pulse space-y-2">
                         {[...Array(3)].map((_, i) => (
-                          <div key={i} className="h-4 bg-muted rounded w-full" />
+                          <div
+                            key={i}
+                            className="h-4 w-full rounded bg-muted"
+                          />
                         ))}
                       </div>
                     ) : (
                       <div className="space-y-3">
-                        {projects.slice(0, 5).map((project) => (
-                          <div key={project.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                        {projects.slice(0, 5).map(project => (
+                          <div
+                            key={project.id}
+                            className="flex items-center justify-between rounded-lg bg-muted/30 p-3"
+                          >
                             <div>
                               <p className="font-medium">{project.title}</p>
-                              <p className="text-sm text-muted-foreground">{project.category}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {project.category}
+                              </p>
                             </div>
                             {project.featured && (
                               <Badge variant="secondary">Featured</Badge>
@@ -249,16 +262,24 @@ export function ProfessionalDashboard({ user }: ProfessionalDashboardProps) {
                     {skillsLoading ? (
                       <div className="animate-pulse space-y-2">
                         {[...Array(3)].map((_, i) => (
-                          <div key={i} className="h-4 bg-muted rounded w-full" />
+                          <div
+                            key={i}
+                            className="h-4 w-full rounded bg-muted"
+                          />
                         ))}
                       </div>
                     ) : (
                       <div className="space-y-3">
-                        {skills.slice(0, 5).map((skill) => (
-                          <div key={skill.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                        {skills.slice(0, 5).map(skill => (
+                          <div
+                            key={skill.id}
+                            className="flex items-center justify-between rounded-lg bg-muted/30 p-3"
+                          >
                             <div>
                               <p className="font-medium">{skill.name}</p>
-                              <p className="text-sm text-muted-foreground">{skill.category}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {skill.category}
+                              </p>
                             </div>
                             <div className="flex items-center gap-2">
                               <span className="text-sm text-muted-foreground">
@@ -289,7 +310,7 @@ export function ProfessionalDashboard({ user }: ProfessionalDashboardProps) {
           <TabsContent value="analytics">
             <div className="space-y-6">
               <AnalyticsCharts />
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 <PerformanceMetrics />
                 <ActivityLogs />
               </div>

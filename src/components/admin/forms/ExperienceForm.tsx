@@ -20,7 +20,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 import { addDoc, collection } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
@@ -35,12 +35,12 @@ const experienceFormSchema = z.object({
 });
 
 const EMPLOYMENT_TYPES = [
-  "Full-time",
-  "Contract",
-  "Founder",
-  "Part-time",
-  "Freelance",
-  "Internship"
+  'Full-time',
+  'Contract',
+  'Founder',
+  'Part-time',
+  'Freelance',
+  'Internship',
 ];
 
 type ExperienceFormValues = z.infer<typeof experienceFormSchema>;
@@ -84,7 +84,7 @@ export function ExperienceForm({ onSuccess }: { onSuccess?: () => void }) {
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
+    <Card className="mx-auto w-full max-w-2xl">
       <CardHeader>
         <CardTitle>Add New Experience</CardTitle>
       </CardHeader>
@@ -153,14 +153,17 @@ export function ExperienceForm({ onSuccess }: { onSuccess?: () => void }) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Employment Type</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select employment type" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {EMPLOYMENT_TYPES.map((type) => (
+                      {EMPLOYMENT_TYPES.map(type => (
                         <SelectItem key={type} value={type}>
                           {type}
                         </SelectItem>
@@ -179,9 +182,9 @@ export function ExperienceForm({ onSuccess }: { onSuccess?: () => void }) {
                 <FormItem>
                   <FormLabel>Achievements</FormLabel>
                   <FormControl>
-                    <Textarea 
+                    <Textarea
                       placeholder="Enter achievements (comma-separated)"
-                      {...field} 
+                      {...field}
                     />
                   </FormControl>
                   <FormMessage />
@@ -196,7 +199,7 @@ export function ExperienceForm({ onSuccess }: { onSuccess?: () => void }) {
                 <FormItem>
                   <FormLabel>Technologies</FormLabel>
                   <FormControl>
-                    <Input 
+                    <Input
                       placeholder="Enter technologies (comma-separated)"
                       {...field}
                     />

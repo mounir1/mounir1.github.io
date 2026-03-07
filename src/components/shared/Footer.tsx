@@ -1,17 +1,20 @@
-import React from 'react'
-import { cn } from '@/lib/utils'
+import React from 'react';
+import { cn } from '@/lib/utils';
 
 export const Footer: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   className,
   ...props
 }) => {
   return (
-    <footer className={cn("w-full border-t bg-background", className)} {...props}>
+    <footer
+      className={cn('w-full border-t bg-background', className)}
+      {...props}
+    >
       <div className="container flex flex-col items-center justify-between gap-4 py-10 md:h-24 md:flex-row md:py-0">
         <div className="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
-          <img 
-            src="/mounir-signature.svg" 
-            alt="Mounir's Signature" 
+          <img
+            src="/mounir-signature.svg"
+            alt="Mounir's Signature"
             className="h-12 w-auto dark:invert"
           />
         </div>
@@ -38,7 +41,7 @@ export const Footer: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
         </p>
       </div>
     </footer>
-  )
-}
+  );
+};
 
-export default Footer
+export default Footer;

@@ -1,22 +1,29 @@
-import React from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { useAccessibility } from "@/contexts/AccessibilityContext";
-import { 
-  Eye, 
-  Volume2, 
-  Keyboard, 
-  Monitor, 
-  Settings, 
+import React from 'react';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { useAccessibility } from '@/contexts/AccessibilityContext';
+import {
+  Eye,
+  Volume2,
+  Keyboard,
+  Monitor,
+  Settings,
   RefreshCw,
-  Accessibility as AccessibilityIcon 
-} from "lucide-react";
+  Accessibility as AccessibilityIcon,
+} from 'lucide-react';
 
 export const AccessibilitySettings: React.FC = () => {
-  const { preferences, updatePreference, resetPreferences } = useAccessibility();
+  const { preferences, updatePreference, resetPreferences } =
+    useAccessibility();
 
   return (
     <div className="space-y-6">
@@ -30,34 +37,43 @@ export const AccessibilitySettings: React.FC = () => {
         <CardContent className="space-y-8">
           {/* Visual Preferences */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold flex items-center gap-2 border-b pb-2">
+            <h3 className="flex items-center gap-2 border-b pb-2 text-lg font-semibold">
               <Eye className="h-4 w-4" />
               Visual Preferences
             </h3>
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid gap-6 md:grid-cols-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="high-contrast">High Contrast Mode</Label>
                 <Switch
                   id="high-contrast"
                   checked={preferences.highContrast}
-                  onCheckedChange={(checked) => updatePreference("highContrast", checked)}
+                  onCheckedChange={checked =>
+                    updatePreference('highContrast', checked)
+                  }
                 />
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <Label htmlFor="reduced-motion">Reduced Motion</Label>
                 <Switch
                   id="reduced-motion"
                   checked={preferences.reducedMotion}
-                  onCheckedChange={(checked) => updatePreference("reducedMotion", checked)}
+                  onCheckedChange={checked =>
+                    updatePreference('reducedMotion', checked)
+                  }
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="font-size">Font Size</Label>
                 <Select
                   value={preferences.fontSize}
-                  onValueChange={(value) => updatePreference("fontSize", value as "small" | "medium" | "large" | "extra-large")}
+                  onValueChange={value =>
+                    updatePreference(
+                      'fontSize',
+                      value as 'small' | 'medium' | 'large' | 'extra-large'
+                    )
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -70,12 +86,17 @@ export const AccessibilitySettings: React.FC = () => {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="color-scheme">Color Scheme</Label>
                 <Select
                   value={preferences.colorScheme}
-                  onValueChange={(value) => updatePreference("colorScheme", value as "light" | "dark" | "auto")}
+                  onValueChange={value =>
+                    updatePreference(
+                      'colorScheme',
+                      value as 'light' | 'dark' | 'auto'
+                    )
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -92,44 +113,56 @@ export const AccessibilitySettings: React.FC = () => {
 
           {/* Interaction Preferences */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold flex items-center gap-2 border-b pb-2">
+            <h3 className="flex items-center gap-2 border-b pb-2 text-lg font-semibold">
               <Keyboard className="h-4 w-4" />
               Interaction Preferences
             </h3>
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid gap-6 md:grid-cols-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="keyboard-navigation">Enhanced Keyboard Navigation</Label>
+                <Label htmlFor="keyboard-navigation">
+                  Enhanced Keyboard Navigation
+                </Label>
                 <Switch
                   id="keyboard-navigation"
                   checked={preferences.keyboardNavigation}
-                  onCheckedChange={(checked) => updatePreference("keyboardNavigation", checked)}
+                  onCheckedChange={checked =>
+                    updatePreference('keyboardNavigation', checked)
+                  }
                 />
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <Label htmlFor="focus-visible">Visible Focus Indicators</Label>
                 <Switch
                   id="focus-visible"
                   checked={preferences.focusVisible}
-                  onCheckedChange={(checked) => updatePreference("focusVisible", checked)}
+                  onCheckedChange={checked =>
+                    updatePreference('focusVisible', checked)
+                  }
                 />
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <Label htmlFor="skip-links">Skip Navigation Links</Label>
                 <Switch
                   id="skip-links"
                   checked={preferences.skipLinks}
-                  onCheckedChange={(checked) => updatePreference("skipLinks", checked)}
+                  onCheckedChange={checked =>
+                    updatePreference('skipLinks', checked)
+                  }
                 />
               </div>
-              
+
               <div className="flex items-center justify-between">
-                <Label htmlFor="screen-reader">Screen Reader Optimizations</Label>
+                <Label htmlFor="screen-reader">
+                  Screen Reader Optimizations
+                </Label>
                 <Switch
                   id="screen-reader"
                   checked={preferences.screenReader}
-                  onCheckedChange={(checked) => updatePreference("screenReader", checked)}
+                  onCheckedChange={checked =>
+                    updatePreference('screenReader', checked)
+                  }
                 />
               </div>
             </div>
@@ -137,44 +170,54 @@ export const AccessibilitySettings: React.FC = () => {
 
           {/* Content Preferences */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold flex items-center gap-2 border-b pb-2">
+            <h3 className="flex items-center gap-2 border-b pb-2 text-lg font-semibold">
               <Volume2 className="h-4 w-4" />
               Content Preferences
             </h3>
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid gap-6 md:grid-cols-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="captions">Auto-Enable Captions</Label>
                 <Switch
                   id="captions"
                   checked={preferences.captions}
-                  onCheckedChange={(checked) => updatePreference("captions", checked)}
+                  onCheckedChange={checked =>
+                    updatePreference('captions', checked)
+                  }
                 />
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <Label htmlFor="audio-descriptions">Audio Descriptions</Label>
                 <Switch
                   id="audio-descriptions"
                   checked={preferences.audioDescriptions}
-                  onCheckedChange={(checked) => updatePreference("audioDescriptions", checked)}
+                  onCheckedChange={checked =>
+                    updatePreference('audioDescriptions', checked)
+                  }
                 />
               </div>
-              
+
               <div className="flex items-center justify-between">
-                <Label htmlFor="simplified-interface">Simplified Interface</Label>
+                <Label htmlFor="simplified-interface">
+                  Simplified Interface
+                </Label>
                 <Switch
                   id="simplified-interface"
                   checked={preferences.simplifiedInterface}
-                  onCheckedChange={(checked) => updatePreference("simplifiedInterface", checked)}
+                  onCheckedChange={checked =>
+                    updatePreference('simplifiedInterface', checked)
+                  }
                 />
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <Label htmlFor="autoplay-media">Auto-play Media</Label>
                 <Switch
                   id="autoplay-media"
                   checked={preferences.autoplayMedia}
-                  onCheckedChange={(checked) => updatePreference("autoplayMedia", checked)}
+                  onCheckedChange={checked =>
+                    updatePreference('autoplayMedia', checked)
+                  }
                 />
               </div>
             </div>
@@ -182,34 +225,40 @@ export const AccessibilitySettings: React.FC = () => {
 
           {/* Animation Preferences */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold flex items-center gap-2 border-b pb-2">
+            <h3 className="flex items-center gap-2 border-b pb-2 text-lg font-semibold">
               <Monitor className="h-4 w-4" />
               Animation Preferences
             </h3>
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid gap-6 md:grid-cols-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="parallax-effects">Parallax Effects</Label>
                 <Switch
                   id="parallax-effects"
                   checked={preferences.parallaxEffects}
-                  onCheckedChange={(checked) => updatePreference("parallaxEffects", checked)}
+                  onCheckedChange={checked =>
+                    updatePreference('parallaxEffects', checked)
+                  }
                 />
               </div>
-              
+
               <div className="flex items-center justify-between">
-                <Label htmlFor="background-animations">Background Animations</Label>
+                <Label htmlFor="background-animations">
+                  Background Animations
+                </Label>
                 <Switch
                   id="background-animations"
                   checked={preferences.backgroundAnimations}
-                  onCheckedChange={(checked) => updatePreference("backgroundAnimations", checked)}
+                  onCheckedChange={checked =>
+                    updatePreference('backgroundAnimations', checked)
+                  }
                 />
               </div>
             </div>
           </div>
 
           {/* Actions */}
-          <div className="flex gap-4 pt-4 border-t">
-            <Button 
+          <div className="flex gap-4 border-t pt-4">
+            <Button
               onClick={resetPreferences}
               variant="outline"
               className="flex items-center gap-2"

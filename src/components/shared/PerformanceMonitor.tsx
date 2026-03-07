@@ -2,11 +2,11 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { 
-  performanceMonitor, 
-  connectionMonitor, 
-  projectCache, 
-  skillCache 
+import {
+  performanceMonitor,
+  connectionMonitor,
+  projectCache,
+  skillCache,
 } from '@/lib/performance';
 import { Activity, Wifi, WifiOff, Database, Gauge } from 'lucide-react';
 
@@ -42,9 +42,11 @@ export function PerformanceMonitor() {
   }, [updateStats]);
 
   const getConnectionIcon = () => {
-    return connectionQuality === 'poor' ? 
-      <WifiOff className="h-4 w-4 text-red-500" /> : 
-      <Wifi className="h-4 w-4 text-green-500" />;
+    return connectionQuality === 'poor' ? (
+      <WifiOff className="h-4 w-4 text-red-500" />
+    ) : (
+      <Wifi className="h-4 w-4 text-green-500" />
+    );
   };
 
   const formatMs = (ms: number) => {
@@ -66,7 +68,7 @@ export function PerformanceMonitor() {
           onClick={() => setIsOpen(true)}
           className="bg-background/80 backdrop-blur-sm"
         >
-          <Activity className="h-4 w-4 mr-2" />
+          <Activity className="mr-2 h-4 w-4" />
           Performance
         </Button>
       </div>
@@ -75,18 +77,14 @@ export function PerformanceMonitor() {
 
   return (
     <div className="fixed bottom-4 right-4 z-50 w-80">
-      <Card className="bg-background/95 backdrop-blur-sm border shadow-xl">
+      <Card className="border bg-background/95 shadow-xl backdrop-blur-sm">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-lg">
               <Gauge className="h-5 w-5" />
               Performance
             </CardTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsOpen(false)}
-            >
+            <Button variant="ghost" size="sm" onClick={() => setIsOpen(false)}>
               ×
             </Button>
           </div>
@@ -98,7 +96,9 @@ export function PerformanceMonitor() {
               {getConnectionIcon()}
               <span className="text-sm">Connection</span>
             </div>
-            <Badge variant={connectionQuality === 'poor' ? 'destructive' : 'default'}>
+            <Badge
+              variant={connectionQuality === 'poor' ? 'destructive' : 'default'}
+            >
               {connectionQuality}
             </Badge>
           </div>
@@ -116,16 +116,18 @@ export function PerformanceMonitor() {
           {Object.keys(stats).length > 0 && (
             <div className="space-y-2">
               <h4 className="text-sm font-semibold">Timing Metrics</h4>
-              {Object.entries(stats).slice(0, 3).map(([label, metric]) => (
-                <div key={label} className="flex justify-between text-xs">
-                  <span className="truncate">{label}:</span>
-                  <span>{formatMs(metric.avg)}</span>
-                </div>
-              ))}
+              {Object.entries(stats)
+                .slice(0, 3)
+                .map(([label, metric]) => (
+                  <div key={label} className="flex justify-between text-xs">
+                    <span className="truncate">{label}:</span>
+                    <span>{formatMs(metric.avg)}</span>
+                  </div>
+                ))}
             </div>
           )}
 
-          <div className="flex gap-2 pt-2 border-t">
+          <div className="flex gap-2 border-t pt-2">
             <Button
               variant="outline"
               size="sm"

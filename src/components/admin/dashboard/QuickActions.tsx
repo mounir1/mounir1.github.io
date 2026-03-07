@@ -2,19 +2,19 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Plus, 
-  Database, 
-  Award, 
-  Settings, 
-  Upload, 
-  Download, 
-  RefreshCw, 
+import {
+  Plus,
+  Database,
+  Award,
+  Settings,
+  Upload,
+  Download,
+  RefreshCw,
   Zap,
   FileText,
   BarChart3,
   Users,
-  Globe
+  Globe,
 } from 'lucide-react';
 
 interface QuickAction {
@@ -42,7 +42,7 @@ const defaultActions: QuickAction[] = [
     description: 'Create a new portfolio project',
     icon: Plus,
     onClick: () => {},
-    variant: 'default'
+    variant: 'default',
   },
   {
     id: 'manage-projects',
@@ -50,7 +50,7 @@ const defaultActions: QuickAction[] = [
     description: 'View and edit existing projects',
     icon: Database,
     onClick: () => {},
-    variant: 'outline'
+    variant: 'outline',
   },
   {
     id: 'manage-skills',
@@ -58,7 +58,7 @@ const defaultActions: QuickAction[] = [
     description: 'Update your skills and expertise',
     icon: Award,
     onClick: () => {},
-    variant: 'outline'
+    variant: 'outline',
   },
   {
     id: 'export-data',
@@ -67,7 +67,7 @@ const defaultActions: QuickAction[] = [
     icon: Download,
     onClick: () => {},
     variant: 'outline',
-    badge: 'New'
+    badge: 'New',
   },
   {
     id: 'import-data',
@@ -75,7 +75,7 @@ const defaultActions: QuickAction[] = [
     description: 'Upload portfolio data',
     icon: Upload,
     onClick: () => {},
-    variant: 'outline'
+    variant: 'outline',
   },
   {
     id: 'analytics',
@@ -83,7 +83,7 @@ const defaultActions: QuickAction[] = [
     description: 'Portfolio performance metrics',
     icon: BarChart3,
     onClick: () => {},
-    variant: 'outline'
+    variant: 'outline',
   },
   {
     id: 'settings',
@@ -91,7 +91,7 @@ const defaultActions: QuickAction[] = [
     description: 'Configure admin preferences',
     icon: Settings,
     onClick: () => {},
-    variant: 'ghost'
+    variant: 'ghost',
   },
   {
     id: 'refresh',
@@ -99,15 +99,15 @@ const defaultActions: QuickAction[] = [
     description: 'Sync latest changes',
     icon: RefreshCw,
     onClick: () => {},
-    variant: 'ghost'
-  }
+    variant: 'ghost',
+  },
 ];
 
-export const QuickActions: React.FC<QuickActionsProps> = ({ 
+export const QuickActions: React.FC<QuickActionsProps> = ({
   actions = defaultActions,
   layout = 'list',
   maxItems = 8,
-  onActionClick
+  onActionClick,
 }) => {
   const displayedActions = actions.slice(0, maxItems);
 
@@ -127,18 +127,18 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 gap-3">
-            {displayedActions.map((action) => (
+            {displayedActions.map(action => (
               <Button
                 key={action.id}
                 onClick={() => handleActionClick(action)}
                 disabled={action.disabled}
                 variant={action.variant || 'outline'}
-                className="h-auto p-4 flex flex-col items-center gap-2 text-center relative"
+                className="relative flex h-auto flex-col items-center gap-2 p-4 text-center"
               >
                 {action.badge && (
-                  <Badge 
-                    variant="secondary" 
-                    className="absolute -top-2 -right-2 text-xs px-1.5 py-0.5"
+                  <Badge
+                    variant="secondary"
+                    className="absolute -right-2 -top-2 px-1.5 py-0.5 text-xs"
                   >
                     {action.badge}
                   </Badge>
@@ -167,27 +167,27 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
-        {displayedActions.map((action) => (
+        {displayedActions.map(action => (
           <Button
             key={action.id}
             onClick={() => handleActionClick(action)}
             disabled={action.disabled}
             variant={action.variant || 'outline'}
-            className="w-full justify-start relative group hover:shadow-md transition-all duration-200"
+            className="group relative w-full justify-start transition-all duration-200 hover:shadow-md"
           >
             {action.badge && (
-              <Badge 
-                variant="secondary" 
-                className="absolute -top-1 -right-1 text-xs px-1.5 py-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+              <Badge
+                variant="secondary"
+                className="absolute -right-1 -top-1 px-1.5 py-0.5 text-xs opacity-0 transition-opacity group-hover:opacity-100"
               >
                 {action.badge}
               </Badge>
             )}
-            <action.icon className="h-4 w-4 mr-3" />
+            <action.icon className="mr-3 h-4 w-4" />
             <div className="flex-1 text-left">
               <div className="font-medium">{action.label}</div>
               {action.description && (
-                <div className="text-xs text-muted-foreground mt-0.5">
+                <div className="mt-0.5 text-xs text-muted-foreground">
                   {action.description}
                 </div>
               )}

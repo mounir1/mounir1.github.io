@@ -19,21 +19,21 @@ export * from './css-optimization';
 export const initializePerformanceOptimizations = async () => {
   const { initializeCSSOptimization } = await import('./css-optimization');
   const { initializeWebVitals } = await import('./web-vitals');
-  
+
   // Initialize CSS optimizations
   const cssOptimizations = initializeCSSOptimization();
-  
+
   // Initialize Web Vitals tracking
   const webVitalsTracker = initializeWebVitals({
     FCP: 1800,
     LCP: 2500,
     FID: 100,
     CLS: 0.1,
-    TTFB: 800
+    TTFB: 800,
   });
-  
+
   return {
     cssOptimizations,
-    webVitalsTracker
+    webVitalsTracker,
   };
 };

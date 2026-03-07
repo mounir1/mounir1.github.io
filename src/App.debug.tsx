@@ -3,7 +3,7 @@ import React from 'react';
 // Minimal app for debugging the React hook issue
 export default function App() {
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center">
+    <div className="flex min-h-screen items-center justify-center bg-white dark:bg-gray-900">
       <div className="text-center">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
           Debug App - Testing React Hooks

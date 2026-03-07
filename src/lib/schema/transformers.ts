@@ -3,9 +3,24 @@
  */
 
 import { z } from 'zod';
-import { ProjectSchema, ProjectInput, Project, DEFAULT_PROJECT_VALUES } from './projectSchema';
-import { SkillSchema, SkillInput, Skill, DEFAULT_SKILL_VALUES } from './skillSchema';
-import { ProjectStatus, ProjectCategory, SkillCategory, SkillLevel } from './types';
+import {
+  ProjectSchema,
+  ProjectInput,
+  Project,
+  DEFAULT_PROJECT_VALUES,
+} from './projectSchema';
+import {
+  SkillSchema,
+  SkillInput,
+  Skill,
+  DEFAULT_SKILL_VALUES,
+} from './skillSchema';
+import {
+  ProjectStatus,
+  ProjectCategory,
+  SkillCategory,
+  SkillLevel,
+} from './types';
 
 /**
  * Generic transformer interface
@@ -20,51 +35,61 @@ export interface DataTransformer<TInput, TOutput> {
  * Legacy project data transformer
  * Converts old project format to new schema-compliant format
  */
-export class LegacyProjectTransformer implements DataTransformer<any, ProjectInput> {
+export class LegacyProjectTransformer
+  implements DataTransformer<any, ProjectInput>
+{
   transform(legacyProject: any): ProjectInput {
     const transformed: ProjectInput = {
       ...DEFAULT_PROJECT_VALUES,
       title: legacyProject.title || '',
       description: legacyProject.description || '',
       longDescription: legacyProject.longDescription,
-      
+
       // Map legacy categories to new enum values
       category: this.mapLegacyCategory(legacyProject.category),
-      
+
       // Map legacy status to new enum values
       status: this.mapLegacyStatus(legacyProject.status),
-      
+
       // Handle arrays with fallbacks
-      technologies: Array.isArray(legacyProject.technologies) ? legacyProject.technologies : [],
-      achievements: Array.isArray(legacyProject.achievements) ? legacyProject.achievements : [],
+      technologies: Array.isArray(legacyProject.technologies)
+        ? legacyProject.technologies
+        : [],
+      achievements: Array.isArray(legacyProject.achievements)
+        ? legacyProject.achievements
+        : [],
       tags: Array.isArray(legacyProject.tags) ? legacyProject.tags : [],
-      challenges: Array.isArray(legacyProject.challenges) ? legacyProject.challenges : [],
-      solutions: Array.isArray(legacyProject.solutions) ? legacyProject.solutions : [],
-      
+      challenges: Array.isArray(legacyProject.challenges)
+        ? legacyProject.challenges
+        : [],
+      solutions: Array.isArray(legacyProject.solutions)
+        ? legacyProject.solutions
+        : [],
+
       // Handle media
       images: this.transformImages(legacyProject),
       links: this.transformLinks(legacyProject),
       icon: legacyProject.icon,
-      
+
       // Boolean fields with defaults
       featured: Boolean(legacyProject.featured),
       disabled: Boolean(legacyProject.disabled),
       visibility: legacyProject.visibility || 'public',
-      
+
       // Numeric fields with validation
       priority: this.validateNumber(legacyProject.priority, 1, 100, 50),
       teamSize: this.validateNumber(legacyProject.teamSize, 1, 100, 1),
-      
+
       // Dates
       startDate: this.transformDate(legacyProject.startDate),
       endDate: this.transformDate(legacyProject.endDate),
       duration: legacyProject.duration,
-      
+
       // Role and client info
       role: legacyProject.role || 'Developer',
       clientInfo: this.transformClientInfo(legacyProject.clientInfo),
       metrics: this.transformMetrics(legacyProject.metrics),
-      
+
       // System fields
       createdAt: legacyProject.createdAt || Date.now(),
       updatedAt: legacyProject.updatedAt || Date.now(),
@@ -86,8 +111,8 @@ export class LegacyProjectTransformer implements DataTransformer<any, ProjectInp
       'DevOps & Infrastructure': ProjectCategory.DEVOPS_INFRASTRUCTURE,
       'Desktop Application': ProjectCategory.DESKTOP_APPLICATION,
       'Game Development': ProjectCategory.GAME_DEVELOPMENT,
-      'Blockchain': ProjectCategory.BLOCKCHAIN,
-      'IoT': ProjectCategory.IOT,
+      Blockchain: ProjectCategory.BLOCKCHAIN,
+      IoT: ProjectCategory.IOT,
     };
 
     return categoryMap[category] || ProjectCategory.OTHER;
@@ -95,13 +120,13 @@ export class LegacyProjectTransformer implements DataTransformer<any, ProjectInp
 
   private mapLegacyStatus(status: string): ProjectStatus {
     const statusMap: Record<string, ProjectStatus> = {
-      'completed': ProjectStatus.COMPLETED,
+      completed: ProjectStatus.COMPLETED,
       'in-progress': ProjectStatus.IN_PROGRESS,
-      'maintenance': ProjectStatus.MAINTENANCE,
-      'archived': ProjectStatus.ARCHIVED,
-      'planning': ProjectStatus.PLANNING,
+      maintenance: ProjectStatus.MAINTENANCE,
+      archived: ProjectStatus.ARCHIVED,
+      planning: ProjectStatus.PLANNING,
       'on-hold': ProjectStatus.ON_HOLD,
-      'cancelled': ProjectStatus.CANCELLED,
+      cancelled: ProjectStatus.CANCELLED,
     };
 
     return statusMap[status] || ProjectStatus.COMPLETED;
@@ -109,7 +134,7 @@ export class LegacyProjectTransformer implements DataTransformer<any, ProjectInp
 
   private transformImages(legacyProject: any): any[] {
     const images = [];
-    
+
     // Handle legacy single image field
     if (legacyProject.image) {
       images.push({
@@ -157,7 +182,10 @@ export class LegacyProjectTransformer implements DataTransformer<any, ProjectInp
       });
     }
 
-    if (legacyProject.demoUrl && legacyProject.demoUrl !== legacyProject.liveUrl) {
+    if (
+      legacyProject.demoUrl &&
+      legacyProject.demoUrl !== legacyProject.liveUrl
+    ) {
       links.push({
         type: 'demo',
         url: legacyProject.demoUrl,
@@ -215,8 +243,8 @@ export class LegacyProjectTransformer implements DataTransformer<any, ProjectInp
       uptime: metrics.uptime,
       loadTime: metrics.loadTime,
       codeReduction: metrics.codeReduction,
-      securityImprovements: Array.isArray(metrics.securityImprovements) 
-        ? metrics.securityImprovements 
+      securityImprovements: Array.isArray(metrics.securityImprovements)
+        ? metrics.securityImprovements
         : [],
       customMetrics: metrics.customMetrics || {},
     };
@@ -224,33 +252,33 @@ export class LegacyProjectTransformer implements DataTransformer<any, ProjectInp
 
   private transformDate(dateValue: any): Date | undefined {
     if (!dateValue) return undefined;
-    
+
     if (dateValue instanceof Date) return dateValue;
-    
+
     if (typeof dateValue === 'string' || typeof dateValue === 'number') {
       const date = new Date(dateValue);
       return isNaN(date.getTime()) ? undefined : date;
     }
-    
+
     return undefined;
   }
 
   private validateNumber(
-    value: any, 
-    min: number, 
-    max: number, 
+    value: any,
+    min: number,
+    max: number,
     defaultValue?: number
   ): number | undefined {
     const num = Number(value);
-    
+
     if (isNaN(num)) {
       return defaultValue;
     }
-    
+
     if (num < min || num > max) {
       return defaultValue;
     }
-    
+
     return num;
   }
 
@@ -268,45 +296,54 @@ export class LegacyProjectTransformer implements DataTransformer<any, ProjectInp
 /**
  * Legacy skill data transformer
  */
-export class LegacySkillTransformer implements DataTransformer<any, SkillInput> {
+export class LegacySkillTransformer
+  implements DataTransformer<any, SkillInput>
+{
   transform(legacySkill: any): SkillInput {
     const transformed: SkillInput = {
       ...DEFAULT_SKILL_VALUES,
       name: legacySkill.name || '',
-      
+
       // Map legacy categories to new enum values
       category: this.mapLegacyCategory(legacySkill.category),
-      
+
       // Handle level mapping
       level: this.mapLegacyLevel(legacySkill.level),
-      proficiency: this.mapLegacyProficiency(legacySkill.level, legacySkill.proficiency),
-      
+      proficiency: this.mapLegacyProficiency(
+        legacySkill.level,
+        legacySkill.proficiency
+      ),
+
       // Transform experience
       experience: this.transformExperience(legacySkill),
-      
+
       description: legacySkill.description,
-      
+
       // Transform certifications
       certifications: this.transformCertifications(legacySkill.certifications),
-      
+
       // Transform learning resources
-      learningResources: this.transformLearningResources(legacySkill.learningResources),
-      
+      learningResources: this.transformLearningResources(
+        legacySkill.learningResources
+      ),
+
       // Handle arrays
       projects: Array.isArray(legacySkill.projects) ? legacySkill.projects : [],
-      relatedSkills: Array.isArray(legacySkill.relatedSkills) ? legacySkill.relatedSkills : [],
+      relatedSkills: Array.isArray(legacySkill.relatedSkills)
+        ? legacySkill.relatedSkills
+        : [],
       tags: Array.isArray(legacySkill.tags) ? legacySkill.tags : [],
-      
+
       // Visual properties
       icon: legacySkill.icon,
       color: legacySkill.color,
-      
+
       // Status fields
       featured: Boolean(legacySkill.featured),
       disabled: Boolean(legacySkill.disabled),
       visibility: legacySkill.visibility || 'public',
       priority: this.validateNumber(legacySkill.priority, 1, 100, 50),
-      
+
       // System fields
       createdAt: legacySkill.createdAt || Date.now(),
       updatedAt: legacySkill.updatedAt || Date.now(),
@@ -321,18 +358,18 @@ export class LegacySkillTransformer implements DataTransformer<any, SkillInput> 
     const categoryMap: Record<string, SkillCategory> = {
       'Frontend Development': SkillCategory.FRONTEND_DEVELOPMENT,
       'Backend Development': SkillCategory.BACKEND_DEVELOPMENT,
-      'Database': SkillCategory.DATABASE,
+      Database: SkillCategory.DATABASE,
       'Cloud & DevOps': SkillCategory.CLOUD_DEVOPS,
       'Mobile Development': SkillCategory.MOBILE_DEVELOPMENT,
       'Machine Learning': SkillCategory.MACHINE_LEARNING,
       'AI & Data Science': SkillCategory.AI_DATA_SCIENCE,
-      'Cybersecurity': SkillCategory.CYBERSECURITY,
-      'Blockchain': SkillCategory.BLOCKCHAIN,
+      Cybersecurity: SkillCategory.CYBERSECURITY,
+      Blockchain: SkillCategory.BLOCKCHAIN,
       'Game Development': SkillCategory.GAME_DEVELOPMENT,
-      'Design': SkillCategory.DESIGN,
+      Design: SkillCategory.DESIGN,
       'Project Management': SkillCategory.PROJECT_MANAGEMENT,
-      'Languages': SkillCategory.LANGUAGES,
-      'Tools': SkillCategory.TOOLS,
+      Languages: SkillCategory.LANGUAGES,
+      Tools: SkillCategory.TOOLS,
     };
 
     return categoryMap[category] || SkillCategory.OTHER;
@@ -341,10 +378,10 @@ export class LegacySkillTransformer implements DataTransformer<any, SkillInput> 
   private mapLegacyLevel(level: any): SkillLevel {
     if (typeof level === 'string') {
       const levelMap: Record<string, SkillLevel> = {
-        'beginner': SkillLevel.BEGINNER,
-        'intermediate': SkillLevel.INTERMEDIATE,
-        'advanced': SkillLevel.ADVANCED,
-        'expert': SkillLevel.EXPERT,
+        beginner: SkillLevel.BEGINNER,
+        intermediate: SkillLevel.INTERMEDIATE,
+        advanced: SkillLevel.ADVANCED,
+        expert: SkillLevel.EXPERT,
       };
       return levelMap[level.toLowerCase()] || SkillLevel.INTERMEDIATE;
     }
@@ -362,7 +399,11 @@ export class LegacySkillTransformer implements DataTransformer<any, SkillInput> 
 
   private mapLegacyProficiency(level: any, proficiency: any): number {
     // If proficiency is already a number, validate and return it
-    if (typeof proficiency === 'number' && proficiency >= 0 && proficiency <= 100) {
+    if (
+      typeof proficiency === 'number' &&
+      proficiency >= 0 &&
+      proficiency <= 100
+    ) {
       return Math.round(proficiency / 5) * 5; // Round to nearest 5
     }
 
@@ -435,33 +476,33 @@ export class LegacySkillTransformer implements DataTransformer<any, SkillInput> 
 
   private transformDate(dateValue: any): Date | undefined {
     if (!dateValue) return undefined;
-    
+
     if (dateValue instanceof Date) return dateValue;
-    
+
     if (typeof dateValue === 'string' || typeof dateValue === 'number') {
       const date = new Date(dateValue);
       return isNaN(date.getTime()) ? undefined : date;
     }
-    
+
     return undefined;
   }
 
   private validateNumber(
-    value: any, 
-    min: number, 
-    max: number, 
+    value: any,
+    min: number,
+    max: number,
     defaultValue?: number
   ): number | undefined {
     const num = Number(value);
-    
+
     if (isNaN(num)) {
       return defaultValue;
     }
-    
+
     if (num < min || num > max) {
       return defaultValue;
     }
-    
+
     return num;
   }
 
@@ -487,17 +528,19 @@ export class ExportDataTransformer {
     const headers = Object.keys(data[0]);
     const csvRows = [
       headers.join(','),
-      ...data.map(row => 
-        headers.map(header => {
-          const value = row[header];
-          if (value === null || value === undefined) return '';
-          if (typeof value === 'object') return JSON.stringify(value);
-          if (typeof value === 'string' && value.includes(',')) {
-            return `"${value.replace(/"/g, '""')}"`;
-          }
-          return String(value);
-        }).join(',')
-      )
+      ...data.map(row =>
+        headers
+          .map(header => {
+            const value = row[header];
+            if (value === null || value === undefined) return '';
+            if (typeof value === 'object') return JSON.stringify(value);
+            if (typeof value === 'string' && value.includes(',')) {
+              return `"${value.replace(/"/g, '""')}"`;
+            }
+            return String(value);
+          })
+          .join(',')
+      ),
     ];
 
     return csvRows.join('\n');
@@ -507,33 +550,44 @@ export class ExportDataTransformer {
     return JSON.stringify(data, null, pretty ? 2 : 0);
   }
 
-  static toXML<T extends Record<string, any>>(data: T[], rootElement = 'data'): string {
-    const escapeXml = (str: string) => 
-      str.replace(/[<>&'"]/g, (c) => {
+  static toXML<T extends Record<string, any>>(
+    data: T[],
+    rootElement = 'data'
+  ): string {
+    const escapeXml = (str: string) =>
+      str.replace(/[<>&'"]/g, c => {
         switch (c) {
-          case '<': return '&lt;';
-          case '>': return '&gt;';
-          case '&': return '&amp;';
-          case "'": return '&apos;';
-          case '"': return '&quot;';
-          default: return c;
+          case '<':
+            return '&lt;';
+          case '>':
+            return '&gt;';
+          case '&':
+            return '&amp;';
+          case "'":
+            return '&apos;';
+          case '"':
+            return '&quot;';
+          default:
+            return c;
         }
       });
 
-    const itemsXml = data.map(item => {
-      const itemXml = Object.entries(item)
-        .map(([key, value]) => {
-          if (value === null || value === undefined) return '';
-          if (typeof value === 'object') {
-            return `<${key}>${escapeXml(JSON.stringify(value))}</${key}>`;
-          }
-          return `<${key}>${escapeXml(String(value))}</${key}>`;
-        })
-        .filter(Boolean)
-        .join('\n    ');
-      
-      return `  <item>\n    ${itemXml}\n  </item>`;
-    }).join('\n');
+    const itemsXml = data
+      .map(item => {
+        const itemXml = Object.entries(item)
+          .map(([key, value]) => {
+            if (value === null || value === undefined) return '';
+            if (typeof value === 'object') {
+              return `<${key}>${escapeXml(JSON.stringify(value))}</${key}>`;
+            }
+            return `<${key}>${escapeXml(String(value))}</${key}>`;
+          })
+          .filter(Boolean)
+          .join('\n    ');
+
+        return `  <item>\n    ${itemXml}\n  </item>`;
+      })
+      .join('\n');
 
     return `<?xml version="1.0" encoding="UTF-8"?>\n<${rootElement}>\n${itemsXml}\n</${rootElement}>`;
   }
@@ -572,7 +626,7 @@ export class ImportDataTransformer {
 
     for (let i = 0; i < line.length; i++) {
       const char = line[i];
-      
+
       if (char === '"') {
         if (inQuotes && line[i + 1] === '"') {
           current += '"';
@@ -587,33 +641,35 @@ export class ImportDataTransformer {
         current += char;
       }
     }
-    
+
     result.push(current.trim());
     return result;
   }
 
   private static parseCSVValue(value: string): any {
     if (value === '') return null;
-    
+
     // Try to parse as JSON for objects/arrays
-    if ((value.startsWith('{') && value.endsWith('}')) || 
-        (value.startsWith('[') && value.endsWith(']'))) {
+    if (
+      (value.startsWith('{') && value.endsWith('}')) ||
+      (value.startsWith('[') && value.endsWith(']'))
+    ) {
       try {
         return JSON.parse(value);
       } catch {
         return value;
       }
     }
-    
+
     // Try to parse as number
     if (!isNaN(Number(value)) && value !== '') {
       return Number(value);
     }
-    
+
     // Try to parse as boolean
     if (value.toLowerCase() === 'true') return true;
     if (value.toLowerCase() === 'false') return false;
-    
+
     return value;
   }
 

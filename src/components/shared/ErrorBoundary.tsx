@@ -3,13 +3,23 @@
  * Consolidated error boundary with comprehensive error handling and recovery options
  */
 
-import React, { Component, ReactNode, ErrorInfo } from "react";
-import { AlertTriangle, RefreshCw, Home, Bug, Copy, Check } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { toast } from "@/hooks/use-toast";
+import React, { Component, ReactNode, ErrorInfo } from 'react';
+import { AlertTriangle, RefreshCw, Home, Bug, Copy, Check } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
+import { toast } from '@/hooks/use-toast';
 
 // Simple error boundary alias for backward compatibility - defined at the end of this file
 
@@ -68,7 +78,7 @@ const ErrorBoundaryFallback: React.FC<ErrorBoundaryFallbackProps> = ({
   maxRetries,
   title,
   description,
-  className
+  className,
 }) => {
   const [isExpanded, setIsExpanded] = React.useState(false);
   const [copied, setCopied] = React.useState(false);
@@ -80,23 +90,25 @@ const ErrorBoundaryFallback: React.FC<ErrorBoundaryFallbackProps> = ({
     errorId,
     timestamp: new Date().toISOString(),
     userAgent: navigator.userAgent,
-    url: window.location.href
+    url: window.location.href,
   };
 
   const handleCopyError = async () => {
     try {
-      await navigator.clipboard.writeText(JSON.stringify(errorDetails, null, 2));
+      await navigator.clipboard.writeText(
+        JSON.stringify(errorDetails, null, 2)
+      );
       setCopied(true);
       toast({
-        title: "Error details copied",
-        description: "Error information has been copied to clipboard"
+        title: 'Error details copied',
+        description: 'Error information has been copied to clipboard',
       });
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       toast({
-        title: "Failed to copy",
-        description: "Could not copy error details to clipboard",
-        variant: "destructive"
+        title: 'Failed to copy',
+        description: 'Could not copy error details to clipboard',
+        variant: 'destructive',
       });
     }
   };
@@ -104,21 +116,22 @@ const ErrorBoundaryFallback: React.FC<ErrorBoundaryFallbackProps> = ({
   const canRetry = enableRetry && retryCount < maxRetries;
 
   return (
-    <div className={`flex items-center justify-center p-8 ${className || ""}`}>
-      <Card className="max-w-2xl w-full">
+    <div className={`flex items-center justify-center p-8 ${className || ''}`}>
+      <Card className="w-full max-w-2xl">
         <CardHeader className="text-center">
-          <div className="flex items-center justify-center mb-4">
+          <div className="mb-4 flex items-center justify-center">
             <div className="rounded-full bg-destructive/10 p-4">
-              <AlertTriangle className="w-8 h-8 text-destructive" />
+              <AlertTriangle className="h-8 w-8 text-destructive" />
             </div>
           </div>
-          
+
           <CardTitle className="text-xl">
-            {title || "Something went wrong"}
+            {title || 'Something went wrong'}
           </CardTitle>
-          
+
           <CardDescription className="text-base">
-            {description || "We encountered an unexpected error. Please try refreshing the page or contact support if the problem persists."}
+            {description ||
+              'We encountered an unexpected error. Please try refreshing the page or contact support if the problem persists.'}
           </CardDescription>
         </CardHeader>
 
@@ -127,7 +140,7 @@ const ErrorBoundaryFallback: React.FC<ErrorBoundaryFallbackProps> = ({
           <Alert>
             <Bug className="h-4 w-4" />
             <AlertDescription>
-              Error ID: <code className="text-xs font-mono">{errorId}</code>
+              Error ID: <code className="font-mono text-xs">{errorId}</code>
             </AlertDescription>
           </Alert>
 
@@ -135,7 +148,7 @@ const ErrorBoundaryFallback: React.FC<ErrorBoundaryFallbackProps> = ({
           <div className="flex flex-wrap items-center justify-center gap-2">
             {canRetry && (
               <Button onClick={onRetry} className="flex items-center gap-2">
-                <RefreshCw className="w-4 h-4" />
+                <RefreshCw className="h-4 w-4" />
                 Try Again
                 {retryCount > 0 && (
                   <span className="text-xs opacity-75">
@@ -146,22 +159,38 @@ const ErrorBoundaryFallback: React.FC<ErrorBoundaryFallbackProps> = ({
             )}
 
             {onGoHome && (
-              <Button variant="outline" onClick={onGoHome} className="flex items-center gap-2">
-                <Home className="w-4 h-4" />
+              <Button
+                variant="outline"
+                onClick={onGoHome}
+                className="flex items-center gap-2"
+              >
+                <Home className="h-4 w-4" />
                 Go Home
               </Button>
             )}
 
             {enableReport && onReport && (
-              <Button variant="outline" onClick={onReport} className="flex items-center gap-2">
-                <Bug className="w-4 h-4" />
+              <Button
+                variant="outline"
+                onClick={onReport}
+                className="flex items-center gap-2"
+              >
+                <Bug className="h-4 w-4" />
                 Report Issue
               </Button>
             )}
 
             {showErrorDetails && (
-              <Button variant="ghost" onClick={handleCopyError} className="flex items-center gap-2">
-                {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+              <Button
+                variant="ghost"
+                onClick={handleCopyError}
+                className="flex items-center gap-2"
+              >
+                {copied ? (
+                  <Check className="h-4 w-4" />
+                ) : (
+                  <Copy className="h-4 w-4" />
+                )}
                 Copy Error Details
               </Button>
             )}
@@ -174,30 +203,34 @@ const ErrorBoundaryFallback: React.FC<ErrorBoundaryFallbackProps> = ({
                 <Button variant="ghost" className="w-full justify-between">
                   <span>Error Details</span>
                   <span className="text-xs">
-                    {isExpanded ? "Hide" : "Show"}
+                    {isExpanded ? 'Hide' : 'Show'}
                   </span>
                 </Button>
               </CollapsibleTrigger>
-              
+
               <CollapsibleContent className="space-y-2">
-                <div className="bg-muted p-4 rounded-md">
-                  <h4 className="font-semibold text-sm mb-2">Error Message:</h4>
-                  <p className="text-sm font-mono text-destructive">{error.message}</p>
+                <div className="rounded-md bg-muted p-4">
+                  <h4 className="mb-2 text-sm font-semibold">Error Message:</h4>
+                  <p className="font-mono text-sm text-destructive">
+                    {error.message}
+                  </p>
                 </div>
 
                 {error.stack && (
-                  <div className="bg-muted p-4 rounded-md">
-                    <h4 className="font-semibold text-sm mb-2">Stack Trace:</h4>
-                    <pre className="text-xs font-mono overflow-x-auto whitespace-pre-wrap">
+                  <div className="rounded-md bg-muted p-4">
+                    <h4 className="mb-2 text-sm font-semibold">Stack Trace:</h4>
+                    <pre className="overflow-x-auto whitespace-pre-wrap font-mono text-xs">
                       {error.stack}
                     </pre>
                   </div>
                 )}
 
                 {errorInfo.componentStack && (
-                  <div className="bg-muted p-4 rounded-md">
-                    <h4 className="font-semibold text-sm mb-2">Component Stack:</h4>
-                    <pre className="text-xs font-mono overflow-x-auto whitespace-pre-wrap">
+                  <div className="rounded-md bg-muted p-4">
+                    <h4 className="mb-2 text-sm font-semibold">
+                      Component Stack:
+                    </h4>
+                    <pre className="overflow-x-auto whitespace-pre-wrap font-mono text-xs">
                       {errorInfo.componentStack}
                     </pre>
                   </div>
@@ -210,7 +243,8 @@ const ErrorBoundaryFallback: React.FC<ErrorBoundaryFallbackProps> = ({
             <Alert>
               <AlertTriangle className="h-4 w-4" />
               <AlertDescription>
-                Maximum retry attempts reached. Please refresh the page or contact support.
+                Maximum retry attempts reached. Please refresh the page or
+                contact support.
               </AlertDescription>
             </Alert>
           )}
@@ -220,7 +254,10 @@ const ErrorBoundaryFallback: React.FC<ErrorBoundaryFallbackProps> = ({
   );
 };
 
-export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+export class ErrorBoundary extends Component<
+  ErrorBoundaryProps,
+  ErrorBoundaryState
+> {
   private retryCount = 0;
 
   constructor(props: ErrorBoundaryProps) {
@@ -229,9 +266,9 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       hasError: false,
       error: null,
       errorInfo: null,
-      errorId: "",
+      errorId: '',
       isExpanded: false,
-      copied: false
+      copied: false,
     };
   }
 
@@ -240,14 +277,14 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     return {
       hasError: true,
       error,
-      errorId
+      errorId,
     };
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     this.setState({
       error,
-      errorInfo
+      errorInfo,
     });
 
     // Call custom error handler if provided
@@ -256,8 +293,8 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     }
 
     // Log error to console in development
-    if (process.env.NODE_ENV === "development") {
-      console.error("ErrorBoundary caught an error:", error, errorInfo);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('ErrorBoundary caught an error:', error, errorInfo);
     }
   }
 
@@ -265,14 +302,20 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     const { resetKeys, resetOnPropsChange } = this.props;
     const { hasError } = this.state;
 
-    if (hasError && prevProps.children !== this.props.children && resetOnPropsChange) {
+    if (
+      hasError &&
+      prevProps.children !== this.props.children &&
+      resetOnPropsChange
+    ) {
       this.resetErrorBoundary();
     }
 
     if (hasError && resetKeys && resetKeys.length > 0) {
       const prevResetKeys = prevProps.resetKeys || [];
-      const hasResetKeyChanged = resetKeys.some((key, index) => key !== prevResetKeys[index]);
-      
+      const hasResetKeyChanged = resetKeys.some(
+        (key, index) => key !== prevResetKeys[index]
+      );
+
       if (hasResetKeyChanged) {
         this.resetErrorBoundary();
       }
@@ -285,9 +328,9 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       hasError: false,
       error: null,
       errorInfo: null,
-      errorId: "",
+      errorId: '',
       isExpanded: false,
-      copied: false
+      copied: false,
     });
   };
 
@@ -302,29 +345,29 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
     // Here you could integrate with error reporting services
     // like Sentry, Bugsnag, etc.
-    console.log("Reporting error:", { error, errorInfo, errorId });
-    
+    console.log('Reporting error:', { error, errorInfo, errorId });
+
     toast({
-      title: "Error reported",
-      description: "Thank you for reporting this issue. We'll look into it."
+      title: 'Error reported',
+      description: "Thank you for reporting this issue. We'll look into it.",
     });
   };
 
   handleGoHome = () => {
-    window.location.href = "/";
+    window.location.href = '/';
   };
 
   render() {
-    const { 
-      children, 
-      fallback, 
+    const {
+      children,
+      fallback,
       showErrorDetails = true,
       enableRetry = true,
       enableReport = true,
       maxRetries = 3,
       title,
       description,
-      className
+      className,
     } = this.props;
 
     const { hasError, error, errorInfo, errorId } = this.state;

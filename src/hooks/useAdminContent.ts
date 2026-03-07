@@ -3,15 +3,15 @@
  * Firebase-integrated hooks for managing portfolio content
  */
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect } from 'react';
 import {
   projectService,
   analyticsService,
   contentService,
   type PortfolioProject,
   type AnalyticsData,
-} from "@/lib/firebase-services";
-import { toast } from "sonner";
+} from '@/lib/firebase-services';
+import { toast } from 'sonner';
 
 // ============================================
 // PROJECT MANAGEMENT HOOK
@@ -30,7 +30,8 @@ export const useProjectManagement = () => {
       setProjects(data);
       setError(null);
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to fetch projects";
+      const message =
+        err instanceof Error ? err.message : 'Failed to fetch projects';
       setError(message);
       toast.error(message);
     } finally {
@@ -40,14 +41,17 @@ export const useProjectManagement = () => {
 
   // Create project
   const createProject = useCallback(
-    async (project: Omit<PortfolioProject, "id" | "createdAt" | "updatedAt">) => {
+    async (
+      project: Omit<PortfolioProject, 'id' | 'createdAt' | 'updatedAt'>
+    ) => {
       try {
         const id = await projectService.create(project);
         await fetchProjects();
-        toast.success("Project created successfully");
+        toast.success('Project created successfully');
         return id;
       } catch (err) {
-        const message = err instanceof Error ? err.message : "Failed to create project";
+        const message =
+          err instanceof Error ? err.message : 'Failed to create project';
         setError(message);
         toast.error(message);
         throw err;
@@ -61,12 +65,13 @@ export const useProjectManagement = () => {
     async (id: string, updates: Partial<PortfolioProject>) => {
       try {
         await projectService.update(id, updates);
-        setProjects((prev) =>
-          prev.map((p) => (p.id === id ? { ...p, ...updates } : p))
+        setProjects(prev =>
+          prev.map(p => (p.id === id ? { ...p, ...updates } : p))
         );
-        toast.success("Project updated successfully");
+        toast.success('Project updated successfully');
       } catch (err) {
-        const message = err instanceof Error ? err.message : "Failed to update project";
+        const message =
+          err instanceof Error ? err.message : 'Failed to update project';
         setError(message);
         toast.error(message);
         throw err;
@@ -76,32 +81,30 @@ export const useProjectManagement = () => {
   );
 
   // Delete project
-  const deleteProject = useCallback(
-    async (id: string) => {
-      try {
-        await projectService.delete(id);
-        setProjects((prev) => prev.filter((p) => p.id !== id));
-        toast.success("Project deleted successfully");
-      } catch (err) {
-        const message = err instanceof Error ? err.message : "Failed to delete project";
-        setError(message);
-        toast.error(message);
-        throw err;
-      }
-    },
-    []
-  );
+  const deleteProject = useCallback(async (id: string) => {
+    try {
+      await projectService.delete(id);
+      setProjects(prev => prev.filter(p => p.id !== id));
+      toast.success('Project deleted successfully');
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : 'Failed to delete project';
+      setError(message);
+      toast.error(message);
+      throw err;
+    }
+  }, []);
 
   // Toggle featured status
   const toggleFeatured = useCallback(
     async (id: string) => {
-      const project = projects.find((p) => p.id === id);
+      const project = projects.find(p => p.id === id);
       if (!project) return;
 
       try {
         await updateProject(id, { featured: !project.featured });
       } catch (err) {
-        console.error("Failed to toggle featured status:", err);
+        console.error('Failed to toggle featured status:', err);
       }
     },
     [projects, updateProject]
@@ -112,15 +115,16 @@ export const useProjectManagement = () => {
     async (updates: { id: string; data: Partial<PortfolioProject> }[]) => {
       try {
         await projectService.batchUpdate(updates);
-        setProjects((prev) =>
-          prev.map((p) => {
-            const update = updates.find((u) => u.id === p.id);
+        setProjects(prev =>
+          prev.map(p => {
+            const update = updates.find(u => u.id === p.id);
             return update ? { ...p, ...update.data } : p;
           })
         );
-        toast.success("Projects updated successfully");
+        toast.success('Projects updated successfully');
       } catch (err) {
-        const message = err instanceof Error ? err.message : "Failed to update projects";
+        const message =
+          err instanceof Error ? err.message : 'Failed to update projects';
         setError(message);
         toast.error(message);
         throw err;
@@ -164,7 +168,8 @@ export const useAnalytics = () => {
       setAnalytics(data);
       setError(null);
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to fetch analytics";
+      const message =
+        err instanceof Error ? err.message : 'Failed to fetch analytics';
       setError(message);
     } finally {
       setLoading(false);
@@ -172,41 +177,43 @@ export const useAnalytics = () => {
   }, []);
 
   // Fetch analytics for date range
-  const fetchByDateRange = useCallback(async (startDate: Date, endDate: Date) => {
-    try {
-      setLoading(true);
-      const data = await analyticsService.getByDateRange(startDate, endDate);
-      if (data.length > 0) {
-        setAnalytics(data[0]);
-      }
-      setError(null);
-      return data;
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to fetch analytics";
-      setError(message);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // Save analytics
-  const save = useCallback(
-    async (data: Omit<AnalyticsData, "id">) => {
+  const fetchByDateRange = useCallback(
+    async (startDate: Date, endDate: Date) => {
       try {
-        const id = await analyticsService.save(data);
-        setAnalytics({ id, ...data });
-        toast.success("Analytics saved successfully");
-        return id;
+        setLoading(true);
+        const data = await analyticsService.getByDateRange(startDate, endDate);
+        if (data.length > 0) {
+          setAnalytics(data[0]);
+        }
+        setError(null);
+        return data;
       } catch (err) {
-        const message = err instanceof Error ? err.message : "Failed to save analytics";
+        const message =
+          err instanceof Error ? err.message : 'Failed to fetch analytics';
         setError(message);
-        toast.error(message);
         throw err;
+      } finally {
+        setLoading(false);
       }
     },
     []
   );
+
+  // Save analytics
+  const save = useCallback(async (data: Omit<AnalyticsData, 'id'>) => {
+    try {
+      const id = await analyticsService.save(data);
+      setAnalytics({ id, ...data });
+      toast.success('Analytics saved successfully');
+      return id;
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : 'Failed to save analytics';
+      setError(message);
+      toast.error(message);
+      throw err;
+    }
+  }, []);
 
   useEffect(() => {
     fetchLatest();
@@ -244,7 +251,10 @@ export const useContentManagement = (collectionName: string) => {
       setDocuments(data as ContentDocument[]);
       setError(null);
     } catch (err) {
-      const message = err instanceof Error ? err.message : `Failed to fetch ${collectionName}`;
+      const message =
+        err instanceof Error
+          ? err.message
+          : `Failed to fetch ${collectionName}`;
       setError(message);
       toast.error(message);
     } finally {
@@ -257,8 +267,8 @@ export const useContentManagement = (collectionName: string) => {
     async (docId: string, data: Record<string, unknown>) => {
       try {
         await contentService.setDocument(collectionName, docId, data);
-        setDocuments((prev) => {
-          const existing = prev.findIndex((d) => d.id === docId);
+        setDocuments(prev => {
+          const existing = prev.findIndex(d => d.id === docId);
           if (existing >= 0) {
             const updated = [...prev];
             updated[existing] = { id: docId, ...data };
@@ -266,9 +276,10 @@ export const useContentManagement = (collectionName: string) => {
           }
           return [...prev, { id: docId, ...data }];
         });
-        toast.success("Document saved successfully");
+        toast.success('Document saved successfully');
       } catch (err) {
-        const message = err instanceof Error ? err.message : "Failed to save document";
+        const message =
+          err instanceof Error ? err.message : 'Failed to save document';
         setError(message);
         toast.error(message);
         throw err;
@@ -282,10 +293,11 @@ export const useContentManagement = (collectionName: string) => {
     async (docId: string) => {
       try {
         await contentService.deleteDocument(collectionName, docId);
-        setDocuments((prev) => prev.filter((d) => d.id !== docId));
-        toast.success("Document deleted successfully");
+        setDocuments(prev => prev.filter(d => d.id !== docId));
+        toast.success('Document deleted successfully');
       } catch (err) {
-        const message = err instanceof Error ? err.message : "Failed to delete document";
+        const message =
+          err instanceof Error ? err.message : 'Failed to delete document';
         setError(message);
         toast.error(message);
         throw err;
@@ -337,7 +349,8 @@ export const usePortfolioSettings = () => {
       setSettings((data as unknown as PortfolioSettings) || {});
       setError(null);
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to fetch settings";
+      const message =
+        err instanceof Error ? err.message : 'Failed to fetch settings';
       setError(message);
       toast.error(message);
     } finally {
@@ -346,18 +359,24 @@ export const usePortfolioSettings = () => {
   }, []);
 
   // Update settings
-  const updateSettings = useCallback(async (updates: Partial<PortfolioSettings>) => {
-    try {
-      await contentService.updateMetadata(updates);
-      setSettings((prev) => (prev ? { ...prev, ...updates } : (updates as PortfolioSettings)));
-      toast.success("Settings updated successfully");
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to update settings";
-      setError(message);
-      toast.error(message);
-      throw err;
-    }
-  }, []);
+  const updateSettings = useCallback(
+    async (updates: Partial<PortfolioSettings>) => {
+      try {
+        await contentService.updateMetadata(updates);
+        setSettings(prev =>
+          prev ? { ...prev, ...updates } : (updates as PortfolioSettings)
+        );
+        toast.success('Settings updated successfully');
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : 'Failed to update settings';
+        setError(message);
+        toast.error(message);
+        throw err;
+      }
+    },
+    []
+  );
 
   useEffect(() => {
     fetchSettings();

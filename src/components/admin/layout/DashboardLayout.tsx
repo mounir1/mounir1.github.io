@@ -2,7 +2,7 @@ import React from 'react';
 import { AdminSidebar } from '@/components/admin/layout/AdminSidebar';
 import { AddItemDialog } from '@/components/admin/forms/AddItemDialog';
 import { cn } from '@/lib/utils';
-import { 
+import {
   BarChart3,
   Layout,
   Settings,
@@ -11,7 +11,7 @@ import {
   Code2,
   LineChart,
   Rocket,
-  Shield
+  Shield,
 } from 'lucide-react';
 
 export interface DashboardLayoutProps {
@@ -21,7 +21,7 @@ export interface DashboardLayoutProps {
 
 export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   children,
-  className
+  className,
 }) => {
   const [currentPage, setCurrentPage] = React.useState<string>('dashboard');
 
@@ -46,63 +46,61 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
   return (
     <div className="relative flex min-h-screen">
-      <AdminSidebar 
+      <AdminSidebar
         items={[
           {
             id: 'dashboard',
             label: 'Dashboard',
             icon: BarChart3,
-            onClick: () => handleNavigation('/admin/dashboard')
+            onClick: () => handleNavigation('/admin/dashboard'),
           },
           {
             id: 'analytics',
             label: 'Analytics',
             icon: LineChart,
-            onClick: () => handleNavigation('/admin/analytics')
+            onClick: () => handleNavigation('/admin/analytics'),
           },
           {
             id: 'projects',
             label: 'Projects',
             icon: Layout,
-            onClick: () => handleNavigation('/admin/projects')
+            onClick: () => handleNavigation('/admin/projects'),
           },
           {
             id: 'skills',
             label: 'Skills',
             icon: Code2,
-            onClick: () => handleNavigation('/admin/skills')
+            onClick: () => handleNavigation('/admin/skills'),
           },
           {
             id: 'pages',
             label: 'Pages',
             icon: FileText,
-            onClick: () => handleNavigation('/admin/pages')
+            onClick: () => handleNavigation('/admin/pages'),
           },
           {
             id: 'settings',
             label: 'Settings',
             icon: Settings,
-            onClick: () => handleNavigation('/admin/settings')
+            onClick: () => handleNavigation('/admin/settings'),
           },
           {
             id: 'users',
             label: 'Users',
             icon: Users,
-            onClick: () => handleNavigation('/admin/users')
+            onClick: () => handleNavigation('/admin/users'),
           },
           {
             id: 'security',
             label: 'Security',
             icon: Shield,
-            onClick: () => handleNavigation('/admin/security')
-          }
-        ]} 
+            onClick: () => handleNavigation('/admin/security'),
+          },
+        ]}
       />
 
-      <main className={cn("flex-1 overflow-auto px-4 py-6", className)}>
-        <div className="mb-6">
-          {renderAddButton()}
-        </div>
+      <main className={cn('flex-1 overflow-auto px-4 py-6', className)}>
+        <div className="mb-6">{renderAddButton()}</div>
         {children}
       </main>
     </div>

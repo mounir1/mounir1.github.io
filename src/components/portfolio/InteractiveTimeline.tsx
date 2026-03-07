@@ -1,14 +1,14 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { 
-  Calendar, 
-  MapPin, 
-  Building, 
-  Award, 
-  ExternalLink, 
-  ChevronDown, 
+import React, { useState, useRef, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import {
+  Calendar,
+  MapPin,
+  Building,
+  Award,
+  ExternalLink,
+  ChevronDown,
   ChevronUp,
   Star,
   Users,
@@ -18,11 +18,11 @@ import {
   GraduationCap,
   Heart,
   Rocket,
-  Target
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useReducedMotion } from "@/hooks/useAccessibility";
-import { ScrollAnimation } from "./ScrollAnimations";
+  Target,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useReducedMotion } from '@/hooks/useAccessibility';
+import { ScrollAnimation } from './ScrollAnimations';
 
 // Timeline item interface
 export interface TimelineItem {
@@ -43,7 +43,7 @@ export interface TimelineItem {
   }>;
   companyLogo?: string;
   companyUrl?: string;
-  type: "work" | "education" | "certification" | "project" | "achievement";
+  type: 'work' | 'education' | 'certification' | 'project' | 'achievement';
   featured?: boolean;
   tags?: string[];
   metrics?: Array<{
@@ -55,7 +55,7 @@ export interface TimelineItem {
 
 // Timeline configuration
 export interface TimelineConfig {
-  orientation?: "vertical" | "horizontal";
+  orientation?: 'vertical' | 'horizontal';
   showConnectors?: boolean;
   showDates?: boolean;
   showIcons?: boolean;
@@ -81,7 +81,7 @@ export interface InteractiveTimelineProps {
 
 // Default configuration
 const DEFAULT_CONFIG: TimelineConfig = {
-  orientation: "vertical",
+  orientation: 'vertical',
   showConnectors: true,
   showDates: true,
   showIcons: true,
@@ -90,25 +90,25 @@ const DEFAULT_CONFIG: TimelineConfig = {
   enableSearch: false,
   animateOnScroll: true,
   centerMode: false,
-  compactMode: false
+  compactMode: false,
 };
 
 // Type icons mapping
 const TYPE_ICONS = {
-  work: <Briefcase className="w-4 h-4" />,
-  education: <GraduationCap className="w-4 h-4" />,
-  certification: <Award className="w-4 h-4" />,
-  project: <Code className="w-4 h-4" />,
-  achievement: <Star className="w-4 h-4" />
+  work: <Briefcase className="h-4 w-4" />,
+  education: <GraduationCap className="h-4 w-4" />,
+  certification: <Award className="h-4 w-4" />,
+  project: <Code className="h-4 w-4" />,
+  achievement: <Star className="h-4 w-4" />,
 };
 
 // Type colors mapping
 const TYPE_COLORS = {
-  work: "bg-blue-500",
-  education: "bg-green-500",
-  certification: "bg-purple-500",
-  project: "bg-orange-500",
-  achievement: "bg-yellow-500"
+  work: 'bg-blue-500',
+  education: 'bg-green-500',
+  certification: 'bg-purple-500',
+  project: 'bg-orange-500',
+  achievement: 'bg-yellow-500',
 };
 
 // Individual timeline item component
@@ -131,106 +131,122 @@ const TimelineItemComponent: React.FC<TimelineItemComponentProps> = ({
   onToggleExpand,
   onClick,
   index,
-  isLast
+  isLast,
 }) => {
   const prefersReducedMotion = useReducedMotion();
   const [imageError, setImageError] = useState(false);
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'short' 
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
     });
   };
 
   const getDuration = () => {
     const start = new Date(item.startDate);
     const end = item.endDate ? new Date(item.endDate) : new Date();
-    const months = (end.getFullYear() - start.getFullYear()) * 12 + 
-                   (end.getMonth() - start.getMonth());
-    
+    const months =
+      (end.getFullYear() - start.getFullYear()) * 12 +
+      (end.getMonth() - start.getMonth());
+
     if (months < 12) {
       return `${months} month${months !== 1 ? 's' : ''}`;
     }
-    
+
     const years = Math.floor(months / 12);
     const remainingMonths = months % 12;
-    
+
     if (remainingMonths === 0) {
       return `${years} year${years !== 1 ? 's' : ''}`;
     }
-    
+
     return `${years} year${years !== 1 ? 's' : ''}, ${remainingMonths} month${remainingMonths !== 1 ? 's' : ''}`;
   };
 
   const isCurrent = !item.endDate;
 
   return (
-    <ScrollAnimation 
-      animation="slideUp" 
+    <ScrollAnimation
+      animation="slideUp"
       config={{ delay: index * 100 }}
       className={cn(
-        "relative",
-        config.orientation === "horizontal" && "inline-block"
+        'relative',
+        config.orientation === 'horizontal' && 'inline-block'
       )}
     >
-      <div className={cn(
-        "flex gap-4",
-        config.orientation === "vertical" && "items-start",
-        config.centerMode && config.orientation === "vertical" && (
-          index % 2 === 0 ? "flex-row" : "flex-row-reverse"
-        )
-      )}>
+      <div
+        className={cn(
+          'flex gap-4',
+          config.orientation === 'vertical' && 'items-start',
+          config.centerMode &&
+            config.orientation === 'vertical' &&
+            (index % 2 === 0 ? 'flex-row' : 'flex-row-reverse')
+        )}
+      >
         {/* Timeline connector and icon */}
-        {config.orientation === "vertical" && (
-          <div className="flex flex-col items-center flex-shrink-0">
+        {config.orientation === 'vertical' && (
+          <div className="flex flex-shrink-0 flex-col items-center">
             {/* Icon */}
             {config.showIcons && (
-              <div className={cn(
-                "relative z-10 flex items-center justify-center w-10 h-10 rounded-full border-2 border-background shadow-lg transition-all duration-300",
-                TYPE_COLORS[item.type],
-                isSelected && "scale-110 ring-2 ring-primary ring-offset-2",
-                isCurrent && "animate-pulse"
-              )}>
-                <div className="text-white">
-                  {TYPE_ICONS[item.type]}
-                </div>
-                
+              <div
+                className={cn(
+                  'relative z-10 flex h-10 w-10 items-center justify-center rounded-full border-2 border-background shadow-lg transition-all duration-300',
+                  TYPE_COLORS[item.type],
+                  isSelected && 'scale-110 ring-2 ring-primary ring-offset-2',
+                  isCurrent && 'animate-pulse'
+                )}
+              >
+                <div className="text-white">{TYPE_ICONS[item.type]}</div>
+
                 {isCurrent && (
-                  <div className="absolute inset-0 rounded-full bg-current animate-ping opacity-20" />
+                  <div className="absolute inset-0 animate-ping rounded-full bg-current opacity-20" />
                 )}
               </div>
             )}
-            
+
             {/* Connector line */}
             {config.showConnectors && !isLast && (
-              <div className={cn(
-                "w-0.5 h-16 mt-2 transition-colors duration-300",
-                isSelected ? "bg-primary" : "bg-border"
-              )} />
+              <div
+                className={cn(
+                  'mt-2 h-16 w-0.5 transition-colors duration-300',
+                  isSelected ? 'bg-primary' : 'bg-border'
+                )}
+              />
             )}
           </div>
         )}
 
         {/* Content */}
-        <div className={cn(
-          "flex-1 min-w-0",
-          config.centerMode && config.orientation === "vertical" && index % 2 === 1 && "text-right"
-        )}>
+        <div
+          className={cn(
+            'min-w-0 flex-1',
+            config.centerMode &&
+              config.orientation === 'vertical' &&
+              index % 2 === 1 &&
+              'text-right'
+          )}
+        >
           {/* Date badge */}
           {config.showDates && (
-            <div className={cn(
-              "inline-flex items-center gap-1 mb-2",
-              config.centerMode && config.orientation === "vertical" && index % 2 === 1 && "justify-end"
-            )}>
+            <div
+              className={cn(
+                'mb-2 inline-flex items-center gap-1',
+                config.centerMode &&
+                  config.orientation === 'vertical' &&
+                  index % 2 === 1 &&
+                  'justify-end'
+              )}
+            >
               <Badge variant="outline" className="text-xs">
-                <Calendar className="w-3 h-3 mr-1" />
-                {formatDate(item.startDate)} - {item.endDate ? formatDate(item.endDate) : 'Present'}
+                <Calendar className="mr-1 h-3 w-3" />
+                {formatDate(item.startDate)} -{' '}
+                {item.endDate ? formatDate(item.endDate) : 'Present'}
               </Badge>
-              
+
               {item.featured && (
                 <Badge variant="default" className="text-xs">
-                  <Star className="w-3 h-3 mr-1" />
+                  <Star className="mr-1 h-3 w-3" />
                   Featured
                 </Badge>
               )}
@@ -238,43 +254,42 @@ const TimelineItemComponent: React.FC<TimelineItemComponentProps> = ({
           )}
 
           {/* Main card */}
-          <Card className={cn(
-            "transition-all duration-300 cursor-pointer",
-            isSelected && "ring-2 ring-primary shadow-lg",
-            isExpanded && "shadow-xl",
-            "hover:shadow-md"
-          )}>
-            <CardHeader 
-              className="pb-3 cursor-pointer"
-              onClick={onClick}
-            >
+          <Card
+            className={cn(
+              'cursor-pointer transition-all duration-300',
+              isSelected && 'shadow-lg ring-2 ring-primary',
+              isExpanded && 'shadow-xl',
+              'hover:shadow-md'
+            )}
+          >
+            <CardHeader className="cursor-pointer pb-3" onClick={onClick}>
               <div className="flex items-start justify-between">
-                <div className="flex-1 min-w-0">
-                  <CardTitle className="text-lg leading-tight font-heading">
+                <div className="min-w-0 flex-1">
+                  <CardTitle className="font-heading text-lg leading-tight">
                     {item.title}
                   </CardTitle>
-                  
+
                   {item.company && (
-                    <div className="flex items-center gap-2 mt-1">
+                    <div className="mt-1 flex items-center gap-2">
                       {item.companyLogo && !imageError ? (
                         <img
                           src={item.companyLogo}
                           alt={item.company}
-                          className="w-5 h-5 rounded object-cover"
+                          className="h-5 w-5 rounded object-cover"
                           onError={() => setImageError(true)}
                         />
                       ) : (
-                        <Building className="w-4 h-4 text-muted-foreground" />
+                        <Building className="h-4 w-4 text-muted-foreground" />
                       )}
-                      
-                      <span className="text-primary font-medium">
+
+                      <span className="font-medium text-primary">
                         {item.companyUrl ? (
-                          <a 
-                            href={item.companyUrl} 
-                            target="_blank" 
+                          <a
+                            href={item.companyUrl}
+                            target="_blank"
                             rel="noopener noreferrer"
                             className="hover:underline"
-                            onClick={(e) => e.stopPropagation()}
+                            onClick={e => e.stopPropagation()}
                           >
                             {item.company}
                           </a>
@@ -284,33 +299,33 @@ const TimelineItemComponent: React.FC<TimelineItemComponentProps> = ({
                       </span>
                     </div>
                   )}
-                  
+
                   {item.location && (
-                    <div className="flex items-center gap-1 mt-1 text-sm text-muted-foreground">
-                      <MapPin className="w-3 h-3" />
+                    <div className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
+                      <MapPin className="h-3 w-3" />
                       {item.location}
                     </div>
                   )}
                 </div>
 
-                <div className="flex items-center gap-2 ml-4">
+                <div className="ml-4 flex items-center gap-2">
                   <Badge variant="secondary" className="text-xs">
                     {getDuration()}
                   </Badge>
-                  
+
                   {config.enableExpansion && (
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={(e) => {
+                      onClick={e => {
                         e.stopPropagation();
                         onToggleExpand();
                       }}
                     >
                       {isExpanded ? (
-                        <ChevronUp className="w-4 h-4" />
+                        <ChevronUp className="h-4 w-4" />
                       ) : (
-                        <ChevronDown className="w-4 h-4" />
+                        <ChevronDown className="h-4 w-4" />
                       )}
                     </Button>
                   )}
@@ -320,24 +335,28 @@ const TimelineItemComponent: React.FC<TimelineItemComponentProps> = ({
 
             <CardContent className="pt-0">
               {/* Description */}
-              <p className="text-muted-foreground mb-4">
-                {item.description}
-              </p>
+              <p className="mb-4 text-muted-foreground">{item.description}</p>
 
               {/* Skills and Technologies */}
               {(item.skills || item.technologies) && (
-                <div className="space-y-2 mb-4">
+                <div className="mb-4 space-y-2">
                   {item.skills && item.skills.length > 0 && (
                     <div>
-                      <span className="text-xs font-medium text-muted-foreground block mb-1">
+                      <span className="mb-1 block text-xs font-medium text-muted-foreground">
                         Skills:
                       </span>
                       <div className="flex flex-wrap gap-1">
-                        {item.skills.slice(0, isExpanded ? undefined : 5).map(skill => (
-                          <Badge key={skill} variant="secondary" className="text-xs">
-                            {skill}
-                          </Badge>
-                        ))}
+                        {item.skills
+                          .slice(0, isExpanded ? undefined : 5)
+                          .map(skill => (
+                            <Badge
+                              key={skill}
+                              variant="secondary"
+                              className="text-xs"
+                            >
+                              {skill}
+                            </Badge>
+                          ))}
                         {!isExpanded && item.skills.length > 5 && (
                           <Badge variant="outline" className="text-xs">
                             +{item.skills.length - 5} more
@@ -346,18 +365,24 @@ const TimelineItemComponent: React.FC<TimelineItemComponentProps> = ({
                       </div>
                     </div>
                   )}
-                  
+
                   {item.technologies && item.technologies.length > 0 && (
                     <div>
-                      <span className="text-xs font-medium text-muted-foreground block mb-1">
+                      <span className="mb-1 block text-xs font-medium text-muted-foreground">
                         Technologies:
                       </span>
                       <div className="flex flex-wrap gap-1">
-                        {item.technologies.slice(0, isExpanded ? undefined : 4).map(tech => (
-                          <Badge key={tech} variant="outline" className="text-xs">
-                            {tech}
-                          </Badge>
-                        ))}
+                        {item.technologies
+                          .slice(0, isExpanded ? undefined : 4)
+                          .map(tech => (
+                            <Badge
+                              key={tech}
+                              variant="outline"
+                              className="text-xs"
+                            >
+                              {tech}
+                            </Badge>
+                          ))}
                         {!isExpanded && item.technologies.length > 4 && (
                           <Badge variant="outline" className="text-xs">
                             +{item.technologies.length - 4} more
@@ -375,14 +400,17 @@ const TimelineItemComponent: React.FC<TimelineItemComponentProps> = ({
                   {/* Achievements */}
                   {item.achievements && item.achievements.length > 0 && (
                     <div>
-                      <h4 className="font-medium mb-2 flex items-center gap-2">
-                        <Target className="w-4 h-4 text-green-500" />
+                      <h4 className="mb-2 flex items-center gap-2 font-medium">
+                        <Target className="h-4 w-4 text-green-500" />
                         Key Achievements
                       </h4>
                       <ul className="space-y-1">
                         {item.achievements.map((achievement, index) => (
-                          <li key={index} className="text-sm text-muted-foreground flex items-start gap-2">
-                            <div className="w-1 h-1 bg-primary rounded-full mt-2 flex-shrink-0" />
+                          <li
+                            key={index}
+                            className="flex items-start gap-2 text-sm text-muted-foreground"
+                          >
+                            <div className="mt-2 h-1 w-1 flex-shrink-0 rounded-full bg-primary" />
                             {achievement}
                           </li>
                         ))}
@@ -393,17 +421,19 @@ const TimelineItemComponent: React.FC<TimelineItemComponentProps> = ({
                   {/* Projects */}
                   {item.projects && item.projects.length > 0 && (
                     <div>
-                      <h4 className="font-medium mb-2 flex items-center gap-2">
-                        <Rocket className="w-4 h-4 text-blue-500" />
+                      <h4 className="mb-2 flex items-center gap-2 font-medium">
+                        <Rocket className="h-4 w-4 text-blue-500" />
                         Notable Projects
                       </h4>
                       <div className="space-y-2">
                         {item.projects.map((project, index) => (
-                          <div key={index} className="border rounded-lg p-3">
+                          <div key={index} className="rounded-lg border p-3">
                             <div className="flex items-start justify-between">
                               <div>
-                                <h5 className="font-medium text-sm">{project.name}</h5>
-                                <p className="text-xs text-muted-foreground mt-1">
+                                <h5 className="text-sm font-medium">
+                                  {project.name}
+                                </h5>
+                                <p className="mt-1 text-xs text-muted-foreground">
                                   {project.description}
                                 </p>
                               </div>
@@ -412,14 +442,14 @@ const TimelineItemComponent: React.FC<TimelineItemComponentProps> = ({
                                   variant="ghost"
                                   size="sm"
                                   asChild
-                                  onClick={(e) => e.stopPropagation()}
+                                  onClick={e => e.stopPropagation()}
                                 >
                                   <a
                                     href={project.url}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                   >
-                                    <ExternalLink className="w-3 h-3" />
+                                    <ExternalLink className="h-3 w-3" />
                                   </a>
                                 </Button>
                               )}
@@ -433,16 +463,21 @@ const TimelineItemComponent: React.FC<TimelineItemComponentProps> = ({
                   {/* Metrics */}
                   {item.metrics && item.metrics.length > 0 && (
                     <div>
-                      <h4 className="font-medium mb-2 flex items-center gap-2">
-                        <TrendingUp className="w-4 h-4 text-purple-500" />
+                      <h4 className="mb-2 flex items-center gap-2 font-medium">
+                        <TrendingUp className="h-4 w-4 text-purple-500" />
                         Impact & Results
                       </h4>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                      <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
                         {item.metrics.map((metric, index) => (
-                          <div key={index} className="text-center p-2 bg-muted/50 rounded">
-                            <div className="flex items-center justify-center gap-1 mb-1">
+                          <div
+                            key={index}
+                            className="rounded bg-muted/50 p-2 text-center"
+                          >
+                            <div className="mb-1 flex items-center justify-center gap-1">
                               {metric.icon}
-                              <span className="font-bold text-primary">{metric.value}</span>
+                              <span className="font-bold text-primary">
+                                {metric.value}
+                              </span>
                             </div>
                             <span className="text-xs text-muted-foreground">
                               {metric.label}
@@ -471,17 +506,17 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({
   onItemExpand,
   selectedItemId,
   enableVirtualization = false,
-  maxHeight
+  maxHeight,
 }) => {
   const mergedConfig = { ...DEFAULT_CONFIG, ...config };
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
   const [filteredItems, setFilteredItems] = useState(items);
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Sort items by date (newest first)
-  const sortedItems = [...filteredItems].sort((a, b) => 
-    new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+  const sortedItems = [...filteredItems].sort(
+    (a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
   );
 
   // Filter and search functionality
@@ -496,12 +531,13 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({
     // Apply search
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
-      filtered = filtered.filter(item =>
-        item.title.toLowerCase().includes(term) ||
-        item.company?.toLowerCase().includes(term) ||
-        item.description.toLowerCase().includes(term) ||
-        item.skills?.some(skill => skill.toLowerCase().includes(term)) ||
-        item.technologies?.some(tech => tech.toLowerCase().includes(term))
+      filtered = filtered.filter(
+        item =>
+          item.title.toLowerCase().includes(term) ||
+          item.company?.toLowerCase().includes(term) ||
+          item.description.toLowerCase().includes(term) ||
+          item.skills?.some(skill => skill.toLowerCase().includes(term)) ||
+          item.technologies?.some(tech => tech.toLowerCase().includes(term))
       );
     }
 
@@ -517,7 +553,7 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({
       newExpanded.add(itemId);
     }
     setExpandedItems(newExpanded);
-    
+
     const item = items.find(i => i.id === itemId);
     if (item) {
       onItemExpand?.(item, newExpanded.has(itemId));
@@ -533,7 +569,7 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({
   const uniqueTypes = Array.from(new Set(items.map(item => item.type)));
 
   return (
-    <div className={cn("space-y-6", className)}>
+    <div className={cn('space-y-6', className)}>
       {/* Filters and Search */}
       {(mergedConfig.enableFiltering || mergedConfig.enableSearch) && (
         <div className="space-y-4">
@@ -544,8 +580,8 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({
                 type="text"
                 placeholder="Search timeline..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                onChange={e => setSearchTerm(e.target.value)}
+                className="w-full rounded-lg border px-4 py-2 focus:border-transparent focus:ring-2 focus:ring-primary"
               />
             </div>
           )}
@@ -554,7 +590,7 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({
           {mergedConfig.enableFiltering && (
             <div className="flex flex-wrap gap-2">
               <Button
-                variant={activeFilter === null ? "default" : "outline"}
+                variant={activeFilter === null ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setActiveFilter(null)}
               >
@@ -563,7 +599,7 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({
               {uniqueTypes.map(type => (
                 <Button
                   key={type}
-                  variant={activeFilter === type ? "default" : "outline"}
+                  variant={activeFilter === type ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => setActiveFilter(type)}
                   className="gap-2"
@@ -578,16 +614,16 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({
       )}
 
       {/* Timeline */}
-      <div 
+      <div
         className={cn(
-          "relative",
-          maxHeight && "overflow-y-auto",
-          mergedConfig.orientation === "horizontal" && "overflow-x-auto",
-          mergedConfig.compactMode && "space-y-2"
+          'relative',
+          maxHeight && 'overflow-y-auto',
+          mergedConfig.orientation === 'horizontal' && 'overflow-x-auto',
+          mergedConfig.compactMode && 'space-y-2'
         )}
         style={{ maxHeight }}
       >
-        {mergedConfig.orientation === "vertical" ? (
+        {mergedConfig.orientation === 'vertical' ? (
           <div className="space-y-6">
             {sortedItems.map((item, index) => (
               <TimelineItemComponent
@@ -624,14 +660,15 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({
 
         {/* Empty state */}
         {sortedItems.length === 0 && (
-          <div className="text-center py-12">
-            <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No timeline items found</h3>
+          <div className="py-12 text-center">
+            <Calendar className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+            <h3 className="mb-2 text-lg font-semibold">
+              No timeline items found
+            </h3>
             <p className="text-muted-foreground">
-              {searchTerm || activeFilter 
-                ? "Try adjusting your search or filter criteria"
-                : "No timeline items available"
-              }
+              {searchTerm || activeFilter
+                ? 'Try adjusting your search or filter criteria'
+                : 'No timeline items available'}
             </p>
           </div>
         )}
@@ -639,7 +676,7 @@ export const InteractiveTimeline: React.FC<InteractiveTimelineProps> = ({
 
       {/* Summary */}
       {sortedItems.length > 0 && (
-        <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground border-t pt-4">
+        <div className="flex items-center justify-center gap-4 border-t pt-4 text-sm text-muted-foreground">
           <span>{sortedItems.length} items shown</span>
           <span>•</span>
           <span>{uniqueTypes.length} categories</span>

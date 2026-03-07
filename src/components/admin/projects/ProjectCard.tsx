@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { type Project } from "@/hooks/useProjects";
-import { format } from "date-fns";
+import React, { useState } from 'react';
+import { type Project } from '@/hooks/useProjects';
+import { format } from 'date-fns';
 
 import {
   Database,
@@ -19,34 +19,29 @@ import {
   AlertCircle,
   Pause,
   Archive,
-} from "lucide-react";
+} from 'lucide-react';
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/dropdown-menu';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from '@/components/ui/tooltip';
 
 interface ProjectCardProps {
   project: Project;
-  viewMode: "grid" | "list";
+  viewMode: 'grid' | 'list';
   selected?: boolean;
   onSelect?: (selected: boolean) => void;
   onEdit?: () => void;
@@ -61,28 +56,28 @@ interface ProjectCardProps {
 const statusConfig = {
   completed: {
     icon: CheckCircle2,
-    color: "text-green-600",
-    bgColor: "bg-green-50 dark:bg-green-950/20",
-    label: "Completed"
+    color: 'text-green-600',
+    bgColor: 'bg-green-50 dark:bg-green-950/20',
+    label: 'Completed',
   },
-  "in-progress": {
+  'in-progress': {
     icon: Clock,
-    color: "text-blue-600",
-    bgColor: "bg-blue-50 dark:bg-blue-950/20",
-    label: "In Progress"
+    color: 'text-blue-600',
+    bgColor: 'bg-blue-50 dark:bg-blue-950/20',
+    label: 'In Progress',
   },
   maintenance: {
     icon: Pause,
-    color: "text-yellow-600",
-    bgColor: "bg-yellow-50 dark:bg-yellow-950/20",
-    label: "Maintenance"
+    color: 'text-yellow-600',
+    bgColor: 'bg-yellow-50 dark:bg-yellow-950/20',
+    label: 'Maintenance',
   },
   archived: {
     icon: Archive,
-    color: "text-gray-600",
-    bgColor: "bg-gray-50 dark:bg-gray-950/20",
-    label: "Archived"
-  }
+    color: 'text-gray-600',
+    bgColor: 'bg-gray-50 dark:bg-gray-950/20',
+    label: 'Archived',
+  },
 };
 
 export const ProjectCard = React.memo(function ProjectCard({
@@ -96,22 +91,28 @@ export const ProjectCard = React.memo(function ProjectCard({
   onDuplicate,
   onToggleFeatured,
   onToggleVisibility,
-  className = "",
+  className = '',
 }: ProjectCardProps) {
   const [imageError, setImageError] = useState(false);
 
-  const statusInfo = statusConfig[project.status as keyof typeof statusConfig] || statusConfig.completed;
+  const statusInfo =
+    statusConfig[project.status as keyof typeof statusConfig] ||
+    statusConfig.completed;
   const StatusIcon = statusInfo.icon;
 
   const handleImageError = () => {
     setImageError(true);
   };
 
-  if (viewMode === "list") {
+  if (viewMode === 'list') {
     return (
-      <Card className={`transition-all duration-200 hover:shadow-md ${selected ? "ring-2 ring-primary" : ""
-        } ${project.disabled ? "opacity-60" : ""} ${project.featured ? "bg-yellow-50/30 dark:bg-yellow-950/20" : ""
-        } ${className}`}>
+      <Card
+        className={`transition-all duration-200 hover:shadow-md ${
+          selected ? 'ring-2 ring-primary' : ''
+        } ${project.disabled ? 'opacity-60' : ''} ${
+          project.featured ? 'bg-yellow-50/30 dark:bg-yellow-950/20' : ''
+        } ${className}`}
+      >
         <CardContent className="p-4">
           <div className="flex items-center gap-4">
             {/* Selection Checkbox */}
@@ -124,12 +125,12 @@ export const ProjectCard = React.memo(function ProjectCard({
             )}
 
             {/* Project Image/Logo */}
-            <div className="w-16 h-16 rounded-lg flex-shrink-0 overflow-hidden bg-muted flex items-center justify-center">
+            <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg bg-muted">
               {project.image && !imageError ? (
                 <img
                   src={project.image}
                   alt={project.title}
-                  className="w-full h-full object-cover"
+                  className="h-full w-full object-cover"
                   onError={handleImageError}
                   loading="lazy"
                 />
@@ -137,7 +138,7 @@ export const ProjectCard = React.memo(function ProjectCard({
                 <img
                   src={project.logo}
                   alt={project.title}
-                  className="w-full h-full object-contain p-2"
+                  className="h-full w-full object-contain p-2"
                   onError={handleImageError}
                   loading="lazy"
                 />
@@ -147,20 +148,22 @@ export const ProjectCard = React.memo(function ProjectCard({
             </div>
 
             {/* Project Info */}
-            <div className="flex-1 min-w-0">
+            <div className="min-w-0 flex-1">
               <div className="flex items-start justify-between">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-semibold text-lg truncate">{project.title}</h3>
+                <div className="min-w-0 flex-1">
+                  <div className="mb-1 flex items-center gap-2">
+                    <h3 className="truncate text-lg font-semibold">
+                      {project.title}
+                    </h3>
                     {project.featured && (
-                      <Star className="h-4 w-4 text-yellow-500 fill-yellow-500 flex-shrink-0" />
+                      <Star className="h-4 w-4 flex-shrink-0 fill-yellow-500 text-yellow-500" />
                     )}
                     {project.disabled && (
-                      <EyeOff className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                      <EyeOff className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
                     )}
                   </div>
 
-                  <p className="text-muted-foreground text-sm mb-2 line-clamp-2">
+                  <p className="mb-2 line-clamp-2 text-sm text-muted-foreground">
                     {project.description}
                   </p>
 
@@ -177,29 +180,34 @@ export const ProjectCard = React.memo(function ProjectCard({
                     {project.teamSize && (
                       <div className="flex items-center gap-1">
                         <Users className="h-4 w-4" />
-                        <span>{project.teamSize} {project.teamSize === 1 ? 'person' : 'people'}</span>
+                        <span>
+                          {project.teamSize}{' '}
+                          {project.teamSize === 1 ? 'person' : 'people'}
+                        </span>
                       </div>
                     )}
 
                     <div className="flex items-center gap-1">
                       <Calendar className="h-4 w-4" />
-                      <span>{format(new Date(project.updatedAt), "MMM dd, yyyy")}</span>
+                      <span>
+                        {format(new Date(project.updatedAt), 'MMM dd, yyyy')}
+                      </span>
                     </div>
                   </div>
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center gap-2 ml-4">
+                <div className="ml-4 flex items-center gap-2">
                   {project.liveUrl && (
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            asChild
-                          >
-                            <a href={project.liveUrl} target="_blank" rel="noopener noreferrer">
+                          <Button variant="ghost" size="sm" asChild>
+                            <a
+                              href={project.liveUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
                               <Globe className="h-4 w-4" />
                             </a>
                           </Button>
@@ -213,12 +221,12 @@ export const ProjectCard = React.memo(function ProjectCard({
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            asChild
-                          >
-                            <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
+                          <Button variant="ghost" size="sm" asChild>
+                            <a
+                              href={project.githubUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
                               <Github className="h-4 w-4" />
                             </a>
                           </Button>
@@ -243,26 +251,28 @@ export const ProjectCard = React.memo(function ProjectCard({
                     <DropdownMenuContent align="end">
                       {onView && (
                         <DropdownMenuItem onClick={onView}>
-                          <Eye className="h-4 w-4 mr-2" />
+                          <Eye className="mr-2 h-4 w-4" />
                           View Details
                         </DropdownMenuItem>
                       )}
                       {onEdit && (
                         <DropdownMenuItem onClick={onEdit}>
-                          <Edit className="h-4 w-4 mr-2" />
+                          <Edit className="mr-2 h-4 w-4" />
                           Edit Project
                         </DropdownMenuItem>
                       )}
                       {onDuplicate && (
                         <DropdownMenuItem onClick={onDuplicate}>
-                          <Database className="h-4 w-4 mr-2" />
+                          <Database className="mr-2 h-4 w-4" />
                           Duplicate
                         </DropdownMenuItem>
                       )}
                       <DropdownMenuSeparator />
                       {onToggleFeatured && (
                         <DropdownMenuItem onClick={onToggleFeatured}>
-                          <Star className={`h-4 w-4 mr-2 ${project.featured ? 'fill-current' : ''}`} />
+                          <Star
+                            className={`mr-2 h-4 w-4 ${project.featured ? 'fill-current' : ''}`}
+                          />
                           {project.featured ? 'Unfeature' : 'Feature'}
                         </DropdownMenuItem>
                       )}
@@ -270,12 +280,12 @@ export const ProjectCard = React.memo(function ProjectCard({
                         <DropdownMenuItem onClick={onToggleVisibility}>
                           {project.disabled ? (
                             <>
-                              <Eye className="h-4 w-4 mr-2" />
+                              <Eye className="mr-2 h-4 w-4" />
                               Show Project
                             </>
                           ) : (
                             <>
-                              <EyeOff className="h-4 w-4 mr-2" />
+                              <EyeOff className="mr-2 h-4 w-4" />
                               Hide Project
                             </>
                           )}
@@ -284,8 +294,11 @@ export const ProjectCard = React.memo(function ProjectCard({
                       {onDelete && (
                         <>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem onClick={onDelete} className="text-destructive">
-                            <AlertCircle className="h-4 w-4 mr-2" />
+                          <DropdownMenuItem
+                            onClick={onDelete}
+                            className="text-destructive"
+                          >
+                            <AlertCircle className="mr-2 h-4 w-4" />
                             Delete Project
                           </DropdownMenuItem>
                         </>
@@ -298,7 +311,7 @@ export const ProjectCard = React.memo(function ProjectCard({
           </div>
 
           {/* Technologies */}
-          <div className="flex flex-wrap gap-1 mt-3 ml-20">
+          <div className="ml-20 mt-3 flex flex-wrap gap-1">
             {project.technologies.slice(0, 6).map((tech, index) => (
               <Badge key={index} variant="secondary" className="text-xs">
                 {tech}
@@ -317,25 +330,26 @@ export const ProjectCard = React.memo(function ProjectCard({
 
   // Grid view
   return (
-    <Card className={`transition-all duration-200 hover:shadow-lg hover:-translate-y-1 ${selected ? "ring-2 ring-primary" : ""
-      } ${project.disabled ? "opacity-60" : ""} ${project.featured ? "bg-yellow-50/30 dark:bg-yellow-950/20" : ""
-      } ${className}`}>
+    <Card
+      className={`transition-all duration-200 hover:-translate-y-1 hover:shadow-lg ${
+        selected ? 'ring-2 ring-primary' : ''
+      } ${project.disabled ? 'opacity-60' : ''} ${
+        project.featured ? 'bg-yellow-50/30 dark:bg-yellow-950/20' : ''
+      } ${className}`}
+    >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-2">
             {onSelect && (
-              <Checkbox
-                checked={selected}
-                onCheckedChange={onSelect}
-              />
+              <Checkbox checked={selected} onCheckedChange={onSelect} />
             )}
 
-            <div className="w-8 h-8 rounded-md flex-shrink-0 overflow-hidden bg-muted flex items-center justify-center">
+            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center overflow-hidden rounded-md bg-muted">
               {project.logo && !imageError ? (
                 <img
                   src={project.logo}
                   alt={project.title}
-                  className="w-full h-full object-contain p-1"
+                  className="h-full w-full object-contain p-1"
                   onError={handleImageError}
                   loading="lazy"
                 />
@@ -354,26 +368,28 @@ export const ProjectCard = React.memo(function ProjectCard({
             <DropdownMenuContent align="end">
               {onView && (
                 <DropdownMenuItem onClick={onView}>
-                  <Eye className="h-4 w-4 mr-2" />
+                  <Eye className="mr-2 h-4 w-4" />
                   View Details
                 </DropdownMenuItem>
               )}
               {onEdit && (
                 <DropdownMenuItem onClick={onEdit}>
-                  <Edit className="h-4 w-4 mr-2" />
+                  <Edit className="mr-2 h-4 w-4" />
                   Edit Project
                 </DropdownMenuItem>
               )}
               {onDuplicate && (
                 <DropdownMenuItem onClick={onDuplicate}>
-                  <Database className="h-4 w-4 mr-2" />
+                  <Database className="mr-2 h-4 w-4" />
                   Duplicate
                 </DropdownMenuItem>
               )}
               <DropdownMenuSeparator />
               {onToggleFeatured && (
                 <DropdownMenuItem onClick={onToggleFeatured}>
-                  <Star className={`h-4 w-4 mr-2 ${project.featured ? 'fill-current' : ''}`} />
+                  <Star
+                    className={`mr-2 h-4 w-4 ${project.featured ? 'fill-current' : ''}`}
+                  />
                   {project.featured ? 'Unfeature' : 'Feature'}
                 </DropdownMenuItem>
               )}
@@ -381,12 +397,12 @@ export const ProjectCard = React.memo(function ProjectCard({
                 <DropdownMenuItem onClick={onToggleVisibility}>
                   {project.disabled ? (
                     <>
-                      <Eye className="h-4 w-4 mr-2" />
+                      <Eye className="mr-2 h-4 w-4" />
                       Show Project
                     </>
                   ) : (
                     <>
-                      <EyeOff className="h-4 w-4 mr-2" />
+                      <EyeOff className="mr-2 h-4 w-4" />
                       Hide Project
                     </>
                   )}
@@ -395,8 +411,11 @@ export const ProjectCard = React.memo(function ProjectCard({
               {onDelete && (
                 <>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={onDelete} className="text-destructive">
-                    <AlertCircle className="h-4 w-4 mr-2" />
+                  <DropdownMenuItem
+                    onClick={onDelete}
+                    className="text-destructive"
+                  >
+                    <AlertCircle className="mr-2 h-4 w-4" />
                     Delete Project
                   </DropdownMenuItem>
                 </>
@@ -409,10 +428,10 @@ export const ProjectCard = React.memo(function ProjectCard({
           <div className="flex items-center gap-2">
             <span className="truncate">{project.title}</span>
             {project.featured && (
-              <Star className="h-4 w-4 text-yellow-500 fill-yellow-500 flex-shrink-0" />
+              <Star className="h-4 w-4 flex-shrink-0 fill-yellow-500 text-yellow-500" />
             )}
             {project.disabled && (
-              <EyeOff className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+              <EyeOff className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
             )}
           </div>
         </CardTitle>
@@ -421,11 +440,11 @@ export const ProjectCard = React.memo(function ProjectCard({
       <CardContent className="space-y-4">
         {/* Project Image */}
         {project.image && !imageError && (
-          <div className="w-full h-32 rounded-md overflow-hidden bg-muted">
+          <div className="h-32 w-full overflow-hidden rounded-md bg-muted">
             <img
               src={project.image}
               alt={project.title}
-              className="w-full h-full object-cover"
+              className="h-full w-full object-cover"
               onError={handleImageError}
               loading="lazy"
             />
@@ -433,13 +452,15 @@ export const ProjectCard = React.memo(function ProjectCard({
         )}
 
         {/* Description */}
-        <p className="text-sm text-muted-foreground line-clamp-3">
+        <p className="line-clamp-3 text-sm text-muted-foreground">
           {project.description}
         </p>
 
         {/* Status and Category */}
         <div className="flex items-center gap-2">
-          <div className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs ${statusInfo.bgColor}`}>
+          <div
+            className={`flex items-center gap-1 rounded-md px-2 py-1 text-xs ${statusInfo.bgColor}`}
+          >
             <StatusIcon className={`h-3 w-3 ${statusInfo.color}`} />
             <span className={statusInfo.color}>{statusInfo.label}</span>
           </div>
@@ -467,7 +488,10 @@ export const ProjectCard = React.memo(function ProjectCard({
         {project.achievements && project.achievements.length > 0 && (
           <div className="flex items-center gap-1 text-xs text-muted-foreground">
             <Trophy className="h-3 w-3" />
-            <span>{project.achievements.length} achievement{project.achievements.length !== 1 ? 's' : ''}</span>
+            <span>
+              {project.achievements.length} achievement
+              {project.achievements.length !== 1 ? 's' : ''}
+            </span>
           </div>
         )}
 
@@ -477,12 +501,12 @@ export const ProjectCard = React.memo(function ProjectCard({
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    asChild
-                  >
-                    <a href={project.liveUrl} target="_blank" rel="noopener noreferrer">
+                  <Button variant="outline" size="sm" asChild>
+                    <a
+                      href={project.liveUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       <Globe className="h-4 w-4" />
                     </a>
                   </Button>
@@ -496,12 +520,12 @@ export const ProjectCard = React.memo(function ProjectCard({
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    asChild
-                  >
-                    <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
+                  <Button variant="outline" size="sm" asChild>
+                    <a
+                      href={project.githubUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       <Github className="h-4 w-4" />
                     </a>
                   </Button>
@@ -512,17 +536,22 @@ export const ProjectCard = React.memo(function ProjectCard({
           )}
 
           {onEdit && (
-            <Button variant="outline" size="sm" onClick={onEdit} className="ml-auto">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onEdit}
+              className="ml-auto"
+            >
               <Edit className="h-4 w-4" />
             </Button>
           )}
         </div>
 
         {/* Footer Info */}
-        <div className="flex items-center justify-between text-xs text-muted-foreground pt-2 border-t">
+        <div className="flex items-center justify-between border-t pt-2 text-xs text-muted-foreground">
           <div className="flex items-center gap-1">
             <Calendar className="h-3 w-3" />
-            <span>{format(new Date(project.updatedAt), "MMM dd")}</span>
+            <span>{format(new Date(project.updatedAt), 'MMM dd')}</span>
           </div>
 
           {project.teamSize && (
@@ -532,9 +561,7 @@ export const ProjectCard = React.memo(function ProjectCard({
             </div>
           )}
 
-          <div className="text-right">
-            Priority: {project.priority}
-          </div>
+          <div className="text-right">Priority: {project.priority}</div>
         </div>
       </CardContent>
     </Card>

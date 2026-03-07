@@ -1,8 +1,17 @@
-import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
-import { getFirestore, type Firestore, connectFirestoreEmulator } from "firebase/firestore";
-import { getAuth, type Auth, connectAuthEmulator, GithubAuthProvider } from "firebase/auth";
-import { getAnalytics, type Analytics } from "firebase/analytics";
-import { getStorage, type FirebaseStorage } from "firebase/storage";
+import { initializeApp, getApps, type FirebaseApp } from 'firebase/app';
+import {
+  getFirestore,
+  type Firestore,
+  connectFirestoreEmulator,
+} from 'firebase/firestore';
+import {
+  getAuth,
+  type Auth,
+  connectAuthEmulator,
+  GithubAuthProvider,
+} from 'firebase/auth';
+import { getAnalytics, type Analytics } from 'firebase/analytics';
+import { getStorage, type FirebaseStorage } from 'firebase/storage';
 
 // Production Firebase configuration
 const productionConfig = {
@@ -17,23 +26,23 @@ const productionConfig = {
 
 // Development fallback configuration (for demo purposes)
 const developmentConfig = {
-  apiKey: "demo-api-key",
-  authDomain: "demo-project.firebaseapp.com",
-  projectId: "demo-project",
-  storageBucket: "demo-project.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:abcdef123456",
-  measurementId: "G-XXXXXXXXXX",
+  apiKey: 'demo-api-key',
+  authDomain: 'demo-project.firebaseapp.com',
+  projectId: 'demo-project',
+  storageBucket: 'demo-project.appspot.com',
+  messagingSenderId: '123456789',
+  appId: '1:123456789:web:abcdef123456',
+  measurementId: 'G-XXXXXXXXXX',
 };
 
 // Use production config if available, otherwise fallback to development
 const firebaseConfig = (() => {
   const hasProductionConfig = Boolean(
     productionConfig.apiKey &&
-    productionConfig.authDomain &&
-    productionConfig.projectId &&
-    productionConfig.apiKey !== 'mock-api-key-for-development' &&
-    !productionConfig.apiKey.includes('demo')
+      productionConfig.authDomain &&
+      productionConfig.projectId &&
+      productionConfig.apiKey !== 'mock-api-key-for-development' &&
+      !productionConfig.apiKey.includes('demo')
   );
 
   if (hasProductionConfig) {
@@ -52,9 +61,7 @@ const firebaseConfig = (() => {
 
 // Validate configuration
 const hasRequiredConfig = Boolean(
-  firebaseConfig.apiKey &&
-  firebaseConfig.authDomain &&
-  firebaseConfig.projectId
+  firebaseConfig.apiKey && firebaseConfig.authDomain && firebaseConfig.projectId
 );
 
 // Enable Firebase based on environment and configuration
@@ -66,7 +73,9 @@ export const isFirebaseEnabled: boolean = (() => {
 
   // In development, enable if we have config or if explicitly enabled
   if (import.meta.env.DEV) {
-    return hasRequiredConfig || import.meta.env.VITE_FIREBASE_ENABLE_DEV === 'true';
+    return (
+      hasRequiredConfig || import.meta.env.VITE_FIREBASE_ENABLE_DEV === 'true'
+    );
   }
 
   return hasRequiredConfig;
@@ -80,7 +89,7 @@ console.log('🔥 Firebase Debug Info:', {
   isProd: import.meta.env.PROD,
   enableDev: import.meta.env.VITE_FIREBASE_ENABLE_DEV,
   apiKey: firebaseConfig.apiKey ? '✅ Present' : '❌ Missing',
-  projectId: firebaseConfig.projectId || '❌ Missing'
+  projectId: firebaseConfig.projectId || '❌ Missing',
 });
 
 // Log configuration status
@@ -89,7 +98,7 @@ if (import.meta.env.DEV) {
     hasRequiredConfig,
     isEnabled: isFirebaseEnabled,
     environment: import.meta.env.MODE,
-    authDomain: firebaseConfig.authDomain
+    authDomain: firebaseConfig.authDomain,
   });
 }
 
@@ -105,23 +114,29 @@ if (isFirebaseEnabled) {
     db = getFirestore(app);
     auth = getAuth(app);
     storage = getStorage(app);
-    
+
     // Initialize Analytics only in production
     if (typeof window !== 'undefined' && import.meta.env.PROD) {
       analytics = getAnalytics(app);
     }
-    
+
     // Connect to emulators in development - disabled to avoid connection issues in production
-    if (import.meta.env.DEV && typeof window !== 'undefined' && import.meta.env.VITE_FIREBASE_USE_EMULATORS === 'true') {
+    if (
+      import.meta.env.DEV &&
+      typeof window !== 'undefined' &&
+      import.meta.env.VITE_FIREBASE_USE_EMULATORS === 'true'
+    ) {
       try {
         // Connect to emulators
-        connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
+        connectAuthEmulator(auth, 'http://localhost:9099', {
+          disableWarnings: true,
+        });
         connectFirestoreEmulator(db, 'localhost', 8081);
       } catch (error) {
         console.log('Firebase emulators not available, using production');
       }
     }
-    
+
     console.log('✅ Firebase initialized successfully');
   } catch (error) {
     console.error('❌ Firebase initialization failed:', error);
@@ -134,4 +149,12 @@ if (isFirebaseEnabled) {
   }
 }
 
-export { app, db, auth, analytics, firebaseConfig, storage, GithubAuthProvider };
+export {
+  app,
+  db,
+  auth,
+  analytics,
+  firebaseConfig,
+  storage,
+  GithubAuthProvider,
+};

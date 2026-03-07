@@ -5,6 +5,7 @@ This directory contains the core layout components for the admin dashboard, desi
 ## Components
 
 ### AdminLayout
+
 The main layout wrapper that provides responsive grid system and consistent spacing.
 
 ```tsx
@@ -12,16 +13,18 @@ import { AdminLayout } from '@/components/admin/layout';
 
 <AdminLayout>
   <div>Your content here</div>
-</AdminLayout>
+</AdminLayout>;
 ```
 
 **Props:**
+
 - `children`: React.ReactNode - Content to render
 - `sidebarCollapsed?`: boolean - Whether sidebar is collapsed
 - `onSidebarToggle?`: () => void - Sidebar toggle handler
 - `className?`: string - Additional CSS classes
 
 ### AdminHeader
+
 Sticky header with branding, user actions, and navigation.
 
 ```tsx
@@ -35,13 +38,14 @@ import { AdminHeader } from '@/components/admin/layout';
       label: 'Settings',
       icon: Settings,
       onClick: () => console.log('Settings'),
-      variant: 'outline'
-    }
+      variant: 'outline',
+    },
   ]}
-/>
+/>;
 ```
 
 **Props:**
+
 - `user`: User | null - Current user object
 - `onLogout`: () => void - Logout handler
 - `showUserMenu?`: boolean - Show user menu (default: true)
@@ -49,6 +53,7 @@ import { AdminHeader } from '@/components/admin/layout';
 - `className?`: string - Additional CSS classes
 
 ### AdminSidebar
+
 Collapsible sidebar navigation with mobile support.
 
 ```tsx
@@ -61,16 +66,17 @@ import { AdminSidebar } from '@/components/admin/layout';
       label: 'Overview',
       icon: BarChart3,
       onClick: () => setActiveTab('overview'),
-      active: activeTab === 'overview'
-    }
+      active: activeTab === 'overview',
+    },
   ]}
   collapsed={sidebarCollapsed}
   onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
   activeItem={activeTab}
-/>
+/>;
 ```
 
 **Props:**
+
 - `items?`: SidebarItem[] - Navigation items
 - `collapsed?`: boolean - Collapsed state
 - `onToggle?`: () => void - Toggle handler
@@ -78,6 +84,7 @@ import { AdminSidebar } from '@/components/admin/layout';
 - `className?`: string - Additional CSS classes
 
 ### AdminBreadcrumb
+
 Breadcrumb navigation for context and hierarchy.
 
 ```tsx
@@ -86,12 +93,13 @@ import { AdminBreadcrumb } from '@/components/admin/layout';
 <AdminBreadcrumb
   items={[
     { label: 'Dashboard', onClick: () => setActiveTab('overview') },
-    { label: 'Projects', active: true }
+    { label: 'Projects', active: true },
   ]}
-/>
+/>;
 ```
 
 **Props:**
+
 - `items`: BreadcrumbItem[] - Breadcrumb items
 - `showHome?`: boolean - Show home/admin link (default: true)
 - `className?`: string - Additional CSS classes
@@ -106,7 +114,7 @@ import {
   AdminLayout,
   AdminHeader,
   AdminSidebar,
-  AdminBreadcrumb
+  AdminBreadcrumb,
 } from '@/components/admin/layout';
 
 export const AdminDashboard = ({ user, onLogout }) => {
@@ -119,20 +127,20 @@ export const AdminDashboard = ({ user, onLogout }) => {
       label: 'Overview',
       icon: BarChart3,
       onClick: () => setActiveTab('overview'),
-      active: activeTab === 'overview'
+      active: activeTab === 'overview',
     },
     // ... more items
   ];
 
   const breadcrumbItems = [
     { label: 'Dashboard', onClick: () => setActiveTab('overview') },
-    { label: 'Current Section', active: true }
+    { label: 'Current Section', active: true },
   ];
 
   return (
     <div className="min-h-screen">
       <AdminHeader user={user} onLogout={onLogout} />
-      
+
       <div className="flex">
         <AdminSidebar
           items={sidebarItems}
@@ -140,10 +148,12 @@ export const AdminDashboard = ({ user, onLogout }) => {
           onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
           activeItem={activeTab}
         />
-        
-        <div className={`flex-1 transition-all duration-300 ${
-          sidebarCollapsed ? 'lg:ml-20' : 'lg:ml-68'
-        }`}>
+
+        <div
+          className={`flex-1 transition-all duration-300 ${
+            sidebarCollapsed ? 'lg:ml-20' : 'lg:ml-68'
+          }`}
+        >
           <AdminLayout>
             <AdminBreadcrumb items={breadcrumbItems} />
             {/* Your content here */}
@@ -158,18 +168,21 @@ export const AdminDashboard = ({ user, onLogout }) => {
 ## Features
 
 ### Responsive Design
+
 - **Mobile**: Single column layout, overlay sidebar, touch-friendly controls
 - **Tablet**: Optimized spacing, persistent sidebar option
 - **Desktop**: Full multi-column layout, hover interactions
 - **Wide Screen**: Maximum content width, additional columns
 
 ### Grid System
+
 - CSS Grid and Flexbox for optimal layouts
 - Responsive breakpoints: mobile (0px), tablet (768px), desktop (1024px), wide (1280px)
 - Consistent spacing using Tailwind's spacing scale
 - Automatic content overflow handling
 
 ### Accessibility
+
 - Full keyboard navigation support
 - ARIA labels and descriptions
 - Screen reader compatibility
@@ -177,6 +190,7 @@ export const AdminDashboard = ({ user, onLogout }) => {
 - High contrast support
 
 ### Performance
+
 - Lazy loading support for content sections
 - Optimized re-renders with React.memo
 - Smooth transitions and animations
@@ -185,6 +199,7 @@ export const AdminDashboard = ({ user, onLogout }) => {
 ## Customization
 
 ### Theming
+
 Components use CSS custom properties for theming:
 
 ```css
@@ -198,6 +213,7 @@ Components use CSS custom properties for theming:
 ```
 
 ### Layout Configuration
+
 Customize layout behavior through props:
 
 ```tsx
@@ -205,7 +221,7 @@ const layoutConfig = {
   showSidebar: true,
   showBreadcrumb: true,
   maxWidth: '7xl', // 'full' | '7xl' | '6xl'
-  padding: 'md'    // 'sm' | 'md' | 'lg'
+  padding: 'md', // 'sm' | 'md' | 'lg'
 };
 ```
 
@@ -236,6 +252,7 @@ npm test src/components/admin/layout/__tests__/
 ```
 
 The test suite covers:
+
 - Component rendering
 - User interactions
 - Responsive behavior

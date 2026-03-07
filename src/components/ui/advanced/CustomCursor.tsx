@@ -24,14 +24,14 @@ export const CustomCursor: React.FC<CustomCursorProps> = ({
   size = 'md',
   variant = 'default',
   hideOnLeave = true,
-  blendMode = 'normal'
+  blendMode = 'normal',
 }) => {
   const [position, setPosition] = useState<CursorPosition>({ x: 0, y: 0 });
   const [isVisible, setIsVisible] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
   const [isClicking, setIsClicking] = useState(false);
   const [hoverTarget, setHoverTarget] = useState<string | null>(null);
-  
+
   const cursorRef = useRef<HTMLDivElement>(null);
   const trailRef = useRef<HTMLDivElement>(null);
 
@@ -45,23 +45,33 @@ export const CustomCursor: React.FC<CustomCursorProps> = ({
 
     const handleMouseEnter = () => setIsVisible(true);
     const handleMouseLeave = () => hideOnLeave && setIsVisible(false);
-    
+
     const handleMouseDown = () => setIsClicking(true);
     const handleMouseUp = () => setIsClicking(false);
 
     const handleMouseOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      const interactiveElements = ['A', 'BUTTON', 'INPUT', 'TEXTAREA', 'SELECT'];
-      const isInteractive = interactiveElements.includes(target.tagName) ||
-                           target.hasAttribute('data-cursor-hover') ||
-                           target.closest('[data-cursor-hover]');
-      
+      const interactiveElements = [
+        'A',
+        'BUTTON',
+        'INPUT',
+        'TEXTAREA',
+        'SELECT',
+      ];
+      const isInteractive =
+        interactiveElements.includes(target.tagName) ||
+        target.hasAttribute('data-cursor-hover') ||
+        target.closest('[data-cursor-hover]');
+
       setIsHovering(isInteractive);
-      
+
       if (isInteractive) {
-        const hoverType = target.getAttribute('data-cursor-hover') ||
-                         target.closest('[data-cursor-hover]')?.getAttribute('data-cursor-hover') ||
-                         'default';
+        const hoverType =
+          target.getAttribute('data-cursor-hover') ||
+          target
+            .closest('[data-cursor-hover]')
+            ?.getAttribute('data-cursor-hover') ||
+          'default';
         setHoverTarget(hoverType);
       } else {
         setHoverTarget(null);
@@ -90,21 +100,21 @@ export const CustomCursor: React.FC<CustomCursorProps> = ({
   const sizeClasses = {
     sm: 'w-4 h-4',
     md: 'w-6 h-6',
-    lg: 'w-8 h-8'
+    lg: 'w-8 h-8',
   };
 
   const variantClasses = {
     default: 'bg-primary rounded-full',
     dot: 'bg-primary rounded-full',
     ring: 'border-2 border-primary rounded-full',
-    crosshair: 'border border-primary'
+    crosshair: 'border border-primary',
   };
 
   const blendModeClasses = {
     normal: 'mix-blend-normal',
     difference: 'mix-blend-difference',
     multiply: 'mix-blend-multiply',
-    screen: 'mix-blend-screen'
+    screen: 'mix-blend-screen',
   };
 
   return (
@@ -113,7 +123,7 @@ export const CustomCursor: React.FC<CustomCursorProps> = ({
       <div
         ref={cursorRef}
         className={cn(
-          'fixed pointer-events-none z-[9999] transition-all duration-150 ease-out',
+          'pointer-events-none fixed z-[9999] transition-all duration-150 ease-out',
           sizeClasses[size],
           variantClasses[variant],
           blendModeClasses[blendMode],
@@ -124,19 +134,19 @@ export const CustomCursor: React.FC<CustomCursorProps> = ({
             'bg-red-500': hoverTarget === 'danger',
             'bg-green-500': hoverTarget === 'success',
             'bg-yellow-500': hoverTarget === 'warning',
-            'animate-pulse': hoverTarget === 'pulse'
+            'animate-pulse': hoverTarget === 'pulse',
           }
         )}
         style={{
           left: position.x - (variant === 'crosshair' ? 8 : 12),
           top: position.y - (variant === 'crosshair' ? 8 : 12),
-          transform: `translate(-50%, -50%)`
+          transform: `translate(-50%, -50%)`,
         }}
       >
         {variant === 'crosshair' && (
           <>
-            <div className="absolute top-1/2 left-0 w-full h-px bg-primary transform -translate-y-1/2" />
-            <div className="absolute left-1/2 top-0 w-px h-full bg-primary transform -translate-x-1/2" />
+            <div className="absolute left-0 top-1/2 h-px w-full -translate-y-1/2 transform bg-primary" />
+            <div className="absolute left-1/2 top-0 h-full w-px -translate-x-1/2 transform bg-primary" />
           </>
         )}
       </div>
@@ -145,14 +155,14 @@ export const CustomCursor: React.FC<CustomCursorProps> = ({
       <div
         ref={trailRef}
         className={cn(
-          'fixed pointer-events-none z-[9998] transition-all duration-300 ease-out opacity-30',
-          'w-8 h-8 border border-primary rounded-full',
+          'pointer-events-none fixed z-[9998] opacity-30 transition-all duration-300 ease-out',
+          'h-8 w-8 rounded-full border border-primary',
           blendModeClasses[blendMode]
         )}
         style={{
           left: position.x - 16,
           top: position.y - 16,
-          transform: `translate(-50%, -50%) scale(${isHovering ? 1.5 : 1})`
+          transform: `translate(-50%, -50%) scale(${isHovering ? 1.5 : 1})`,
         }}
       />
     </>
@@ -164,8 +174,8 @@ export const useCursor = () => {
   const setCursorHover = (type: string) => {
     return {
       'data-cursor-hover': type,
-      onMouseEnter: () => document.body.style.cursor = 'none',
-      onMouseLeave: () => document.body.style.cursor = 'auto'
+      onMouseEnter: () => (document.body.style.cursor = 'none'),
+      onMouseLeave: () => (document.body.style.cursor = 'auto'),
     };
   };
 

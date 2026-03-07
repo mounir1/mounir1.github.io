@@ -19,27 +19,28 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 import { addDoc, collection } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
 const skillFormSchema = z.object({
   name: z.string().min(1, 'Skill name is required'),
   category: z.string().min(1, 'Category is required'),
-  level: z.coerce.number()
+  level: z.coerce
+    .number()
     .min(0, 'Level must be at least 0')
     .max(100, 'Level must be at most 100'),
   featured: z.boolean().optional(),
 });
 
 const SKILL_CATEGORIES = [
-  "Frontend Development",
-  "Backend Development",
-  "Mobile Development",
-  "Cloud Services",
-  "Databases",
-  "DevOps",
-  "Other"
+  'Frontend Development',
+  'Backend Development',
+  'Mobile Development',
+  'Cloud Services',
+  'Databases',
+  'DevOps',
+  'Other',
 ];
 
 type SkillFormValues = z.infer<typeof skillFormSchema>;
@@ -78,7 +79,7 @@ export function SkillForm({ onSuccess }: { onSuccess?: () => void }) {
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
+    <Card className="mx-auto w-full max-w-2xl">
       <CardHeader>
         <CardTitle>Add New Skill</CardTitle>
       </CardHeader>
@@ -105,14 +106,17 @@ export function SkillForm({ onSuccess }: { onSuccess?: () => void }) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Category</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select a category" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {SKILL_CATEGORIES.map((category) => (
+                      {SKILL_CATEGORIES.map(category => (
                         <SelectItem key={category} value={category}>
                           {category}
                         </SelectItem>

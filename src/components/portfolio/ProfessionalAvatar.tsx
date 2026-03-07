@@ -1,31 +1,31 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { 
-  Camera, 
-  Edit3, 
-  Download, 
-  Share2, 
-  User, 
+import React, { useState, useRef, useEffect } from 'react';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+  Camera,
+  Edit3,
+  Download,
+  Share2,
+  User,
   MapPin,
   Calendar,
   Award,
   Star,
-  Heart
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useReducedMotion } from "@/hooks/useAccessibility";
+  Heart,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useReducedMotion } from '@/hooks/useAccessibility';
 
 // Avatar configuration interface
 export interface AvatarConfig {
   src: string;
   alt: string;
   fallbackText?: string;
-  size?: "sm" | "md" | "lg" | "xl" | "2xl";
-  shape?: "circle" | "rounded" | "square";
-  borderStyle?: "none" | "simple" | "gradient" | "glow" | "animated";
-  hoverEffect?: "scale" | "glow" | "tilt" | "flip" | "float" | "pulse" | "none";
+  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+  shape?: 'circle' | 'rounded' | 'square';
+  borderStyle?: 'none' | 'simple' | 'gradient' | 'glow' | 'animated';
+  hoverEffect?: 'scale' | 'glow' | 'tilt' | 'flip' | 'float' | 'pulse' | 'none';
 }
 
 // Professional avatar props
@@ -38,7 +38,7 @@ export interface ProfessionalAvatarProps {
   joinDate?: string;
   badges?: Array<{
     label: string;
-    variant?: "default" | "secondary" | "destructive" | "outline";
+    variant?: 'default' | 'secondary' | 'destructive' | 'outline';
     icon?: React.ReactNode;
   }>;
   stats?: Array<{
@@ -50,12 +50,12 @@ export interface ProfessionalAvatarProps {
     label: string;
     icon?: React.ReactNode;
     onClick?: () => void;
-    variant?: "default" | "outline" | "ghost" | "secondary";
+    variant?: 'default' | 'outline' | 'ghost' | 'secondary';
   }>;
   showOnlineStatus?: boolean;
   isOnline?: boolean;
   className?: string;
-  layout?: "card" | "profile" | "compact";
+  layout?: 'card' | 'profile' | 'compact';
   enableAnimations?: boolean;
   showBackground?: boolean;
   backgroundGradient?: string;
@@ -63,63 +63,64 @@ export interface ProfessionalAvatarProps {
 
 // Size configurations
 const SIZE_CONFIG = {
-  sm: { 
-    avatar: "w-16 h-16", 
-    container: "p-4", 
-    text: "text-sm",
-    title: "text-base"
+  sm: {
+    avatar: 'w-16 h-16',
+    container: 'p-4',
+    text: 'text-sm',
+    title: 'text-base',
   },
-  md: { 
-    avatar: "w-24 h-24", 
-    container: "p-6", 
-    text: "text-sm",
-    title: "text-lg"
+  md: {
+    avatar: 'w-24 h-24',
+    container: 'p-6',
+    text: 'text-sm',
+    title: 'text-lg',
   },
-  lg: { 
-    avatar: "w-32 h-32", 
-    container: "p-8", 
-    text: "text-base",
-    title: "text-xl"
+  lg: {
+    avatar: 'w-32 h-32',
+    container: 'p-8',
+    text: 'text-base',
+    title: 'text-xl',
   },
-  xl: { 
-    avatar: "w-40 h-40", 
-    container: "p-10", 
-    text: "text-base",
-    title: "text-2xl"
+  xl: {
+    avatar: 'w-40 h-40',
+    container: 'p-10',
+    text: 'text-base',
+    title: 'text-2xl',
   },
-  "2xl": { 
-    avatar: "w-48 h-48", 
-    container: "p-12", 
-    text: "text-lg",
-    title: "text-3xl"
-  }
+  '2xl': {
+    avatar: 'w-48 h-48',
+    container: 'p-12',
+    text: 'text-lg',
+    title: 'text-3xl',
+  },
 };
 
 // Shape configurations
 const SHAPE_CONFIG = {
-  circle: "rounded-full",
-  rounded: "rounded-2xl",
-  square: "rounded-lg"
+  circle: 'rounded-full',
+  rounded: 'rounded-2xl',
+  square: 'rounded-lg',
 };
 
 // Border style configurations
 const BORDER_STYLES = {
-  none: "",
-  simple: "ring-2 ring-border",
-  gradient: "ring-2 ring-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 p-1",
-  glow: "ring-4 ring-primary/30 shadow-lg shadow-primary/25",
-  animated: "ring-2 ring-primary animate-pulse"
+  none: '',
+  simple: 'ring-2 ring-border',
+  gradient:
+    'ring-2 ring-transparent bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 p-1',
+  glow: 'ring-4 ring-primary/30 shadow-lg shadow-primary/25',
+  animated: 'ring-2 ring-primary animate-pulse',
 };
 
 // Hover effect configurations
 const HOVER_EFFECTS = {
-  scale: "hover:scale-110 transition-transform duration-300",
-  glow: "hover:shadow-2xl hover:shadow-primary/50 transition-shadow duration-300",
-  tilt: "hover:rotate-3 transition-transform duration-300",
-  flip: "hover:scale-y-[-1] transition-transform duration-500",
-  float: "hover:-translate-y-2 transition-transform duration-300",
-  pulse: "hover:animate-pulse",
-  none: ""
+  scale: 'hover:scale-110 transition-transform duration-300',
+  glow: 'hover:shadow-2xl hover:shadow-primary/50 transition-shadow duration-300',
+  tilt: 'hover:rotate-3 transition-transform duration-300',
+  flip: 'hover:scale-y-[-1] transition-transform duration-500',
+  float: 'hover:-translate-y-2 transition-transform duration-300',
+  pulse: 'hover:animate-pulse',
+  none: '',
 };
 
 // Avatar image component
@@ -133,10 +134,12 @@ const AvatarImage: React.FC<AvatarImageProps> = ({ config, className }) => {
   const [imageError, setImageError] = useState(false);
   const prefersReducedMotion = useReducedMotion();
 
-  const sizeClass = SIZE_CONFIG[config.size || "lg"].avatar;
-  const shapeClass = SHAPE_CONFIG[config.shape || "circle"];
-  const borderClass = BORDER_STYLES[config.borderStyle || "glow"];
-  const hoverClass = prefersReducedMotion ? "" : HOVER_EFFECTS[config.hoverEffect || "scale"];
+  const sizeClass = SIZE_CONFIG[config.size || 'lg'].avatar;
+  const shapeClass = SHAPE_CONFIG[config.shape || 'circle'];
+  const borderClass = BORDER_STYLES[config.borderStyle || 'glow'];
+  const hoverClass = prefersReducedMotion
+    ? ''
+    : HOVER_EFFECTS[config.hoverEffect || 'scale'];
 
   const handleImageLoad = () => {
     setImageLoaded(true);
@@ -154,36 +157,40 @@ const AvatarImage: React.FC<AvatarImageProps> = ({ config, className }) => {
       {config.fallbackText}
     </span>
   ) : (
-    <User className="w-1/2 h-1/2 text-muted-foreground" />
+    <User className="h-1/2 w-1/2 text-muted-foreground" />
   );
 
   return (
-    <div className={cn("relative", className)}>
+    <div className={cn('relative', className)}>
       {/* Avatar container with border styles */}
-      <div className={cn(
-        "relative overflow-hidden",
-        sizeClass,
-        shapeClass,
-        borderClass,
-        hoverClass,
-        "bg-gradient-to-br from-muted to-muted/50"
-      )}>
+      <div
+        className={cn(
+          'relative overflow-hidden',
+          sizeClass,
+          shapeClass,
+          borderClass,
+          hoverClass,
+          'bg-gradient-to-br from-muted to-muted/50'
+        )}
+      >
         {/* Background gradient for gradient border */}
-        {config.borderStyle === "gradient" && (
-          <div className={cn(
-            "absolute inset-1 overflow-hidden bg-background",
-            shapeClass
-          )}>
+        {config.borderStyle === 'gradient' && (
+          <div
+            className={cn(
+              'absolute inset-1 overflow-hidden bg-background',
+              shapeClass
+            )}
+          >
             {!imageError && config.src ? (
               <img
                 src={config.src}
                 alt={config.alt}
-                className="w-full h-full object-cover"
+                className="h-full w-full object-cover"
                 onLoad={handleImageLoad}
                 onError={handleImageError}
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center">
+              <div className="flex h-full w-full items-center justify-center">
                 {fallbackContent}
               </div>
             )}
@@ -191,21 +198,21 @@ const AvatarImage: React.FC<AvatarImageProps> = ({ config, className }) => {
         )}
 
         {/* Regular avatar content */}
-        {config.borderStyle !== "gradient" && (
+        {config.borderStyle !== 'gradient' && (
           <>
             {!imageError && config.src ? (
               <img
                 src={config.src}
                 alt={config.alt}
                 className={cn(
-                  "w-full h-full object-cover transition-opacity duration-300",
-                  imageLoaded ? "opacity-100" : "opacity-0"
+                  'h-full w-full object-cover transition-opacity duration-300',
+                  imageLoaded ? 'opacity-100' : 'opacity-0'
                 )}
                 onLoad={handleImageLoad}
                 onError={handleImageError}
               />
             ) : null}
-            
+
             {(imageError || !config.src || !imageLoaded) && (
               <div className="absolute inset-0 flex items-center justify-center">
                 {fallbackContent}
@@ -216,7 +223,7 @@ const AvatarImage: React.FC<AvatarImageProps> = ({ config, className }) => {
 
         {/* Loading skeleton */}
         {!imageLoaded && !imageError && config.src && (
-          <div className="absolute inset-0 bg-muted animate-pulse" />
+          <div className="absolute inset-0 animate-pulse bg-muted" />
         )}
       </div>
     </div>
@@ -237,27 +244,28 @@ export const ProfessionalAvatar: React.FC<ProfessionalAvatarProps> = ({
   showOnlineStatus = false,
   isOnline = false,
   className,
-  layout = "card",
+  layout = 'card',
   enableAnimations = true,
   showBackground = true,
-  backgroundGradient = "from-blue-50 via-purple-50 to-pink-50"
+  backgroundGradient = 'from-blue-50 via-purple-50 to-pink-50',
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = useReducedMotion();
 
-  const sizeConfig = SIZE_CONFIG[avatar.size || "lg"];
+  const sizeConfig = SIZE_CONFIG[avatar.size || 'lg'];
 
   // Mouse tracking for tilt effect
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (!enableAnimations || prefersReducedMotion || !containerRef.current) return;
+    if (!enableAnimations || prefersReducedMotion || !containerRef.current)
+      return;
 
     const rect = containerRef.current.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width;
     const y = (e.clientY - rect.top) / rect.height;
-    
+
     setMousePosition({ x, y });
   };
 
@@ -271,18 +279,19 @@ export const ProfessionalAvatar: React.FC<ProfessionalAvatarProps> = ({
   };
 
   // Parallax transform
-  const transform = enableAnimations && !prefersReducedMotion && isHovered
-    ? `perspective(1000px) rotateY(${(mousePosition.x - 0.5) * 10}deg) rotateX(${(mousePosition.y - 0.5) * -10}deg) translateZ(20px)`
-    : 'none';
+  const transform =
+    enableAnimations && !prefersReducedMotion && isHovered
+      ? `perspective(1000px) rotateY(${(mousePosition.x - 0.5) * 10}deg) rotateX(${(mousePosition.y - 0.5) * -10}deg) translateZ(20px)`
+      : 'none';
 
   // Layout variants
   const renderCardLayout = () => (
-    <Card 
+    <Card
       ref={containerRef}
       className={cn(
-        "relative overflow-hidden transition-all duration-500",
-        "hover:shadow-2xl hover:shadow-primary/10",
-        enableAnimations && "transform-gpu",
+        'relative overflow-hidden transition-all duration-500',
+        'hover:shadow-2xl hover:shadow-primary/10',
+        enableAnimations && 'transform-gpu',
         className
       )}
       style={{ transform }}
@@ -292,42 +301,50 @@ export const ProfessionalAvatar: React.FC<ProfessionalAvatarProps> = ({
     >
       {/* Background */}
       {showBackground && (
-        <div className={cn(
-          "absolute inset-0 opacity-50",
-          `bg-gradient-to-br ${backgroundGradient}`
-        )} />
+        <div
+          className={cn(
+            'absolute inset-0 opacity-50',
+            `bg-gradient-to-br ${backgroundGradient}`
+          )}
+        />
       )}
 
-      <div className={cn("relative", sizeConfig.container)}>
-        <div className="text-center space-y-6">
+      <div className={cn('relative', sizeConfig.container)}>
+        <div className="space-y-6 text-center">
           {/* Avatar with online status */}
           <div className="relative inline-block">
             <AvatarImage config={avatar} />
-            
+
             {/* Online status indicator */}
             {showOnlineStatus && (
-              <div className={cn(
-                "absolute -bottom-1 -right-1 w-6 h-6 rounded-full border-2 border-background",
-                isOnline ? "bg-green-500" : "bg-gray-400"
-              )}>
-                <div className={cn(
-                  "w-full h-full rounded-full",
-                  isOnline && enableAnimations && "animate-ping bg-green-400 opacity-75"
-                )} />
+              <div
+                className={cn(
+                  'absolute -bottom-1 -right-1 h-6 w-6 rounded-full border-2 border-background',
+                  isOnline ? 'bg-green-500' : 'bg-gray-400'
+                )}
+              >
+                <div
+                  className={cn(
+                    'h-full w-full rounded-full',
+                    isOnline &&
+                      enableAnimations &&
+                      'animate-ping bg-green-400 opacity-75'
+                  )}
+                />
               </div>
             )}
           </div>
 
           {/* Name and title */}
           <div className="space-y-2">
-            <h2 className={cn("font-bold text-foreground", sizeConfig.title)}>
+            <h2 className={cn('font-bold text-foreground', sizeConfig.title)}>
               {name}
             </h2>
-            <p className={cn("text-primary font-medium", sizeConfig.text)}>
+            <p className={cn('font-medium text-primary', sizeConfig.text)}>
               {title}
             </p>
             {subtitle && (
-              <p className={cn("text-muted-foreground", sizeConfig.text)}>
+              <p className={cn('text-muted-foreground', sizeConfig.text)}>
                 {subtitle}
               </p>
             )}
@@ -335,16 +352,21 @@ export const ProfessionalAvatar: React.FC<ProfessionalAvatarProps> = ({
 
           {/* Location and join date */}
           {(location || joinDate) && (
-            <div className={cn("flex items-center justify-center gap-4 text-muted-foreground", sizeConfig.text)}>
+            <div
+              className={cn(
+                'flex items-center justify-center gap-4 text-muted-foreground',
+                sizeConfig.text
+              )}
+            >
               {location && (
                 <div className="flex items-center gap-1">
-                  <MapPin className="w-4 h-4" />
+                  <MapPin className="h-4 w-4" />
                   <span>{location}</span>
                 </div>
               )}
               {joinDate && (
                 <div className="flex items-center gap-1">
-                  <Calendar className="w-4 h-4" />
+                  <Calendar className="h-4 w-4" />
                   <span>{joinDate}</span>
                 </div>
               )}
@@ -355,7 +377,11 @@ export const ProfessionalAvatar: React.FC<ProfessionalAvatarProps> = ({
           {badges.length > 0 && (
             <div className="flex flex-wrap justify-center gap-2">
               {badges.map((badge, index) => (
-                <Badge key={index} variant={badge.variant || "secondary"} className="gap-1">
+                <Badge
+                  key={index}
+                  variant={badge.variant || 'secondary'}
+                  className="gap-1"
+                >
                   {badge.icon}
                   {badge.label}
                 </Badge>
@@ -365,14 +391,18 @@ export const ProfessionalAvatar: React.FC<ProfessionalAvatarProps> = ({
 
           {/* Stats */}
           {stats.length > 0 && (
-            <div className="grid grid-cols-3 gap-4 py-4 border-t border-border/50">
+            <div className="grid grid-cols-3 gap-4 border-t border-border/50 py-4">
               {stats.map((stat, index) => (
                 <div key={index} className="text-center">
-                  <div className="flex items-center justify-center gap-1 mb-1">
+                  <div className="mb-1 flex items-center justify-center gap-1">
                     {stat.icon}
-                    <span className="font-bold text-foreground">{stat.value}</span>
+                    <span className="font-bold text-foreground">
+                      {stat.value}
+                    </span>
                   </div>
-                  <span className={cn("text-muted-foreground", sizeConfig.text)}>
+                  <span
+                    className={cn('text-muted-foreground', sizeConfig.text)}
+                  >
                     {stat.label}
                   </span>
                 </div>
@@ -382,11 +412,11 @@ export const ProfessionalAvatar: React.FC<ProfessionalAvatarProps> = ({
 
           {/* Actions */}
           {actions.length > 0 && (
-            <div className="flex flex-wrap justify-center gap-2 pt-4 border-t border-border/50">
+            <div className="flex flex-wrap justify-center gap-2 border-t border-border/50 pt-4">
               {actions.map((action, index) => (
                 <Button
                   key={index}
-                  variant={action.variant || "outline"}
+                  variant={action.variant || 'outline'}
                   size="sm"
                   onClick={action.onClick}
                   className="gap-2"
@@ -403,12 +433,12 @@ export const ProfessionalAvatar: React.FC<ProfessionalAvatarProps> = ({
   );
 
   const renderProfileLayout = () => (
-    <div 
+    <div
       ref={containerRef}
       className={cn(
-        "flex items-center gap-6 p-6 rounded-2xl transition-all duration-500",
+        'flex items-center gap-6 rounded-2xl p-6 transition-all duration-500',
         showBackground && `bg-gradient-to-r ${backgroundGradient}`,
-        enableAnimations && "transform-gpu hover:shadow-xl",
+        enableAnimations && 'transform-gpu hover:shadow-xl',
         className
       )}
       style={{ transform }}
@@ -419,12 +449,14 @@ export const ProfessionalAvatar: React.FC<ProfessionalAvatarProps> = ({
       {/* Avatar */}
       <div className="relative flex-shrink-0">
         <AvatarImage config={avatar} />
-        
+
         {showOnlineStatus && (
-          <div className={cn(
-            "absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-background",
-            isOnline ? "bg-green-500" : "bg-gray-400"
-          )} />
+          <div
+            className={cn(
+              'absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-background',
+              isOnline ? 'bg-green-500' : 'bg-gray-400'
+            )}
+          />
         )}
       </div>
 
@@ -432,9 +464,9 @@ export const ProfessionalAvatar: React.FC<ProfessionalAvatarProps> = ({
       <div className="flex-1 space-y-3">
         <div>
           <h3 className="text-xl font-bold text-foreground">{name}</h3>
-          <p className="text-primary font-medium">{title}</p>
+          <p className="font-medium text-primary">{title}</p>
           {subtitle && (
-            <p className="text-muted-foreground text-sm">{subtitle}</p>
+            <p className="text-sm text-muted-foreground">{subtitle}</p>
           )}
         </div>
 
@@ -442,7 +474,11 @@ export const ProfessionalAvatar: React.FC<ProfessionalAvatarProps> = ({
         {badges.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {badges.slice(0, 3).map((badge, index) => (
-              <Badge key={index} variant={badge.variant || "secondary"} className="gap-1">
+              <Badge
+                key={index}
+                variant={badge.variant || 'secondary'}
+                className="gap-1"
+              >
                 {badge.icon}
                 {badge.label}
               </Badge>
@@ -463,7 +499,9 @@ export const ProfessionalAvatar: React.FC<ProfessionalAvatarProps> = ({
                     {stat.icon}
                     <span className="font-bold">{stat.value}</span>
                   </div>
-                  <span className="text-xs text-muted-foreground">{stat.label}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {stat.label}
+                  </span>
                 </div>
               ))}
             </div>
@@ -474,7 +512,7 @@ export const ProfessionalAvatar: React.FC<ProfessionalAvatarProps> = ({
               {actions.slice(0, 2).map((action, index) => (
                 <Button
                   key={index}
-                  variant={action.variant || "outline"}
+                  variant={action.variant || 'outline'}
                   size="sm"
                   onClick={action.onClick}
                   className="gap-2"
@@ -491,30 +529,32 @@ export const ProfessionalAvatar: React.FC<ProfessionalAvatarProps> = ({
   );
 
   const renderCompactLayout = () => (
-    <div 
+    <div
       ref={containerRef}
       className={cn(
-        "flex items-center gap-3 p-3 rounded-lg transition-all duration-300",
-        enableAnimations && "hover:bg-muted/50",
+        'flex items-center gap-3 rounded-lg p-3 transition-all duration-300',
+        enableAnimations && 'hover:bg-muted/50',
         className
       )}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
       <div className="relative">
-        <AvatarImage config={{ ...avatar, size: "sm" }} />
-        
+        <AvatarImage config={{ ...avatar, size: 'sm' }} />
+
         {showOnlineStatus && (
-          <div className={cn(
-            "absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border border-background",
-            isOnline ? "bg-green-500" : "bg-gray-400"
-          )} />
+          <div
+            className={cn(
+              'absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border border-background',
+              isOnline ? 'bg-green-500' : 'bg-gray-400'
+            )}
+          />
         )}
       </div>
 
-      <div className="flex-1 min-w-0">
-        <h4 className="font-medium text-foreground truncate">{name}</h4>
-        <p className="text-sm text-muted-foreground truncate">{title}</p>
+      <div className="min-w-0 flex-1">
+        <h4 className="truncate font-medium text-foreground">{name}</h4>
+        <p className="truncate text-sm text-muted-foreground">{title}</p>
       </div>
 
       {actions.length > 0 && (
@@ -524,7 +564,7 @@ export const ProfessionalAvatar: React.FC<ProfessionalAvatarProps> = ({
           onClick={actions[0]?.onClick}
           className="flex-shrink-0"
         >
-          {actions[0]?.icon || <User className="w-4 h-4" />}
+          {actions[0]?.icon || <User className="h-4 w-4" />}
         </Button>
       )}
     </div>
@@ -532,9 +572,9 @@ export const ProfessionalAvatar: React.FC<ProfessionalAvatarProps> = ({
 
   // Render based on layout
   switch (layout) {
-    case "profile":
+    case 'profile':
       return renderProfileLayout();
-    case "compact":
+    case 'compact':
       return renderCompactLayout();
     default:
       return renderCardLayout();

@@ -26,33 +26,33 @@ const transitionVariants: Record<string, TransitionConfig> = {
   fade: {
     enter: 'opacity-100 translate-y-0',
     exit: 'opacity-0 translate-y-4',
-    duration: 300
+    duration: 300,
   },
   slide: {
     enter: 'translate-x-0 opacity-100',
     exit: 'translate-x-full opacity-0',
-    duration: 400
+    duration: 400,
   },
   scale: {
     enter: 'scale-100 opacity-100',
     exit: 'scale-95 opacity-0',
-    duration: 250
+    duration: 250,
   },
   flip: {
     enter: 'rotateY-0 opacity-100',
     exit: 'rotateY-90 opacity-0',
-    duration: 500
+    duration: 500,
   },
   curtain: {
     enter: 'clip-path-full opacity-100',
     exit: 'clip-path-none opacity-0',
-    duration: 600
+    duration: 600,
   },
   wave: {
     enter: 'transform-none opacity-100',
     exit: 'transform-wave opacity-0',
-    duration: 700
-  }
+    duration: 700,
+  },
 };
 
 export const PageTransition: React.FC<PageTransitionProps> = ({
@@ -62,7 +62,7 @@ export const PageTransition: React.FC<PageTransitionProps> = ({
   variant = 'fade',
   duration,
   delay = 0,
-  className
+  className,
 }) => {
   const [isVisible, setIsVisible] = useState(isActive);
   const [animationClass, setAnimationClass] = useState('');
@@ -92,14 +92,10 @@ export const PageTransition: React.FC<PageTransitionProps> = ({
   return (
     <div
       ref={elementRef}
-      className={cn(
-        'transition-all ease-out',
-        animationClass,
-        className
-      )}
+      className={cn('transition-all ease-out', animationClass, className)}
       style={{
         transitionDuration: `${animationDuration}ms`,
-        transitionDelay: `${delay}ms`
+        transitionDelay: `${delay}ms`,
       }}
     >
       {children}
@@ -119,7 +115,7 @@ export const RouteTransition: React.FC<RouteTransitionProps> = ({
   children,
   location,
   variant = 'fade',
-  className
+  className,
 }) => {
   const [currentLocation, setCurrentLocation] = useState(location);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -127,7 +123,7 @@ export const RouteTransition: React.FC<RouteTransitionProps> = ({
   useEffect(() => {
     if (location !== currentLocation) {
       setIsTransitioning(true);
-      
+
       const timer = setTimeout(() => {
         setCurrentLocation(location);
         setIsTransitioning(false);
@@ -139,10 +135,7 @@ export const RouteTransition: React.FC<RouteTransitionProps> = ({
 
   return (
     <div className={cn('relative overflow-hidden', className)}>
-      <PageTransition
-        isActive={!isTransitioning}
-        variant={variant}
-      >
+      <PageTransition isActive={!isTransitioning} variant={variant}>
         {children}
       </PageTransition>
     </div>
@@ -163,7 +156,7 @@ export const StaggeredTransition: React.FC<StaggeredTransitionProps> = ({
   isActive,
   staggerDelay = 100,
   variant = 'fade',
-  className
+  className,
 }) => {
   return (
     <div className={className}>
@@ -192,7 +185,7 @@ export const ParallaxTransition: React.FC<ParallaxTransitionProps> = ({
   children,
   speed = 0.5,
   direction = 'up',
-  className
+  className,
 }) => {
   const [offset, setOffset] = useState(0);
   const elementRef = useRef<HTMLDivElement>(null);
@@ -203,7 +196,7 @@ export const ParallaxTransition: React.FC<ParallaxTransitionProps> = ({
         const rect = elementRef.current.getBoundingClientRect();
         const scrolled = window.pageYOffset;
         const rate = scrolled * -speed;
-        
+
         let transform = '';
         switch (direction) {
           case 'up':
@@ -219,7 +212,7 @@ export const ParallaxTransition: React.FC<ParallaxTransitionProps> = ({
             transform = `translateX(${-rate}px)`;
             break;
         }
-        
+
         setOffset(rate);
       }
     };
@@ -268,7 +261,7 @@ export const MorphTransition: React.FC<MorphTransitionProps> = ({
   to,
   isActive,
   duration = 500,
-  className
+  className,
 }) => {
   const [phase, setPhase] = useState<'from' | 'morphing' | 'to'>('from');
 
@@ -289,17 +282,17 @@ export const MorphTransition: React.FC<MorphTransitionProps> = ({
       <div
         className={cn(
           'transition-all ease-in-out',
-          phase === 'from' ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
+          phase === 'from' ? 'scale-100 opacity-100' : 'scale-90 opacity-0'
         )}
         style={{ transitionDuration: `${duration / 2}ms` }}
       >
         {phase === 'from' && from}
       </div>
-      
+
       <div
         className={cn(
           'absolute inset-0 transition-all ease-in-out',
-          phase === 'to' ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
+          phase === 'to' ? 'scale-100 opacity-100' : 'scale-90 opacity-0'
         )}
         style={{ transitionDuration: `${duration / 2}ms` }}
       >
@@ -417,6 +410,6 @@ export const usePageTransition = (initialState = false) => {
     isTransitioning,
     direction,
     startTransition,
-    endTransition
+    endTransition,
   };
 };

@@ -1,6 +1,6 @@
 /**
  * Database Schema Validation System
- * 
+ *
  * This module provides comprehensive validation schemas for projects and skills
  * with type-safe data transformers, validators, and migration utilities.
  */

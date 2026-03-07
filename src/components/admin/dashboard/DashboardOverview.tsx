@@ -12,11 +12,11 @@ interface DashboardOverviewProps {
   onQuickAction?: (actionId: string) => void;
 }
 
-export const DashboardOverview: React.FC<DashboardOverviewProps> = ({ 
+export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
   className,
   onNavigateToTab,
   onStatClick,
-  onQuickAction
+  onQuickAction,
 }) => {
   const handleStatClick = (statType: string) => {
     onStatClick?.(statType);
@@ -57,7 +57,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
       description: 'Create a new portfolio project',
       icon: () => <BarChart3 className="h-4 w-4" />,
       onClick: () => handleQuickActionClick('add-project'),
-      variant: 'default' as const
+      variant: 'default' as const,
     },
     {
       id: 'manage-projects',
@@ -65,7 +65,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
       description: 'View and edit existing projects',
       icon: () => <BarChart3 className="h-4 w-4" />,
       onClick: () => handleQuickActionClick('manage-projects'),
-      variant: 'outline' as const
+      variant: 'outline' as const,
     },
     {
       id: 'manage-skills',
@@ -73,7 +73,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
       description: 'Update your skills and expertise',
       icon: () => <BarChart3 className="h-4 w-4" />,
       onClick: () => handleQuickActionClick('manage-skills'),
-      variant: 'outline' as const
+      variant: 'outline' as const,
     },
     {
       id: 'analytics',
@@ -82,20 +82,22 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
       icon: () => <BarChart3 className="h-4 w-4" />,
       onClick: () => handleQuickActionClick('analytics'),
       variant: 'outline' as const,
-      badge: 'New'
-    }
+      badge: 'New',
+    },
   ];
 
   return (
     <div className={className}>
       {/* Page Header */}
       <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="p-2 bg-primary/10 rounded-lg">
+        <div className="mb-2 flex items-center gap-3">
+          <div className="rounded-lg bg-primary/10 p-2">
             <BarChart3 className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Dashboard Overview</h1>
+            <h1 className="text-3xl font-bold tracking-tight">
+              Dashboard Overview
+            </h1>
             <p className="text-muted-foreground">
               Monitor your portfolio performance and manage content
             </p>
@@ -105,7 +107,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
 
       {/* Stats Grid */}
       <div className="mb-8">
-        <StatsGrid 
+        <StatsGrid
           columns={4}
           showTrends={true}
           onStatClick={handleStatClick}
@@ -113,19 +115,19 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Recent Activity - Takes 2 columns on large screens */}
         <div className="lg:col-span-2">
-          <RecentActivity 
+          <RecentActivity
             maxItems={8}
             showActions={true}
             onViewAll={() => onNavigateToTab?.('activity')}
           />
         </div>
-        
+
         {/* Quick Actions - Takes 1 column on large screens */}
         <div className="lg:col-span-1">
-          <QuickActions 
+          <QuickActions
             actions={quickActions}
             layout="list"
             maxItems={6}

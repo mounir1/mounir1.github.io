@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { 
-  BarChart3, 
-  Database, 
-  Plus, 
-  Award, 
-  ChevronLeft, 
+import {
+  BarChart3,
+  Database,
+  Plus,
+  Award,
+  ChevronLeft,
   ChevronRight,
   Menu,
-  X
+  X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -35,26 +35,26 @@ const defaultItems: SidebarItem[] = [
     id: 'overview',
     label: 'Overview',
     icon: BarChart3,
-    onClick: () => {}
+    onClick: () => {},
   },
   {
     id: 'projects',
     label: 'Projects',
     icon: Database,
-    onClick: () => {}
+    onClick: () => {},
   },
   {
     id: 'add-project',
     label: 'Add Project',
     icon: Plus,
-    onClick: () => {}
+    onClick: () => {},
   },
   {
     id: 'skills',
     label: 'Skills',
     icon: Award,
-    onClick: () => {}
-  }
+    onClick: () => {},
+  },
 ];
 
 export const AdminSidebar: React.FC<AdminSidebarProps> = ({
@@ -62,23 +62,27 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   collapsed = false,
   onToggle,
   activeItem,
-  className
+  className,
 }) => {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   const toggleMobile = () => setIsMobileOpen(!isMobileOpen);
 
   const SidebarContent = () => (
-    <Card className={cn(
-      "border-0 shadow-medium transition-all duration-300",
-      collapsed ? "w-16" : "w-64",
-      className
-    )}>
-      <div className="p-4 space-y-2">
+    <Card
+      className={cn(
+        'border-0 shadow-medium transition-all duration-300',
+        collapsed ? 'w-16' : 'w-64',
+        className
+      )}
+    >
+      <div className="space-y-2 p-4">
         {/* Toggle Button */}
-        <div className="flex justify-between items-center mb-4">
+        <div className="mb-4 flex items-center justify-between">
           {!collapsed && (
-            <h2 className="text-lg font-semibold text-muted-foreground">Navigation</h2>
+            <h2 className="text-lg font-semibold text-muted-foreground">
+              Navigation
+            </h2>
           )}
           {onToggle && (
             <Button
@@ -98,26 +102,23 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
 
         {/* Navigation Items */}
         <nav className="space-y-1">
-          {items.map((item) => (
+          {items.map(item => (
             <Button
               key={item.id}
-              variant={activeItem === item.id ? "default" : "ghost"}
+              variant={activeItem === item.id ? 'default' : 'ghost'}
               className={cn(
-                "w-full justify-start transition-all duration-200",
-                collapsed ? "px-2" : "px-3",
-                activeItem === item.id && "shadow-glow"
+                'w-full justify-start transition-all duration-200',
+                collapsed ? 'px-2' : 'px-3',
+                activeItem === item.id && 'shadow-glow'
               )}
               onClick={item.onClick}
             >
-              <item.icon className={cn(
-                "h-4 w-4",
-                collapsed ? "" : "mr-2"
-              )} />
+              <item.icon className={cn('h-4 w-4', collapsed ? '' : 'mr-2')} />
               {!collapsed && (
                 <span className="flex-1 text-left">{item.label}</span>
               )}
               {!collapsed && item.badge && (
-                <span className="ml-auto bg-primary/20 text-primary text-xs px-2 py-1 rounded-full">
+                <span className="ml-auto rounded-full bg-primary/20 px-2 py-1 text-xs text-primary">
                   {item.badge}
                 </span>
               )}
@@ -131,7 +132,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   return (
     <>
       {/* Mobile Toggle Button */}
-      <div className="lg:hidden fixed top-20 left-4 z-50">
+      <div className="fixed left-4 top-20 z-50 lg:hidden">
         <Button
           variant="outline"
           size="sm"
@@ -147,21 +148,23 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       </div>
 
       {/* Desktop Sidebar */}
-      <div className={cn(
-        "hidden lg:block fixed left-4 top-28 bottom-4 z-40 transition-all duration-300",
-        collapsed ? "w-16" : "w-64"
-      )}>
+      <div
+        className={cn(
+          'fixed bottom-4 left-4 top-28 z-40 hidden transition-all duration-300 lg:block',
+          collapsed ? 'w-16' : 'w-64'
+        )}
+      >
         <SidebarContent />
       </div>
 
       {/* Mobile Sidebar Overlay */}
       {isMobileOpen && (
-        <div className="lg:hidden fixed inset-0 z-40">
-          <div 
+        <div className="fixed inset-0 z-40 lg:hidden">
+          <div
             className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300"
             onClick={toggleMobile}
           />
-          <div className="absolute left-0 top-0 bottom-0 w-64 transform transition-transform duration-300">
+          <div className="absolute bottom-0 left-0 top-0 w-64 transform transition-transform duration-300">
             <SidebarContent />
           </div>
         </div>

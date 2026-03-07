@@ -1,12 +1,12 @@
-import { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, Edit, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ColumnDef } from '@tanstack/react-table';
+import { MoreHorizontal, Edit, Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/dropdown-menu';
 
 interface ActionColumnProps<T> {
   onEdit?: (item: T) => void;
@@ -18,7 +18,7 @@ export function createActionColumnDef<T>({
   onDelete,
 }: ActionColumnProps<T>): ColumnDef<T> {
   return {
-    id: "actions",
+    id: 'actions',
     cell: ({ row }) => {
       const item = row.original;
 

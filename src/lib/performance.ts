@@ -3,13 +3,17 @@
 
 // Memory cache for expensive operations
 class MemoryCache<T> {
-  private cache = new Map<string, { data: T; timestamp: number; ttl: number }>();
+  private cache = new Map<
+    string,
+    { data: T; timestamp: number; ttl: number }
+  >();
 
-  set(key: string, data: T, ttl: number = 5 * 60 * 1000): void { // 5 minutes default TTL
+  set(key: string, data: T, ttl: number = 5 * 60 * 1000): void {
+    // 5 minutes default TTL
     this.cache.set(key, {
       data,
       timestamp: Date.now(),
-      ttl
+      ttl,
     });
   }
 
@@ -56,7 +60,7 @@ export function debounce<T extends (...args: any[]) => any>(
   delay: number
 ): (...args: Parameters<T>) => void {
   let timeoutId: NodeJS.Timeout;
-  
+
   return (...args: Parameters<T>) => {
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => func(...args), delay);
@@ -69,12 +73,12 @@ export function throttle<T extends (...args: any[]) => any>(
   limit: number
 ): (...args: Parameters<T>) => void {
   let inThrottle: boolean;
-  
+
   return (...args: Parameters<T>) => {
     if (!inThrottle) {
       func(...args);
       inThrottle = true;
-      setTimeout(() => inThrottle = false, limit);
+      setTimeout(() => (inThrottle = false), limit);
     }
   };
 }
@@ -85,17 +89,17 @@ export function memoize<T extends (...args: any[]) => any>(
   getKey?: (...args: Parameters<T>) => string
 ): T {
   const cache = new Map<string, ReturnType<T>>();
-  
+
   return ((...args: Parameters<T>) => {
     const key = getKey ? getKey(...args) : JSON.stringify(args);
-    
+
     if (cache.has(key)) {
       return cache.get(key);
     }
-    
+
     const result = func(...args);
     cache.set(key, result);
-    
+
     return result;
   }) as T;
 }
@@ -140,16 +144,16 @@ export class BatchProcessor<T> {
 
   private async process(): Promise<void> {
     this.processing = true;
-    
+
     while (this.queue.length > 0) {
       const batch = this.queue.splice(0, this.batchSize);
       await this.processBatch(batch);
-      
+
       if (this.queue.length > 0) {
         await new Promise(resolve => setTimeout(resolve, this.delay));
       }
     }
-    
+
     this.processing = false;
   }
 
@@ -180,10 +184,10 @@ export class ConnectionMonitor {
     // Monitor network information if available
     if ('connection' in navigator) {
       const connection = (navigator as any).connection;
-      
+
       const updateQuality = () => {
         const effectiveType = connection.effectiveType;
-        
+
         switch (effectiveType) {
           case '4g':
             this.quality = 'excellent';
@@ -197,10 +201,10 @@ export class ConnectionMonitor {
           default:
             this.quality = 'poor';
         }
-        
+
         this.notifyListeners();
       };
-      
+
       connection.addEventListener('change', updateQuality);
       updateQuality();
     }
@@ -212,7 +216,7 @@ export class ConnectionMonitor {
         this.notifyListeners();
       }
     });
-    
+
     window.addEventListener('offline', () => {
       this.quality = 'poor';
       this.notifyListeners();
@@ -229,7 +233,7 @@ export class ConnectionMonitor {
 
   onQualityChange(callback: (quality: string) => void): () => void {
     this.listeners.push(callback);
-    
+
     // Return unsubscribe function
     return () => {
       const index = this.listeners.indexOf(callback);
@@ -263,27 +267,29 @@ export function createLazyLoader<T>(
       if (loaded && data) {
         return Promise.resolve(data);
       }
-      
+
       if (loading && promise) {
         return promise;
       }
-      
+
       loading = true;
-      promise = loader().then(result => {
-        data = result;
-        loaded = true;
-        loading = false;
-        return result;
-      }).catch(error => {
-        loading = false;
-        throw error;
-      });
-      
+      promise = loader()
+        .then(result => {
+          data = result;
+          loaded = true;
+          loading = false;
+          return result;
+        })
+        .catch(error => {
+          loading = false;
+          throw error;
+        });
+
       return promise;
     },
-    
+
     isLoaded: () => loaded,
-    get: () => data
+    get: () => data,
   };
 }
 
@@ -304,7 +310,7 @@ export class RequestQueue {
           reject(error);
         }
       });
-      
+
       if (!this.processing) {
         this.process();
       }
@@ -313,9 +319,12 @@ export class RequestQueue {
 
   private async process(): Promise<void> {
     this.processing = true;
-    
+
     while (this.queue.length > 0 || this.activeRequests > 0) {
-      while (this.activeRequests < this.maxConcurrent && this.queue.length > 0) {
+      while (
+        this.activeRequests < this.maxConcurrent &&
+        this.queue.length > 0
+      ) {
         const request = this.queue.shift();
         if (request) {
           this.activeRequests++;
@@ -324,12 +333,12 @@ export class RequestQueue {
           });
         }
       }
-      
+
       if (this.activeRequests >= this.maxConcurrent) {
         await new Promise(resolve => setTimeout(resolve, 50));
       }
     }
-    
+
     this.processing = false;
   }
 }
@@ -344,14 +353,14 @@ export class PerformanceMonitor {
 
   startTiming(label: string): () => void {
     const start = performance.now();
-    
+
     return () => {
       const duration = performance.now() - start;
       if (!this.metrics[label]) {
         this.metrics[label] = [];
       }
       this.metrics[label].push(duration);
-      
+
       // Keep only last 100 measurements
       if (this.metrics[label].length > 100) {
         this.metrics[label] = this.metrics[label].slice(-100);
@@ -359,29 +368,38 @@ export class PerformanceMonitor {
     };
   }
 
-  getStats(label: string): { avg: number; min: number; max: number; count: number } | null {
+  getStats(
+    label: string
+  ): { avg: number; min: number; max: number; count: number } | null {
     const measurements = this.metrics[label];
     if (!measurements || measurements.length === 0) {
       return null;
     }
-    
-    const avg = measurements.reduce((sum, val) => sum + val, 0) / measurements.length;
+
+    const avg =
+      measurements.reduce((sum, val) => sum + val, 0) / measurements.length;
     const min = Math.min(...measurements);
     const max = Math.max(...measurements);
-    
+
     return { avg, min, max, count: measurements.length };
   }
 
-  getAllStats(): Record<string, { avg: number; min: number; max: number; count: number }> {
-    const stats: Record<string, { avg: number; min: number; max: number; count: number }> = {};
-    
+  getAllStats(): Record<
+    string,
+    { avg: number; min: number; max: number; count: number }
+  > {
+    const stats: Record<
+      string,
+      { avg: number; min: number; max: number; count: number }
+    > = {};
+
     Object.keys(this.metrics).forEach(label => {
       const labelStats = this.getStats(label);
       if (labelStats) {
         stats[label] = labelStats;
       }
     });
-    
+
     return stats;
   }
 
@@ -393,8 +411,11 @@ export class PerformanceMonitor {
 export const performanceMonitor = new PerformanceMonitor();
 
 // Clean up caches periodically
-setInterval(() => {
-  projectCache.cleanup();
-  skillCache.cleanup();
-  imageCache.cleanup();
-}, 5 * 60 * 1000); // Every 5 minutes
+setInterval(
+  () => {
+    projectCache.cleanup();
+    skillCache.cleanup();
+    imageCache.cleanup();
+  },
+  5 * 60 * 1000
+); // Every 5 minutes

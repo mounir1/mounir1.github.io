@@ -1,5 +1,5 @@
 /**
-* Centralized type definitions
+ * Centralized type definitions
  * Consolidates duplicate types and interfaces across the codebase
  */
 
@@ -31,7 +31,13 @@ export interface BaseCardProps extends BaseComponentProps {
 }
 
 export interface BaseButtonProps extends BaseComponentProps {
-  variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
+  variant?:
+    | 'default'
+    | 'destructive'
+    | 'outline'
+    | 'secondary'
+    | 'ghost'
+    | 'link';
   size?: 'default' | 'sm' | 'lg' | 'icon';
   loading?: boolean;
   disabled?: boolean;

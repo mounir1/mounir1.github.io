@@ -12,11 +12,7 @@ interface AdminAuthProps {
  * and guards admin routes. This is the main entry point for admin authentication.
  */
 export function AdminAuth({ children, fallback }: AdminAuthProps) {
-  return (
-    <AuthGuard fallback={fallback}>
-      {children}
-    </AuthGuard>
-  );
+  return <AuthGuard fallback={fallback}>{children}</AuthGuard>;
 }
 
 // Export the hook for components that need direct access to auth state

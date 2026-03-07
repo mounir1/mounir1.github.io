@@ -104,21 +104,21 @@ export function EnhancedDataTable<TData>({
   // Enhanced columns with selection
   const enhancedColumns = useMemo(() => {
     const baseColumns = [...columns];
-    
+
     if (enableSelection) {
       baseColumns.unshift({
         id: 'select',
         header: ({ table }) => (
           <Checkbox
             checked={table.getIsAllPageRowsSelected()}
-            onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+            onCheckedChange={value => table.toggleAllPageRowsSelected(!!value)}
             aria-label="Select all"
           />
         ),
         cell: ({ row }) => (
           <Checkbox
             checked={row.getIsSelected()}
-            onCheckedChange={(value) => row.toggleSelected(!!value)}
+            onCheckedChange={value => row.toggleSelected(!!value)}
             aria-label="Select row"
           />
         ),
@@ -157,18 +157,24 @@ export function EnhancedDataTable<TData>({
   }, [table, rowSelection]);
 
   const exportData = useCallback(() => {
-    const exportRows = table.getFilteredRowModel().rows.map(row => row.original);
+    const exportRows = table
+      .getFilteredRowModel()
+      .rows.map(row => row.original);
     const dataStr = JSON.stringify(exportRows, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-    
+    const dataUri =
+      'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+
     const link = document.createElement('a');
     link.setAttribute('href', dataUri);
-    link.setAttribute('download', `table-data-${new Date().toISOString().split('T')[0]}.json`);
+    link.setAttribute(
+      'download',
+      `table-data-${new Date().toISOString().split('T')[0]}.json`
+    );
     link.click();
-    
+
     toast({
       title: 'Data Exported',
-      description: `Exported ${exportRows.length} rows`
+      description: `Exported ${exportRows.length} rows`,
     });
   }, [table]);
 
@@ -176,13 +182,13 @@ export function EnhancedDataTable<TData>({
     return (
       <Card className={className}>
         <CardContent className="flex items-center justify-center p-8">
-          <div className="text-center space-y-2">
-            <AlertCircle className="w-8 h-8 text-red-500 mx-auto" />
-            <p className="text-red-600 font-medium">Failed to load data</p>
+          <div className="space-y-2 text-center">
+            <AlertCircle className="mx-auto h-8 w-8 text-red-500" />
+            <p className="font-medium text-red-600">Failed to load data</p>
             <p className="text-sm text-muted-foreground">{error}</p>
             {onRefresh && (
               <Button onClick={onRefresh} variant="outline" size="sm">
-                <RefreshCw className="w-4 h-4 mr-2" />
+                <RefreshCw className="mr-2 h-4 w-4" />
                 Retry
               </Button>
             )}
@@ -201,17 +207,28 @@ export function EnhancedDataTable<TData>({
             <div className="flex items-center justify-between">
               <div>
                 {title && <CardTitle>{title}</CardTitle>}
-                {description && <p className="text-sm text-muted-foreground mt-1">{description}</p>}
+                {description && (
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {description}
+                  </p>
+                )}
               </div>
               <div className="flex items-center gap-2">
                 {onRefresh && (
-                  <Button variant="outline" size="sm" onClick={onRefresh} disabled={loading}>
-                    <RefreshCw className={cn('w-4 h-4', loading && 'animate-spin')} />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={onRefresh}
+                    disabled={loading}
+                  >
+                    <RefreshCw
+                      className={cn('h-4 w-4', loading && 'animate-spin')}
+                    />
                     Refresh
                   </Button>
                 )}
                 <Button variant="outline" size="sm" onClick={exportData}>
-                  <Download className="w-4 h-4 mr-2" />
+                  <Download className="mr-2 h-4 w-4" />
                   Export
                 </Button>
               </div>
@@ -226,12 +243,12 @@ export function EnhancedDataTable<TData>({
           <div className="flex items-center justify-between gap-4">
             {/* Search */}
             {enableSearch && (
-              <div className="relative flex-1 max-w-sm">
+              <div className="relative max-w-sm flex-1">
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search all columns..."
                   value={globalFilter}
-                  onChange={(e) => setGlobalFilter(e.target.value)}
+                  onChange={e => setGlobalFilter(e.target.value)}
                   className="pl-8"
                 />
               </div>
@@ -242,21 +259,23 @@ export function EnhancedDataTable<TData>({
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm">
-                    <EyeOff className="w-4 h-4 mr-2" />
+                    <EyeOff className="mr-2 h-4 w-4" />
                     Columns
-                    <ChevronDown className="w-4 h-4 ml-2" />
+                    <ChevronDown className="ml-2 h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   {table
                     .getAllColumns()
-                    .filter((column) => column.getCanHide())
-                    .map((column) => (
+                    .filter(column => column.getCanHide())
+                    .map(column => (
                       <DropdownMenuCheckboxItem
                         key={column.id}
                         className="capitalize"
                         checked={column.getIsVisible()}
-                        onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                        onCheckedChange={value =>
+                          column.toggleVisibility(!!value)
+                        }
                       >
                         {column.id}
                       </DropdownMenuCheckboxItem>
@@ -266,8 +285,12 @@ export function EnhancedDataTable<TData>({
 
               {/* Clear Filters */}
               {globalFilter && (
-                <Button variant="ghost" size="sm" onClick={() => setGlobalFilter('')}>
-                  <X className="w-4 h-4 mr-2" />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setGlobalFilter('')}
+                >
+                  <X className="mr-2 h-4 w-4" />
                   Clear
                 </Button>
               )}
@@ -276,14 +299,14 @@ export function EnhancedDataTable<TData>({
 
           {/* Bulk Actions */}
           {enableSelection && selectedRows.length > 0 && (
-            <div className="flex items-center justify-between pt-4 border-t">
+            <div className="flex items-center justify-between border-t pt-4">
               <span className="text-sm text-muted-foreground">
                 {selectedRows.length} row(s) selected
               </span>
               <div className="flex gap-2">
                 {actions
                   .filter(action => !action.disabled?.(selectedRows))
-                  .map((action) => (
+                  .map(action => (
                     <Button
                       key={action.id}
                       variant={action.variant || 'outline'}
@@ -306,22 +329,23 @@ export function EnhancedDataTable<TData>({
           {loading ? (
             <div className="flex items-center justify-center p-8">
               <div className="flex items-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Loader2 className="h-4 w-4 animate-spin" />
                 <span>Loading data...</span>
               </div>
             </div>
           ) : (
             <Table>
               <TableHeader>
-                {table.getHeaderGroups().map((headerGroup) => (
+                {table.getHeaderGroups().map(headerGroup => (
                   <TableRow key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
+                    {headerGroup.headers.map(header => (
                       <TableHead key={header.id}>
                         {header.isPlaceholder ? null : (
                           <div
                             className={cn(
                               'flex items-center space-x-2',
-                              header.column.getCanSort() && 'cursor-pointer select-none'
+                              header.column.getCanSort() &&
+                                'cursor-pointer select-none'
                             )}
                             onClick={header.column.getToggleSortingHandler()}
                           >
@@ -330,7 +354,7 @@ export function EnhancedDataTable<TData>({
                               header.getContext()
                             )}
                             {header.column.getCanSort() && (
-                              <ArrowUpDown className="w-4 h-4" />
+                              <ArrowUpDown className="h-4 w-4" />
                             )}
                           </div>
                         )}
@@ -341,14 +365,14 @@ export function EnhancedDataTable<TData>({
               </TableHeader>
               <TableBody>
                 {table.getRowModel().rows?.length ? (
-                  table.getRowModel().rows.map((row) => (
+                  table.getRowModel().rows.map(row => (
                     <TableRow
                       key={row.id}
                       data-state={row.getIsSelected() && 'selected'}
                       className={cn(onRowClick && 'cursor-pointer')}
                       onClick={() => onRowClick?.(row.original)}
                     >
-                      {row.getVisibleCells().map((cell) => (
+                      {row.getVisibleCells().map(cell => (
                         <TableCell key={cell.id}>
                           {flexRender(
                             cell.column.columnDef.cell,
@@ -382,13 +406,13 @@ export function EnhancedDataTable<TData>({
               <p className="text-sm font-medium">Rows per page</p>
               <Select
                 value={`${table.getState().pagination.pageSize}`}
-                onValueChange={(value) => table.setPageSize(Number(value))}
+                onValueChange={value => table.setPageSize(Number(value))}
               >
                 <SelectTrigger className="h-8 w-[70px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {[10, 20, 50, 100].map((pageSize) => (
+                  {[10, 20, 50, 100].map(pageSize => (
                     <SelectItem key={pageSize} value={`${pageSize}`}>
                       {pageSize}
                     </SelectItem>
@@ -396,10 +420,11 @@ export function EnhancedDataTable<TData>({
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div className="flex items-center space-x-6">
               <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-                Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+                Page {table.getState().pagination.pageIndex + 1} of{' '}
+                {table.getPageCount()}
               </div>
               <div className="flex items-center space-x-2">
                 <Button

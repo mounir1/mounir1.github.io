@@ -1,9 +1,9 @@
-import React from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
-import { 
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import {
   Activity,
   Plus,
   Edit,
@@ -13,59 +13,66 @@ import {
   User,
   Lock,
   Upload,
-  Download
-} from 'lucide-react'
+  Download,
+} from 'lucide-react';
 
 interface ActivityLog {
-  id: string
-  type: 'create' | 'update' | 'delete' | 'auth' | 'settings' | 'export' | 'import'
-  description: string
-  user: string
-  timestamp: string
-  details?: string
+  id: string;
+  type:
+    | 'create'
+    | 'update'
+    | 'delete'
+    | 'auth'
+    | 'settings'
+    | 'export'
+    | 'import';
+  description: string;
+  user: string;
+  timestamp: string;
+  details?: string;
 }
 
 const getActivityIcon = (type: ActivityLog['type']) => {
   switch (type) {
     case 'create':
-      return Plus
+      return Plus;
     case 'update':
-      return Edit
+      return Edit;
     case 'delete':
-      return Trash2
+      return Trash2;
     case 'auth':
-      return Lock
+      return Lock;
     case 'settings':
-      return Settings
+      return Settings;
     case 'export':
-      return Download
+      return Download;
     case 'import':
-      return Upload
+      return Upload;
     default:
-      return Activity
+      return Activity;
   }
-}
+};
 
 const getActivityColor = (type: ActivityLog['type']) => {
   switch (type) {
     case 'create':
-      return 'bg-green-500/10 text-green-500'
+      return 'bg-green-500/10 text-green-500';
     case 'update':
-      return 'bg-blue-500/10 text-blue-500'
+      return 'bg-blue-500/10 text-blue-500';
     case 'delete':
-      return 'bg-red-500/10 text-red-500'
+      return 'bg-red-500/10 text-red-500';
     case 'auth':
-      return 'bg-yellow-500/10 text-yellow-500'
+      return 'bg-yellow-500/10 text-yellow-500';
     case 'settings':
-      return 'bg-purple-500/10 text-purple-500'
+      return 'bg-purple-500/10 text-purple-500';
     case 'export':
-      return 'bg-teal-500/10 text-teal-500'
+      return 'bg-teal-500/10 text-teal-500';
     case 'import':
-      return 'bg-indigo-500/10 text-indigo-500'
+      return 'bg-indigo-500/10 text-indigo-500';
     default:
-      return 'bg-slate-500/10 text-slate-500'
+      return 'bg-slate-500/10 text-slate-500';
   }
-}
+};
 
 const recentActivities: ActivityLog[] = [
   {
@@ -74,7 +81,7 @@ const recentActivities: ActivityLog[] = [
     description: 'Created new project',
     user: 'mounir@example.com',
     timestamp: '2 minutes ago',
-    details: 'Portfolio Website v2'
+    details: 'Portfolio Website v2',
   },
   {
     id: '2',
@@ -82,7 +89,7 @@ const recentActivities: ActivityLog[] = [
     description: 'Updated skills',
     user: 'mounir@example.com',
     timestamp: '15 minutes ago',
-    details: 'Added React and TypeScript'
+    details: 'Added React and TypeScript',
   },
   {
     id: '3',
@@ -90,7 +97,7 @@ const recentActivities: ActivityLog[] = [
     description: 'New login detected',
     user: 'mounir@example.com',
     timestamp: '1 hour ago',
-    details: 'From Chrome on Windows'
+    details: 'From Chrome on Windows',
   },
   {
     id: '4',
@@ -98,16 +105,16 @@ const recentActivities: ActivityLog[] = [
     description: 'Changed site settings',
     user: 'mounir@example.com',
     timestamp: '2 hours ago',
-    details: 'Updated theme preferences'
+    details: 'Updated theme preferences',
   },
   {
     id: '5',
     type: 'export',
     description: 'Exported project data',
     user: 'mounir@example.com',
-    timestamp: '3 hours ago'
-  }
-]
+    timestamp: '3 hours ago',
+  },
+];
 
 export const ActivityLogs: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   className,
@@ -123,18 +130,20 @@ export const ActivityLogs: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {recentActivities.map((activity) => {
-            const Icon = getActivityIcon(activity.type)
-            
+          {recentActivities.map(activity => {
+            const Icon = getActivityIcon(activity.type);
+
             return (
               <div
                 key={activity.id}
                 className="flex items-start space-x-4 rounded-lg border p-3"
               >
-                <div className={cn(
-                  'rounded-full p-2',
-                  getActivityColor(activity.type)
-                )}>
+                <div
+                  className={cn(
+                    'rounded-full p-2',
+                    getActivityColor(activity.type)
+                  )}
+                >
                   <Icon className="h-4 w-4" />
                 </div>
                 <div className="flex-1 space-y-1">
@@ -163,10 +172,10 @@ export const ActivityLogs: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
                   {activity.type}
                 </Badge>
               </div>
-            )
+            );
           })}
         </div>
       </CardContent>
     </Card>
-  )
-}
+  );
+};

@@ -15,5 +15,6 @@ export default {
   Hero: () => import('./hero').then(m => ({ default: m.Hero })),
   Skills: () => import('./skills').then(m => ({ default: m.Skills })),
   Projects: () => import('./projects').then(m => ({ default: m.Projects })),
-  Experience: () => import('./experience').then(m => ({ default: m.Experience })),
+  Experience: () =>
+    import('./experience').then(m => ({ default: m.Experience })),
 };

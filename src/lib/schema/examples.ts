@@ -11,7 +11,12 @@ import {
 } from './validators';
 import { legacyProjectTransformer } from './transformers';
 import { MigrationUtils } from './migrations';
-import { ProjectCategory, ProjectStatus, SkillCategory, SkillLevel } from './types';
+import {
+  ProjectCategory,
+  ProjectStatus,
+  SkillCategory,
+  SkillLevel,
+} from './types';
 
 /**
  * Example 1: Basic project validation
@@ -19,7 +24,8 @@ import { ProjectCategory, ProjectStatus, SkillCategory, SkillLevel } from './typ
 export function exampleBasicProjectValidation() {
   const projectData = {
     title: 'E-commerce Platform',
-    description: 'A comprehensive e-commerce platform built with React and Node.js, featuring user authentication, product catalog, shopping cart, and payment processing.',
+    description:
+      'A comprehensive e-commerce platform built with React and Node.js, featuring user authentication, product catalog, shopping cart, and payment processing.',
     category: ProjectCategory.E_COMMERCE,
     status: ProjectStatus.COMPLETED,
     technologies: ['React', 'Node.js', 'MongoDB', 'Stripe'],
@@ -41,7 +47,8 @@ export function exampleBasicProjectValidation() {
 export function exampleCreateProject() {
   const newProjectData = {
     title: 'Portfolio Website',
-    description: 'A modern, responsive portfolio website showcasing my projects and skills with smooth animations and dark mode support.',
+    description:
+      'A modern, responsive portfolio website showcasing my projects and skills with smooth animations and dark mode support.',
     category: ProjectCategory.WEB_APPLICATION,
     technologies: ['React', 'TypeScript', 'Tailwind CSS', 'Framer Motion'],
     role: 'Frontend Developer',
@@ -88,7 +95,8 @@ export function exampleSkillValidation() {
       lastUsed: new Date(),
       frequency: 'daily' as const,
     },
-    description: 'Extensive experience building complex React applications with hooks, context, and modern patterns.',
+    description:
+      'Extensive experience building complex React applications with hooks, context, and modern patterns.',
     certifications: [
       {
         name: 'React Developer Certification',
@@ -134,7 +142,8 @@ export function exampleBulkValidation() {
   const projects = [
     {
       title: 'Project A',
-      description: 'A valid project with all required fields and proper structure.',
+      description:
+        'A valid project with all required fields and proper structure.',
       category: ProjectCategory.WEB_APPLICATION,
       status: ProjectStatus.COMPLETED,
       technologies: ['React', 'Node.js'],
@@ -144,7 +153,8 @@ export function exampleBulkValidation() {
     },
     {
       title: 'Project B',
-      description: 'Another valid project with different technologies and status.',
+      description:
+        'Another valid project with different technologies and status.',
       category: ProjectCategory.MOBILE_APPLICATION,
       status: ProjectStatus.IN_PROGRESS,
       technologies: ['React Native', 'Firebase'],
@@ -167,7 +177,8 @@ export function exampleBulkValidation() {
 export function exampleLegacyTransformation() {
   const legacyProject = {
     title: 'Old Project Format',
-    description: 'This project uses the old data structure that needs to be migrated.',
+    description:
+      'This project uses the old data structure that needs to be migrated.',
     category: 'Web Application',
     status: 'completed',
     technologies: ['React', 'Express'],
@@ -184,7 +195,8 @@ export function exampleLegacyTransformation() {
   };
 
   try {
-    const transformedProject = legacyProjectTransformer.transform(legacyProject);
+    const transformedProject =
+      legacyProjectTransformer.transform(legacyProject);
     const validationResult = validateProject(transformedProject);
     return { transformedProject, validationResult };
   } catch (error) {
@@ -198,7 +210,8 @@ export function exampleLegacyTransformation() {
 export async function exampleAutoMigration() {
   const oldProjectData = {
     title: 'Legacy Project',
-    description: 'This project needs to be migrated to the latest schema version.',
+    description:
+      'This project needs to be migrated to the latest schema version.',
     category: 'Web Application',
     technologies: ['jQuery', 'PHP'],
     image: 'https://example.com/legacy.jpg',
@@ -207,9 +220,16 @@ export async function exampleAutoMigration() {
     createdAt: 1577836800000,
   };
 
-  const detectedVersion = MigrationUtils.detectDataVersion(oldProjectData, 'project');
-  const migrationResult = await MigrationUtils.autoMigrate(oldProjectData, 'project', '1.0.0');
-  
+  const detectedVersion = MigrationUtils.detectDataVersion(
+    oldProjectData,
+    'project'
+  );
+  const migrationResult = await MigrationUtils.autoMigrate(
+    oldProjectData,
+    'project',
+    '1.0.0'
+  );
+
   if (migrationResult.success) {
     const validationResult = validateProject(migrationResult.migratedData);
     return { ...migrationResult, validationResult, detectedVersion };
@@ -225,7 +245,11 @@ export function exampleFieldValidation() {
   return [
     { field: 'title', value: 'Valid Project Title', shouldPass: true },
     { field: 'title', value: '', shouldPass: false },
-    { field: 'description', value: 'This is a sufficiently long description for the project', shouldPass: true },
+    {
+      field: 'description',
+      value: 'This is a sufficiently long description for the project',
+      shouldPass: true,
+    },
     { field: 'description', value: 'Too short', shouldPass: false },
     { field: 'technologies', value: ['React', 'TypeScript'], shouldPass: true },
     { field: 'technologies', value: [], shouldPass: false },
@@ -249,23 +273,26 @@ export function exampleErrorHandling() {
   };
 
   const result = validateProject(invalidProject);
-  
+
   if (!result.success && result.errors) {
-    const errorsByField = result.errors.reduce((acc, error) => {
-      if (!acc[error.field]) {
-        acc[error.field] = [];
-      }
-      acc[error.field].push(error.message);
-      return acc;
-    }, {} as Record<string, string[]>);
+    const errorsByField = result.errors.reduce(
+      (acc, error) => {
+        if (!acc[error.field]) {
+          acc[error.field] = [];
+        }
+        acc[error.field].push(error.message);
+        return acc;
+      },
+      {} as Record<string, string[]>
+    );
 
     const errorCount = result.errors.length;
     const fieldCount = Object.keys(errorsByField).length;
-    
+
     return {
       ...result,
       errorsByField,
-      summary: { errorCount, fieldCount }
+      summary: { errorCount, fieldCount },
     };
   }
 

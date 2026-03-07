@@ -1,9 +1,21 @@
 import React from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { AlertTriangle, CheckCircle, XCircle, Settings, ExternalLink } from 'lucide-react';
+import {
+  AlertTriangle,
+  CheckCircle,
+  XCircle,
+  Settings,
+  ExternalLink,
+} from 'lucide-react';
 import { isFirebaseEnabled, firebaseConfig } from '@/lib/firebase';
 
 interface FirebaseConfigCheckerProps {
@@ -11,22 +23,37 @@ interface FirebaseConfigCheckerProps {
   className?: string;
 }
 
-export const FirebaseConfigChecker: React.FC<FirebaseConfigCheckerProps> = ({ 
+export const FirebaseConfigChecker: React.FC<FirebaseConfigCheckerProps> = ({
   showDetails = false,
-  className 
+  className,
 }) => {
   const configStatus = {
-    apiKey: Boolean(firebaseConfig.apiKey && !firebaseConfig.apiKey.includes('demo')),
-    authDomain: Boolean(firebaseConfig.authDomain && !firebaseConfig.authDomain.includes('demo')),
-    projectId: Boolean(firebaseConfig.projectId && !firebaseConfig.projectId.includes('demo')),
-    storageBucket: Boolean(firebaseConfig.storageBucket && !firebaseConfig.storageBucket.includes('demo')),
-    messagingSenderId: Boolean(firebaseConfig.messagingSenderId && !firebaseConfig.messagingSenderId.includes('123')),
-    appId: Boolean(firebaseConfig.appId && !firebaseConfig.appId.includes('demo')),
+    apiKey: Boolean(
+      firebaseConfig.apiKey && !firebaseConfig.apiKey.includes('demo')
+    ),
+    authDomain: Boolean(
+      firebaseConfig.authDomain && !firebaseConfig.authDomain.includes('demo')
+    ),
+    projectId: Boolean(
+      firebaseConfig.projectId && !firebaseConfig.projectId.includes('demo')
+    ),
+    storageBucket: Boolean(
+      firebaseConfig.storageBucket &&
+        !firebaseConfig.storageBucket.includes('demo')
+    ),
+    messagingSenderId: Boolean(
+      firebaseConfig.messagingSenderId &&
+        !firebaseConfig.messagingSenderId.includes('123')
+    ),
+    appId: Boolean(
+      firebaseConfig.appId && !firebaseConfig.appId.includes('demo')
+    ),
   };
 
   const isProperlyConfigured = Object.values(configStatus).every(Boolean);
   const isDemoMode = !isProperlyConfigured && import.meta.env.DEV;
-  const isProductionWithoutConfig = !isProperlyConfigured && import.meta.env.PROD;
+  const isProductionWithoutConfig =
+    !isProperlyConfigured && import.meta.env.PROD;
 
   if (isProperlyConfigured && !showDetails) {
     return null; // Don't show anything if properly configured and details not requested
@@ -41,7 +68,8 @@ export const FirebaseConfigChecker: React.FC<FirebaseConfigCheckerProps> = ({
           <AlertDescription className="text-red-800 dark:text-red-200">
             <strong>Firebase Configuration Required</strong>
             <br />
-            Firebase is not configured properly. Please check your environment variables and restart the development server.
+            Firebase is not configured properly. Please check your environment
+            variables and restart the development server.
           </AlertDescription>
         </Alert>
       )}
@@ -52,7 +80,8 @@ export const FirebaseConfigChecker: React.FC<FirebaseConfigCheckerProps> = ({
           <AlertDescription className="text-yellow-800 dark:text-yellow-200">
             <strong>Demo Mode Active</strong>
             <br />
-            Running with demo Firebase configuration. Some features may not work properly.
+            Running with demo Firebase configuration. Some features may not work
+            properly.
           </AlertDescription>
         </Alert>
       )}
@@ -87,7 +116,8 @@ export const FirebaseConfigChecker: React.FC<FirebaseConfigCheckerProps> = ({
                 <strong>Environment:</strong> {import.meta.env.MODE}
               </div>
               <div>
-                <strong>Firebase Enabled:</strong> {isFirebaseEnabled ? 'Yes' : 'No'}
+                <strong>Firebase Enabled:</strong>{' '}
+                {isFirebaseEnabled ? 'Yes' : 'No'}
               </div>
             </div>
 
@@ -96,13 +126,22 @@ export const FirebaseConfigChecker: React.FC<FirebaseConfigCheckerProps> = ({
               <h4 className="font-medium">Configuration Variables:</h4>
               <div className="grid gap-2">
                 {Object.entries(configStatus).map(([key, isValid]) => (
-                  <div key={key} className="flex items-center justify-between p-2 rounded border">
-                    <span className="font-mono text-sm">VITE_FIREBASE_{key.toUpperCase()}</span>
-                    <Badge variant={isValid ? "default" : "destructive"}>
+                  <div
+                    key={key}
+                    className="flex items-center justify-between rounded border p-2"
+                  >
+                    <span className="font-mono text-sm">
+                      VITE_FIREBASE_{key.toUpperCase()}
+                    </span>
+                    <Badge variant={isValid ? 'default' : 'destructive'}>
                       {isValid ? (
-                        <><CheckCircle className="w-3 h-3 mr-1" /> Configured</>
+                        <>
+                          <CheckCircle className="mr-1 h-3 w-3" /> Configured
+                        </>
                       ) : (
-                        <><XCircle className="w-3 h-3 mr-1" /> Missing</>
+                        <>
+                          <XCircle className="mr-1 h-3 w-3" /> Missing
+                        </>
                       )}
                     </Badge>
                   </div>
@@ -112,28 +151,49 @@ export const FirebaseConfigChecker: React.FC<FirebaseConfigCheckerProps> = ({
 
             {/* Setup Instructions */}
             {!isProperlyConfigured && (
-              <div className="space-y-3 p-4 bg-muted rounded-lg">
+              <div className="space-y-3 rounded-lg bg-muted p-4">
                 <h4 className="font-medium">Setup Instructions:</h4>
-                <ol className="list-decimal list-inside space-y-2 text-sm">
-                  <li>Create a Firebase project at <a href="https://console.firebase.google.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-flex items-center gap-1">Firebase Console <ExternalLink className="w-3 h-3" /></a></li>
+                <ol className="list-inside list-decimal space-y-2 text-sm">
+                  <li>
+                    Create a Firebase project at{' '}
+                    <a
+                      href="https://console.firebase.google.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-primary hover:underline"
+                    >
+                      Firebase Console <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </li>
                   <li>Enable Authentication and Firestore Database</li>
                   <li>Get your project configuration from Project Settings</li>
-                  <li>Create a <code className="bg-background px-1 rounded">.env.local</code> file in your project root</li>
+                  <li>
+                    Create a{' '}
+                    <code className="rounded bg-background px-1">
+                      .env.local
+                    </code>{' '}
+                    file in your project root
+                  </li>
                   <li>Add the following environment variables:</li>
                 </ol>
-                
-                <div className="bg-background p-3 rounded border font-mono text-xs overflow-x-auto">
+
+                <div className="overflow-x-auto rounded border bg-background p-3 font-mono text-xs">
                   <div>VITE_FIREBASE_API_KEY=your_api_key</div>
-                  <div>VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com</div>
+                  <div>
+                    VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+                  </div>
                   <div>VITE_FIREBASE_PROJECT_ID=your_project_id</div>
-                  <div>VITE_FIREBASE_STORAGE_BUCKET=your_project.appspot.com</div>
+                  <div>
+                    VITE_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+                  </div>
                   <div>VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id</div>
                   <div>VITE_FIREBASE_APP_ID=your_app_id</div>
                   <div>VITE_FIREBASE_MEASUREMENT_ID=your_measurement_id</div>
                 </div>
-                
+
                 <p className="text-sm text-muted-foreground">
-                  After adding the environment variables, restart your development server.
+                  After adding the environment variables, restart your
+                  development server.
                 </p>
               </div>
             )}
@@ -147,18 +207,14 @@ export const FirebaseConfigChecker: React.FC<FirebaseConfigCheckerProps> = ({
               >
                 Refresh Configuration
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                asChild
-              >
-                <a 
-                  href="https://console.firebase.google.com" 
-                  target="_blank" 
+              <Button variant="outline" size="sm" asChild>
+                <a
+                  href="https://console.firebase.google.com"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1"
                 >
-                  Firebase Console <ExternalLink className="w-3 h-3" />
+                  Firebase Console <ExternalLink className="h-3 w-3" />
                 </a>
               </Button>
             </div>

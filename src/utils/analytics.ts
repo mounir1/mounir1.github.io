@@ -11,13 +11,16 @@ declare global {
  * @param eventName - Name of the event to track
  * @param eventData - Additional data for the event
  */
-export const trackEvent = (eventName: string, eventData: Record<string, unknown> = {}) => {
+export const trackEvent = (
+  eventName: string,
+  eventData: Record<string, unknown> = {}
+) => {
   if (typeof window !== 'undefined' && window.dataLayer) {
     window.dataLayer.push({
       event: eventName,
       timestamp: Date.now(),
       page: window.location.pathname,
-      ...eventData
+      ...eventData,
     });
   }
 };
@@ -27,7 +30,10 @@ export const trackEvent = (eventName: string, eventData: Record<string, unknown>
  * @param buttonName - Name of the button
  * @param additionalData - Additional data to track
  */
-export const trackButtonClick = (buttonName: string, additionalData: Record<string, unknown> = {}) => {
+export const trackButtonClick = (
+  buttonName: string,
+  additionalData: Record<string, unknown> = {}
+) => {
   trackEvent('button_click', {
     category: 'engagement',
     label: buttonName,
@@ -35,7 +41,7 @@ export const trackButtonClick = (buttonName: string, additionalData: Record<stri
     button_location: additionalData.location || 'unknown',
     button_type: additionalData.type || 'primary',
     user_action: 'click',
-    ...additionalData
+    ...additionalData,
   });
 };
 
@@ -44,7 +50,10 @@ export const trackButtonClick = (buttonName: string, additionalData: Record<stri
  * @param formName - Name of the form
  * @param additionalData - Additional data to track
  */
-export const trackFormSubmit = (formName: string, additionalData: Record<string, unknown> = {}) => {
+export const trackFormSubmit = (
+  formName: string,
+  additionalData: Record<string, unknown> = {}
+) => {
   trackEvent('form_submit', {
     category: 'engagement',
     label: formName,
@@ -52,7 +61,7 @@ export const trackFormSubmit = (formName: string, additionalData: Record<string,
     form_location: additionalData.location || 'unknown',
     form_status: additionalData.status || 'submitted',
     user_action: 'submit',
-    ...additionalData
+    ...additionalData,
   });
 };
 
@@ -61,7 +70,10 @@ export const trackFormSubmit = (formName: string, additionalData: Record<string,
  * @param pageName - Name of the page
  * @param additionalData - Additional data to track
  */
-export const trackPageView = (pageName: string, additionalData: Record<string, unknown> = {}) => {
+export const trackPageView = (
+  pageName: string,
+  additionalData: Record<string, unknown> = {}
+) => {
   trackEvent('page_view', {
     category: 'navigation',
     label: pageName,
@@ -69,7 +81,7 @@ export const trackPageView = (pageName: string, additionalData: Record<string, u
     page_url: window.location.href,
     page_title: document.title,
     referrer: document.referrer,
-    ...additionalData
+    ...additionalData,
   });
 };
 
@@ -79,7 +91,11 @@ export const trackPageView = (pageName: string, additionalData: Record<string, u
  * @param action - Action performed (click, hover, filter)
  * @param additionalData - Additional data to track
  */
-export const trackSkillInteraction = (skillName: string, action: string, additionalData: Record<string, unknown> = {}) => {
+export const trackSkillInteraction = (
+  skillName: string,
+  action: string,
+  additionalData: Record<string, unknown> = {}
+) => {
   trackEvent('skill_interaction', {
     category: 'skills',
     label: skillName,
@@ -87,7 +103,7 @@ export const trackSkillInteraction = (skillName: string, action: string, additio
     action: action,
     skill_category: additionalData.category || 'unknown',
     skill_level: additionalData.level || 'unknown',
-    ...additionalData
+    ...additionalData,
   });
 };
 
@@ -97,7 +113,11 @@ export const trackSkillInteraction = (skillName: string, action: string, additio
  * @param action - Action performed (view, click, filter)
  * @param additionalData - Additional data to track
  */
-export const trackProjectInteraction = (projectName: string, action: string, additionalData: Record<string, unknown> = {}) => {
+export const trackProjectInteraction = (
+  projectName: string,
+  action: string,
+  additionalData: Record<string, unknown> = {}
+) => {
   trackEvent('project_interaction', {
     category: 'projects',
     label: projectName,
@@ -105,7 +125,7 @@ export const trackProjectInteraction = (projectName: string, action: string, add
     action: action,
     project_category: additionalData.category || 'unknown',
     project_status: additionalData.status || 'unknown',
-    ...additionalData
+    ...additionalData,
   });
 };
 
@@ -114,14 +134,17 @@ export const trackProjectInteraction = (projectName: string, action: string, add
  * @param action - Admin action performed
  * @param additionalData - Additional data to track
  */
-export const trackAdminAction = (action: string, additionalData: Record<string, unknown> = {}) => {
+export const trackAdminAction = (
+  action: string,
+  additionalData: Record<string, unknown> = {}
+) => {
   trackEvent('admin_action', {
     category: 'admin',
     label: action,
     admin_action: action,
     admin_section: additionalData.section || 'unknown',
     admin_user: additionalData.user || 'unknown',
-    ...additionalData
+    ...additionalData,
   });
 };
 
@@ -131,14 +154,18 @@ export const trackAdminAction = (action: string, additionalData: Record<string, 
  * @param errorMessage - Error message
  * @param additionalData - Additional data to track
  */
-export const trackError = (errorType: string, errorMessage: string, additionalData: Record<string, unknown> = {}) => {
+export const trackError = (
+  errorType: string,
+  errorMessage: string,
+  additionalData: Record<string, unknown> = {}
+) => {
   trackEvent('error', {
     category: 'error',
     label: errorType,
     error_type: errorType,
     error_message: errorMessage,
     error_location: additionalData.location || 'unknown',
-    ...additionalData
+    ...additionalData,
   });
 };
 
@@ -157,7 +184,7 @@ export const initializeAnalytics = () => {
       page_load_time: performance.now(),
       user_agent: navigator.userAgent,
       screen_resolution: `${screen.width}x${screen.height}`,
-      viewport_size: `${window.innerWidth}x${window.innerHeight}`
+      viewport_size: `${window.innerWidth}x${window.innerHeight}`,
     });
   }
 };

@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
-import { cn } from "@/lib/utils";
-import { useReducedMotion } from "@/hooks/useAccessibility";
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { cn } from '@/lib/utils';
+import { useReducedMotion } from '@/hooks/useAccessibility';
 
 // Typing configuration interface
 export interface TypingConfig {
@@ -17,7 +17,7 @@ export interface TypingConfig {
 
 // Animation variants
 export interface AnimationVariant {
-  name: "typewriter" | "fade" | "slide" | "scale" | "glitch";
+  name: 'typewriter' | 'fade' | 'slide' | 'scale' | 'glitch';
   duration?: number;
   easing?: string;
 }
@@ -31,7 +31,15 @@ export interface TextStyle {
   gradient?: {
     from: string;
     to: string;
-    direction?: "to-r" | "to-l" | "to-t" | "to-b" | "to-br" | "to-bl" | "to-tr" | "to-tl";
+    direction?:
+      | 'to-r'
+      | 'to-l'
+      | 'to-t'
+      | 'to-b'
+      | 'to-br'
+      | 'to-bl'
+      | 'to-tr'
+      | 'to-tl';
   };
 }
 
@@ -67,10 +75,10 @@ const DEFAULT_CONFIG: TypingConfig = {
   pauseDuration: 2000,
   loop: true,
   showCursor: true,
-  cursorChar: "|",
+  cursorChar: '|',
   cursorBlinkSpeed: 1000,
   randomizeSpeed: false,
-  preserveWhitespace: true
+  preserveWhitespace: true,
 };
 
 // Typing state
@@ -92,7 +100,7 @@ const useTypingSound = (enabled: boolean, soundUrl?: string) => {
       audioRef.current = new Audio(soundUrl);
       audioRef.current.volume = 0.1; // Low volume for subtle effect
     }
-    
+
     return () => {
       if (audioRef.current) {
         audioRef.current.remove();
@@ -120,7 +128,12 @@ interface CursorProps {
   className?: string;
 }
 
-const Cursor: React.FC<CursorProps> = ({ show, char, blinkSpeed, className }) => {
+const Cursor: React.FC<CursorProps> = ({
+  show,
+  char,
+  blinkSpeed,
+  className,
+}) => {
   const [visible, setVisible] = useState(true);
   const prefersReducedMotion = useReducedMotion();
 
@@ -139,9 +152,13 @@ const Cursor: React.FC<CursorProps> = ({ show, char, blinkSpeed, className }) =>
   return (
     <span
       className={cn(
-        "inline-block",
-        prefersReducedMotion ? "opacity-100" : (visible ? "opacity-100" : "opacity-0"),
-        "transition-opacity duration-75",
+        'inline-block',
+        prefersReducedMotion
+          ? 'opacity-100'
+          : visible
+            ? 'opacity-100'
+            : 'opacity-0',
+        'transition-opacity duration-75',
         className
       )}
     >
@@ -167,13 +184,10 @@ const StyledText: React.FC<StyledTextProps> = ({ text, style, className }) => {
 
   // Handle gradient text
   if (style?.gradient) {
-    const gradientClass = `bg-gradient-${style.gradient.direction || "to-r"} from-${style.gradient.from} to-${style.gradient.to} bg-clip-text text-transparent`;
-    
+    const gradientClass = `bg-gradient-${style.gradient.direction || 'to-r'} from-${style.gradient.from} to-${style.gradient.to} bg-clip-text text-transparent`;
+
     return (
-      <span 
-        className={cn(gradientClass, className)}
-        style={textStyle}
-      >
+      <span className={cn(gradientClass, className)} style={textStyle}>
         {text}
       </span>
     );
@@ -195,23 +209,23 @@ export const DynamicTypingEffect: React.FC<DynamicTypingEffectProps> = ({
   onComplete,
   onTextChange,
   startDelay = 0,
-  prefix = "",
-  suffix = "",
-  wrapperElement: WrapperElement = "span",
+  prefix = '',
+  suffix = '',
+  wrapperElement: WrapperElement = 'span',
   enableSound = false,
-  soundUrl
+  soundUrl,
 }) => {
   const mergedConfig = { ...DEFAULT_CONFIG, ...config };
   const prefersReducedMotion = useReducedMotion();
-  
+
   // State management
   const [state, setState] = useState<TypingState>({
     currentIndex: 0,
-    currentText: "",
+    currentText: '',
     isDeleting: false,
     isPaused: false,
     isComplete: false,
-    speed: mergedConfig.typeSpeed || 100
+    speed: mergedConfig.typeSpeed || 100,
   });
 
   const [hasStarted, setHasStarted] = useState(false);
@@ -219,15 +233,15 @@ export const DynamicTypingEffect: React.FC<DynamicTypingEffectProps> = ({
   const playSound = useTypingSound(enableSound, soundUrl);
 
   // Convert texts to TypingTextItem format
-  const normalizedTexts: TypingTextItem[] = texts.map(text => 
-    typeof text === 'string' 
+  const normalizedTexts: TypingTextItem[] = texts.map(text =>
+    typeof text === 'string'
       ? { text, style: defaultStyle }
       : { ...text, style: { ...defaultStyle, ...text.style } }
   );
 
   // Get current text item
   const currentItem = normalizedTexts[state.currentIndex] || normalizedTexts[0];
-  const targetText = currentItem?.text || "";
+  const targetText = currentItem?.text || '';
 
   // Start delay effect
   useEffect(() => {
@@ -246,7 +260,7 @@ export const DynamicTypingEffect: React.FC<DynamicTypingEffectProps> = ({
       setState(prev => ({
         ...prev,
         currentText: targetText,
-        isComplete: !mergedConfig.loop
+        isComplete: !mergedConfig.loop,
       }));
       onTextChange?.(targetText, state.currentIndex);
       return;
@@ -254,7 +268,7 @@ export const DynamicTypingEffect: React.FC<DynamicTypingEffectProps> = ({
 
     setState(prevState => {
       const { currentText, isDeleting, isPaused, currentIndex } = prevState;
-      
+
       if (isPaused) {
         // End pause
         return { ...prevState, isPaused: false };
@@ -265,7 +279,7 @@ export const DynamicTypingEffect: React.FC<DynamicTypingEffectProps> = ({
         if (currentText.length < targetText.length) {
           const nextChar = targetText[currentText.length];
           const newText = currentText + nextChar;
-          
+
           // Play sound on each character
           if (enableSound) {
             playSound();
@@ -274,20 +288,21 @@ export const DynamicTypingEffect: React.FC<DynamicTypingEffectProps> = ({
           return {
             ...prevState,
             currentText: newText,
-            speed: mergedConfig.randomizeSpeed 
+            speed: mergedConfig.randomizeSpeed
               ? (mergedConfig.typeSpeed || 100) + Math.random() * 50 - 25
-              : mergedConfig.typeSpeed || 100
+              : mergedConfig.typeSpeed || 100,
           };
         } else {
           // Finished typing current text
           onTextChange?.(currentText, currentIndex);
-          
-          const pauseDuration = currentItem.pauseAfter || mergedConfig.pauseDuration || 2000;
-          
+
+          const pauseDuration =
+            currentItem.pauseAfter || mergedConfig.pauseDuration || 2000;
+
           return {
             ...prevState,
             isPaused: true,
-            speed: pauseDuration
+            speed: pauseDuration,
           };
         }
       } else {
@@ -297,62 +312,73 @@ export const DynamicTypingEffect: React.FC<DynamicTypingEffectProps> = ({
           return {
             ...prevState,
             currentText: newText,
-            speed: mergedConfig.deleteSpeed || 50
+            speed: mergedConfig.deleteSpeed || 50,
           };
         } else {
           // Finished deleting, move to next text
           const nextIndex = (currentIndex + 1) % normalizedTexts.length;
           const isComplete = !mergedConfig.loop && nextIndex === 0;
-          
+
           if (isComplete) {
             onComplete?.();
           }
-          
+
           return {
             ...prevState,
             currentIndex: nextIndex,
             isDeleting: false,
             isComplete,
-            speed: mergedConfig.typeSpeed || 100
+            speed: mergedConfig.typeSpeed || 100,
           };
         }
       }
     });
   }, [
-    hasStarted, 
-    targetText, 
-    currentItem, 
-    mergedConfig, 
-    onTextChange, 
-    onComplete, 
+    hasStarted,
+    targetText,
+    currentItem,
+    mergedConfig,
+    onTextChange,
+    onComplete,
     state.currentIndex,
     enableSound,
     playSound,
-    prefersReducedMotion
+    prefersReducedMotion,
   ]);
 
   // Handle pause completion and start deleting
   useEffect(() => {
-    if (state.isPaused && state.currentText === targetText && !state.isDeleting) {
+    if (
+      state.isPaused &&
+      state.currentText === targetText &&
+      !state.isDeleting
+    ) {
       const timer = setTimeout(() => {
         setState(prev => ({
           ...prev,
           isPaused: false,
           isDeleting: true,
-          speed: mergedConfig.deleteSpeed || 50
+          speed: mergedConfig.deleteSpeed || 50,
         }));
       }, state.speed);
-      
+
       return () => clearTimeout(timer);
     }
-  }, [state.isPaused, state.currentText, targetText, state.isDeleting, state.speed, mergedConfig.deleteSpeed]);
+  }, [
+    state.isPaused,
+    state.currentText,
+    targetText,
+    state.isDeleting,
+    state.speed,
+    mergedConfig.deleteSpeed,
+  ]);
 
   // Main animation loop
   useEffect(() => {
     if (state.isComplete && !mergedConfig.loop) return;
 
     timeoutRef.current = setTimeout(typeStep, state.speed);
-    
+
     return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
@@ -362,19 +388,19 @@ export const DynamicTypingEffect: React.FC<DynamicTypingEffectProps> = ({
 
   // Animation variants
   const getAnimationClasses = (animation?: AnimationVariant) => {
-    if (!animation || prefersReducedMotion) return "";
+    if (!animation || prefersReducedMotion) return '';
 
     switch (animation.name) {
-      case "fade":
-        return "animate-in fade-in duration-500";
-      case "slide":
-        return "animate-in slide-in-from-left-2 duration-300";
-      case "scale":
-        return "animate-in zoom-in duration-200";
-      case "glitch":
-        return "animate-pulse";
+      case 'fade':
+        return 'animate-in fade-in duration-500';
+      case 'slide':
+        return 'animate-in slide-in-from-left-2 duration-300';
+      case 'scale':
+        return 'animate-in zoom-in duration-200';
+      case 'glitch':
+        return 'animate-pulse';
       default:
-        return "";
+        return '';
     }
   };
 
@@ -384,29 +410,29 @@ export const DynamicTypingEffect: React.FC<DynamicTypingEffectProps> = ({
   const animationClasses = getAnimationClasses(currentItem?.animation);
 
   return (
-    <WrapperElement 
+    <WrapperElement
       className={cn(
-        "inline-block",
+        'inline-block',
         animationClasses,
-        currentItem?.highlight && "bg-primary/10 px-2 py-1 rounded",
+        currentItem?.highlight && 'rounded bg-primary/10 px-2 py-1',
         className
       )}
     >
       {prefix && <span className="text-muted-foreground">{prefix}</span>}
-      
-      <StyledText 
+
+      <StyledText
         text={displayText}
         style={currentItem?.style}
         className="font-medium"
       />
-      
-      <Cursor 
+
+      <Cursor
         show={showCursor}
-        char={mergedConfig.cursorChar || "|"}
+        char={mergedConfig.cursorChar || '|'}
         blinkSpeed={mergedConfig.cursorBlinkSpeed || 1000}
         className="text-primary"
       />
-      
+
       {suffix && <span className="text-muted-foreground">{suffix}</span>}
     </WrapperElement>
   );
@@ -421,10 +447,10 @@ export const TypingPresets = {
     pauseDuration: 3000,
     loop: true,
     showCursor: true,
-    cursorChar: "|",
-    randomizeSpeed: true
+    cursorChar: '|',
+    randomizeSpeed: true,
   },
-  
+
   // Fast and energetic
   energetic: {
     typeSpeed: 50,
@@ -432,10 +458,10 @@ export const TypingPresets = {
     pauseDuration: 1500,
     loop: true,
     showCursor: true,
-    cursorChar: "_",
-    randomizeSpeed: false
+    cursorChar: '_',
+    randomizeSpeed: false,
   },
-  
+
   // Slow and deliberate
   deliberate: {
     typeSpeed: 150,
@@ -443,10 +469,10 @@ export const TypingPresets = {
     pauseDuration: 4000,
     loop: true,
     showCursor: true,
-    cursorChar: "█",
-    randomizeSpeed: false
+    cursorChar: '█',
+    randomizeSpeed: false,
   },
-  
+
   // Terminal style
   terminal: {
     typeSpeed: 60,
@@ -454,37 +480,37 @@ export const TypingPresets = {
     pauseDuration: 2000,
     loop: true,
     showCursor: true,
-    cursorChar: "▋",
+    cursorChar: '▋',
     cursorBlinkSpeed: 500,
-    randomizeSpeed: true
-  }
+    randomizeSpeed: true,
+  },
 };
 
 // Text style presets
 export const TextStylePresets = {
   gradient: {
     gradient: {
-      from: "blue-600",
-      to: "purple-600",
-      direction: "to-r" as const
-    }
+      from: 'blue-600',
+      to: 'purple-600',
+      direction: 'to-r' as const,
+    },
   },
-  
+
   primary: {
-    color: "rgb(var(--primary))"
+    color: 'rgb(var(--primary))',
   },
-  
+
   accent: {
     gradient: {
-      from: "pink-500",
-      to: "orange-500",
-      direction: "to-r" as const
-    }
+      from: 'pink-500',
+      to: 'orange-500',
+      direction: 'to-r' as const,
+    },
   },
-  
+
   success: {
-    color: "rgb(34, 197, 94)"
-  }
+    color: 'rgb(34, 197, 94)',
+  },
 };
 
 export default DynamicTypingEffect;

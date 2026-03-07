@@ -1,40 +1,47 @@
-import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { toast } from "@/hooks/use-toast";
-import { useProjects } from "@/hooks/useProjects";
-import { useSkills } from "@/hooks/useSkills";
-import { PortfolioDataManager } from "@/lib/data-management-service";
-import { 
-  Download, 
-  Upload, 
-  DatabaseBackup, 
-  DatabaseRestore, 
-  FileJson, 
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { toast } from '@/hooks/use-toast';
+import { useProjects } from '@/hooks/useProjects';
+import { useSkills } from '@/hooks/useSkills';
+import { PortfolioDataManager } from '@/lib/data-management-service';
+import {
+  Download,
+  Upload,
+  DatabaseBackup,
+  DatabaseRestore,
+  FileJson,
   DatabaseZap,
   CheckCircle,
-  AlertCircle
-} from "lucide-react";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogFooter, 
-  DialogHeader, 
-  DialogTitle 
-} from "@/components/ui/dialog";
-import { 
-  AlertDialog, 
-  AlertDialogAction, 
-  AlertDialogCancel, 
-  AlertDialogContent, 
-  AlertDialogDescription, 
-  AlertDialogFooter, 
-  AlertDialogHeader, 
-  AlertDialogTitle 
-} from "@/components/ui/alert-dialog";
+  AlertCircle,
+} from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 type ExportFormat = 'json' | 'csv' | 'excel';
 
@@ -61,13 +68,13 @@ export function DataExportManager() {
     includeProjects: true,
     includeSkills: true,
     includeMetadata: true,
-    format: 'json'
+    format: 'json',
   });
 
   const handleExport = async () => {
     setExportProgress(0);
     setExportComplete(false);
-    
+
     try {
       // Simulate export progress
       for (let i = 0; i <= 100; i += 10) {
@@ -83,8 +90,8 @@ export function DataExportManager() {
           exportedAt: new Date().toISOString(),
           totalProjects: projects.length,
           totalSkills: skills.length,
-          format: exportOptions.format
-        })
+          format: exportOptions.format,
+        }),
       };
 
       // Create file based on format
@@ -107,7 +114,8 @@ export function DataExportManager() {
         case 'excel':
           // For Excel, we'll just export a simple summary
           dataStr = `Projects: ${projects.length}, Skills: ${skills.length}`;
-          mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+          mimeType =
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
           extension = 'xlsx';
           break;
         default:
@@ -118,7 +126,7 @@ export function DataExportManager() {
 
       const dataUri = `data:${mimeType};charset=utf-8,${encodeURIComponent(dataStr)}`;
       const exportFileName = `portfolio-data-${new Date().toISOString().slice(0, 10)}.${extension}`;
-      
+
       const linkElement = document.createElement('a');
       linkElement.setAttribute('href', dataUri);
       linkElement.setAttribute('download', exportFileName);
@@ -126,9 +134,9 @@ export function DataExportManager() {
 
       setExportComplete(true);
       toast({
-        title: "Export Successful",
+        title: 'Export Successful',
         description: `Data exported in ${exportOptions.format.toUpperCase()} format`,
-        className: "bg-green-500 text-white"
+        className: 'bg-green-500 text-white',
       });
 
       // Reset after completion
@@ -138,11 +146,11 @@ export function DataExportManager() {
         setExportComplete(false);
       }, 2000);
     } catch (error) {
-      console.error("Export error:", error);
+      console.error('Export error:', error);
       toast({
-        title: "Export Failed",
-        description: "There was an error exporting your data",
-        variant: "destructive"
+        title: 'Export Failed',
+        description: 'There was an error exporting your data',
+        variant: 'destructive',
       });
     }
   };
@@ -156,9 +164,9 @@ export function DataExportManager() {
   const handleImport = async () => {
     if (!file) {
       toast({
-        title: "No file selected",
-        description: "Please select a file to import",
-        variant: "destructive"
+        title: 'No file selected',
+        description: 'Please select a file to import',
+        variant: 'destructive',
       });
       return;
     }
@@ -182,7 +190,8 @@ export function DataExportManager() {
         for (const project of importData.projects) {
           try {
             // Validate project data
-            const validation = PortfolioDataManager.validateProjectData(project);
+            const validation =
+              PortfolioDataManager.validateProjectData(project);
             if (!validation.isValid) {
               console.warn(`Invalid project data:`, validation.errors);
               continue;
@@ -195,7 +204,7 @@ export function DataExportManager() {
               await PortfolioDataManager.createProject(project);
             }
           } catch (error) {
-            console.error("Error importing project:", error);
+            console.error('Error importing project:', error);
           }
         }
       }
@@ -218,16 +227,16 @@ export function DataExportManager() {
               await PortfolioDataManager.createSkill(skill);
             }
           } catch (error) {
-            console.error("Error importing skill:", error);
+            console.error('Error importing skill:', error);
           }
         }
       }
 
       setImportComplete(true);
       toast({
-        title: "Import Successful",
+        title: 'Import Successful',
         description: `Data imported from ${file.name}`,
-        className: "bg-green-500 text-white"
+        className: 'bg-green-500 text-white',
       });
 
       // Reset after completion
@@ -238,11 +247,12 @@ export function DataExportManager() {
         setFile(null);
       }, 2000);
     } catch (error) {
-      console.error("Import error:", error);
+      console.error('Import error:', error);
       toast({
-        title: "Import Failed",
-        description: "There was an error importing your data. Please check the file format.",
-        variant: "destructive"
+        title: 'Import Failed',
+        description:
+          'There was an error importing your data. Please check the file format.',
+        variant: 'destructive',
       });
     }
   };
@@ -250,8 +260,8 @@ export function DataExportManager() {
   const handleBackup = async () => {
     // This would typically call a backend service to create a backup
     toast({
-      title: "Backup Started",
-      description: "Creating backup of your portfolio data..."
+      title: 'Backup Started',
+      description: 'Creating backup of your portfolio data...',
     });
 
     try {
@@ -261,28 +271,29 @@ export function DataExportManager() {
         projects,
         skills,
         backupDate: new Date().toISOString(),
-        version: "1.0"
+        version: '1.0',
       };
 
       const dataStr = JSON.stringify(backupData, null, 2);
-      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+      const dataUri =
+        'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
       const exportFileName = `portfolio-backup-${new Date().toISOString().slice(0, 10)}.json`;
-      
+
       const linkElement = document.createElement('a');
       linkElement.setAttribute('href', dataUri);
       linkElement.setAttribute('download', exportFileName);
       linkElement.click();
 
       toast({
-        title: "Backup Created",
-        description: "Your portfolio data has been backed up successfully"
+        title: 'Backup Created',
+        description: 'Your portfolio data has been backed up successfully',
       });
     } catch (error) {
-      console.error("Backup error:", error);
+      console.error('Backup error:', error);
       toast({
-        title: "Backup Failed",
-        description: "There was an error creating the backup",
-        variant: "destructive"
+        title: 'Backup Failed',
+        description: 'There was an error creating the backup',
+        variant: 'destructive',
       });
     }
   };
@@ -290,9 +301,9 @@ export function DataExportManager() {
   const handleRestore = async () => {
     if (!file) {
       toast({
-        title: "No backup file selected",
-        description: "Please select a backup file to restore",
-        variant: "destructive"
+        title: 'No backup file selected',
+        description: 'Please select a backup file to restore',
+        variant: 'destructive',
       });
       return;
     }
@@ -305,28 +316,33 @@ export function DataExportManager() {
       // In a real implementation, this would send data to a backend service
       // For now, we'll just validate the data and show a success message
       if (!backupData.projects || !backupData.skills) {
-        throw new Error("Invalid backup file format");
+        throw new Error('Invalid backup file format');
       }
 
       // Show confirmation dialog before restoring
-      if (window.confirm("Restoring will overwrite your current data. Are you sure?")) {
+      if (
+        window.confirm(
+          'Restoring will overwrite your current data. Are you sure?'
+        )
+      ) {
         // In a real implementation, this would replace the current data
         // For now, just show success message
         toast({
-          title: "Restore Successful",
+          title: 'Restore Successful',
           description: `Backup restored from ${file.name}`,
-          className: "bg-green-500 text-white"
+          className: 'bg-green-500 text-white',
         });
-        
+
         setIsRestoreDialogOpen(false);
         setFile(null);
       }
     } catch (error) {
-      console.error("Restore error:", error);
+      console.error('Restore error:', error);
       toast({
-        title: "Restore Failed",
-        description: "There was an error restoring from the backup. Please check the file format.",
-        variant: "destructive"
+        title: 'Restore Failed',
+        description:
+          'There was an error restoring from the backup. Please check the file format.',
+        variant: 'destructive',
       });
     }
   };
@@ -344,17 +360,17 @@ export function DataExportManager() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Button 
-              variant="outline" 
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Button
+              variant="outline"
               onClick={() => setIsExportDialogOpen(true)}
               className="flex items-center justify-center gap-2"
             >
               <Download className="h-4 w-4" />
               Export Data
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => setIsImportDialogOpen(true)}
               className="flex items-center justify-center gap-2"
             >
@@ -362,18 +378,18 @@ export function DataExportManager() {
               Import Data
             </Button>
           </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Button 
-              variant="outline" 
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Button
+              variant="outline"
               onClick={handleBackup}
               className="flex items-center justify-center gap-2"
             >
               <DatabaseZap className="h-4 w-4" />
               Create Backup
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => setIsRestoreDialogOpen(true)}
               className="flex items-center justify-center gap-2"
             >
@@ -393,38 +409,52 @@ export function DataExportManager() {
               Select what data to include in your export and choose the format
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4 py-4">
             <div className="flex items-center justify-between">
               <span>Include Projects</span>
-              <Badge variant={exportOptions.includeProjects ? "default" : "secondary"}>
-                {exportOptions.includeProjects ? "Yes" : "No"}
+              <Badge
+                variant={
+                  exportOptions.includeProjects ? 'default' : 'secondary'
+                }
+              >
+                {exportOptions.includeProjects ? 'Yes' : 'No'}
               </Badge>
             </div>
-            
+
             <div className="flex items-center justify-between">
               <span>Include Skills</span>
-              <Badge variant={exportOptions.includeSkills ? "default" : "secondary"}>
-                {exportOptions.includeSkills ? "Yes" : "No"}
+              <Badge
+                variant={exportOptions.includeSkills ? 'default' : 'secondary'}
+              >
+                {exportOptions.includeSkills ? 'Yes' : 'No'}
               </Badge>
             </div>
-            
+
             <div className="flex items-center justify-between">
               <span>Include Metadata</span>
-              <Badge variant={exportOptions.includeMetadata ? "default" : "secondary"}>
-                {exportOptions.includeMetadata ? "Yes" : "No"}
+              <Badge
+                variant={
+                  exportOptions.includeMetadata ? 'default' : 'secondary'
+                }
+              >
+                {exportOptions.includeMetadata ? 'Yes' : 'No'}
               </Badge>
             </div>
-            
+
             <div className="space-y-2">
               <label className="text-sm font-medium">Export Format</label>
               <div className="flex gap-2">
                 {(['json', 'csv', 'excel'] as ExportFormat[]).map(format => (
                   <Button
                     key={format}
-                    variant={exportOptions.format === format ? "default" : "outline"}
+                    variant={
+                      exportOptions.format === format ? 'default' : 'outline'
+                    }
                     size="sm"
-                    onClick={() => setExportOptions({...exportOptions, format})}
+                    onClick={() =>
+                      setExportOptions({ ...exportOptions, format })
+                    }
                   >
                     {format.toUpperCase()}
                   </Button>
@@ -432,7 +462,7 @@ export function DataExportManager() {
               </div>
             </div>
           </div>
-          
+
           {exportProgress > 0 && (
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
@@ -448,20 +478,20 @@ export function DataExportManager() {
               )}
             </div>
           )}
-          
+
           <DialogFooter>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => setIsExportDialogOpen(false)}
               disabled={exportProgress > 0 && exportProgress < 100}
             >
               Cancel
             </Button>
-            <Button 
+            <Button
               onClick={handleExport}
               disabled={exportProgress > 0 && exportProgress < 100}
             >
-              <Download className="h-4 w-4 mr-2" />
+              <Download className="mr-2 h-4 w-4" />
               Export
             </Button>
           </DialogFooter>
@@ -477,34 +507,37 @@ export function DataExportManager() {
               Select a file to import your portfolio data from
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="py-4">
-            <div className="flex items-center justify-center w-full">
-              <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer border-muted hover:bg-muted/50">
-                <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                  <FileJson className="w-8 h-8 mb-4 text-muted-foreground" />
+            <div className="flex w-full items-center justify-center">
+              <label className="flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted hover:bg-muted/50">
+                <div className="flex flex-col items-center justify-center pb-6 pt-5">
+                  <FileJson className="mb-4 h-8 w-8 text-muted-foreground" />
                   <p className="mb-2 text-sm text-muted-foreground">
-                    <span className="font-semibold">Click to upload</span> or drag and drop
+                    <span className="font-semibold">Click to upload</span> or
+                    drag and drop
                   </p>
-                  <p className="text-xs text-muted-foreground">JSON files only</p>
+                  <p className="text-xs text-muted-foreground">
+                    JSON files only
+                  </p>
                 </div>
-                <input 
-                  type="file" 
-                  className="hidden" 
+                <input
+                  type="file"
+                  className="hidden"
                   accept=".json"
                   onChange={handleFileChange}
                 />
               </label>
             </div>
-            
+
             {file && (
-              <div className="mt-4 p-3 bg-muted rounded-md">
+              <div className="mt-4 rounded-md bg-muted p-3">
                 <p className="text-sm font-medium">Selected file:</p>
-                <p className="text-sm truncate">{file.name}</p>
+                <p className="truncate text-sm">{file.name}</p>
               </div>
             )}
           </div>
-          
+
           {importProgress > 0 && (
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
@@ -520,20 +553,20 @@ export function DataExportManager() {
               )}
             </div>
           )}
-          
+
           <DialogFooter>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => setIsImportDialogOpen(false)}
               disabled={importProgress > 0 && importProgress < 100}
             >
               Cancel
             </Button>
-            <Button 
+            <Button
               onClick={handleImport}
               disabled={!file || (importProgress > 0 && importProgress < 100)}
             >
-              <Upload className="h-4 w-4 mr-2" />
+              <Upload className="mr-2 h-4 w-4" />
               Import
             </Button>
           </DialogFooter>
@@ -549,46 +582,46 @@ export function DataExportManager() {
               Select a backup file to restore your portfolio data from
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="py-4">
-            <div className="flex items-center justify-center w-full">
-              <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer border-muted hover:bg-muted/50">
-                <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                  <DatabaseRestore className="w-8 h-8 mb-4 text-muted-foreground" />
+            <div className="flex w-full items-center justify-center">
+              <label className="flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted hover:bg-muted/50">
+                <div className="flex flex-col items-center justify-center pb-6 pt-5">
+                  <DatabaseRestore className="mb-4 h-8 w-8 text-muted-foreground" />
                   <p className="mb-2 text-sm text-muted-foreground">
-                    <span className="font-semibold">Click to upload</span> or drag and drop
+                    <span className="font-semibold">Click to upload</span> or
+                    drag and drop
                   </p>
-                  <p className="text-xs text-muted-foreground">JSON backup files only</p>
+                  <p className="text-xs text-muted-foreground">
+                    JSON backup files only
+                  </p>
                 </div>
-                <input 
-                  type="file" 
-                  className="hidden" 
+                <input
+                  type="file"
+                  className="hidden"
                   accept=".json"
                   onChange={handleFileChange}
                 />
               </label>
             </div>
-            
+
             {file && (
-              <div className="mt-4 p-3 bg-muted rounded-md">
+              <div className="mt-4 rounded-md bg-muted p-3">
                 <p className="text-sm font-medium">Selected file:</p>
-                <p className="text-sm truncate">{file.name}</p>
+                <p className="truncate text-sm">{file.name}</p>
               </div>
             )}
           </div>
-          
+
           <DialogFooter>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => setIsRestoreDialogOpen(false)}
             >
               Cancel
             </Button>
-            <Button 
-              onClick={handleRestore}
-              disabled={!file}
-            >
-              <DatabaseRestore className="h-4 w-4 mr-2" />
+            <Button onClick={handleRestore} disabled={!file}>
+              <DatabaseRestore className="mr-2 h-4 w-4" />
               Restore
             </Button>
           </DialogFooter>

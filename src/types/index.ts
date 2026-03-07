@@ -249,10 +249,16 @@ export type NonFunctionKeys<T> = {
   [K in keyof T]: T[K] extends Function ? never : K;
 }[keyof T];
 
-export type PickByType<T, U> = Pick<T, {
-  [K in keyof T]: T[K] extends U ? K : never;
-}[keyof T]>;
+export type PickByType<T, U> = Pick<
+  T,
+  {
+    [K in keyof T]: T[K] extends U ? K : never;
+  }[keyof T]
+>;
 
-export type OmitByType<T, U> = Pick<T, {
-  [K in keyof T]: T[K] extends U ? never : K;
-}[keyof T]>;
+export type OmitByType<T, U> = Pick<
+  T,
+  {
+    [K in keyof T]: T[K] extends U ? never : K;
+  }[keyof T]
+>;

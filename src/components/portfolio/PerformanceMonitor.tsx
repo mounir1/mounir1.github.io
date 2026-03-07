@@ -1,14 +1,14 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { 
-  Activity, 
-  TrendingUp, 
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import {
+  Activity,
+  TrendingUp,
   TrendingDown,
-  Clock, 
-  Zap, 
-  Eye, 
+  Clock,
+  Zap,
+  Eye,
   Target,
   AlertTriangle,
   CheckCircle,
@@ -20,9 +20,9 @@ import {
   Globe,
   Users,
   MousePointer,
-  Download
-} from "lucide-react";
-import { cn } from "@/lib/utils";
+  Download,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 // Performance metrics interfaces
 interface CoreWebVitals {
@@ -40,7 +40,7 @@ interface PerformanceMetrics {
   url: string;
   userAgent: string;
   connection?: string;
-  deviceType: "mobile" | "tablet" | "desktop";
+  deviceType: 'mobile' | 'tablet' | 'desktop';
   vitals: CoreWebVitals;
   customMetrics: Record<string, number>;
   errors: ErrorInfo[];
@@ -56,7 +56,7 @@ interface ErrorInfo {
 }
 
 interface UserInteraction {
-  type: "click" | "scroll" | "hover" | "focus" | "form_submit" | "page_view";
+  type: 'click' | 'scroll' | 'hover' | 'focus' | 'form_submit' | 'page_view';
   element?: string;
   timestamp: number;
   duration?: number;
@@ -66,7 +66,7 @@ interface UserInteraction {
 
 interface AnalyticsEvent {
   name: string;
-  category: "engagement" | "performance" | "error" | "conversion";
+  category: 'engagement' | 'performance' | 'error' | 'conversion';
   value?: number;
   timestamp: number;
   properties: Record<string, any>;
@@ -78,31 +78,31 @@ const PERFORMANCE_THRESHOLDS = {
   LCP: { good: 2500, needs_improvement: 4000 },
   FID: { good: 100, needs_improvement: 300 },
   CLS: { good: 0.1, needs_improvement: 0.25 },
-  TTFB: { good: 800, needs_improvement: 1800 }
+  TTFB: { good: 800, needs_improvement: 1800 },
 };
 
 // Device detection
-const detectDeviceType = (): "mobile" | "tablet" | "desktop" => {
-  if (typeof window === "undefined") return "desktop";
-  
+const detectDeviceType = (): 'mobile' | 'tablet' | 'desktop' => {
+  if (typeof window === 'undefined') return 'desktop';
+
   const width = window.innerWidth;
-  if (width < 768) return "mobile";
-  if (width < 1024) return "tablet";
-  return "desktop";
+  if (width < 768) return 'mobile';
+  if (width < 1024) return 'tablet';
+  return 'desktop';
 };
 
 // Connection info detection
 const getConnectionInfo = () => {
-  if (typeof navigator === "undefined" || !("connection" in navigator)) {
+  if (typeof navigator === 'undefined' || !('connection' in navigator)) {
     return undefined;
   }
-  
+
   const conn = (navigator as any).connection;
   return {
     effectiveType: conn?.effectiveType,
     downlink: conn?.downlink,
     rtt: conn?.rtt,
-    saveData: conn?.saveData
+    saveData: conn?.saveData,
   };
 };
 
@@ -111,47 +111,52 @@ const useCoreWebVitals = () => {
   const [vitals, setVitals] = useState<Partial<CoreWebVitals>>({});
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === 'undefined') return;
 
     // FCP - First Contentful Paint
     const measureFCP = () => {
-      const observer = new PerformanceObserver((list) => {
+      const observer = new PerformanceObserver(list => {
         const entries = list.getEntries();
-        const fcpEntry = entries.find(entry => entry.name === "first-contentful-paint");
+        const fcpEntry = entries.find(
+          entry => entry.name === 'first-contentful-paint'
+        );
         if (fcpEntry) {
           setVitals(prev => ({ ...prev, FCP: fcpEntry.startTime }));
           observer.disconnect();
         }
       });
-      observer.observe({ entryTypes: ["paint"] });
+      observer.observe({ entryTypes: ['paint'] });
     };
 
     // LCP - Largest Contentful Paint
     const measureLCP = () => {
-      const observer = new PerformanceObserver((list) => {
+      const observer = new PerformanceObserver(list => {
         const entries = list.getEntries();
         const lastEntry = entries[entries.length - 1];
         setVitals(prev => ({ ...prev, LCP: lastEntry.startTime }));
       });
-      observer.observe({ entryTypes: ["largest-contentful-paint"] });
+      observer.observe({ entryTypes: ['largest-contentful-paint'] });
     };
 
     // FID - First Input Delay
     const measureFID = () => {
-      const observer = new PerformanceObserver((list) => {
+      const observer = new PerformanceObserver(list => {
         const entries = list.getEntries();
         entries.forEach((entry: any) => {
-          setVitals(prev => ({ ...prev, FID: entry.processingStart - entry.startTime }));
+          setVitals(prev => ({
+            ...prev,
+            FID: entry.processingStart - entry.startTime,
+          }));
         });
         observer.disconnect();
       });
-      observer.observe({ entryTypes: ["first-input"] });
+      observer.observe({ entryTypes: ['first-input'] });
     };
 
     // CLS - Cumulative Layout Shift
     const measureCLS = () => {
       let clsValue = 0;
-      const observer = new PerformanceObserver((list) => {
+      const observer = new PerformanceObserver(list => {
         const entries = list.getEntries();
         entries.forEach((entry: any) => {
           if (!entry.hadRecentInput) {
@@ -160,12 +165,14 @@ const useCoreWebVitals = () => {
           }
         });
       });
-      observer.observe({ entryTypes: ["layout-shift"] });
+      observer.observe({ entryTypes: ['layout-shift'] });
     };
 
     // TTFB - Time to First Byte
     const measureTTFB = () => {
-      const navEntry = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming;
+      const navEntry = performance.getEntriesByType(
+        'navigation'
+      )[0] as PerformanceNavigationTiming;
       if (navEntry) {
         const ttfb = navEntry.responseStart - navEntry.requestStart;
         setVitals(prev => ({ ...prev, TTFB: ttfb }));
@@ -199,9 +206,9 @@ const useErrorTracking = () => {
         timestamp: Date.now(),
         url: event.filename || window.location.href,
         lineNumber: event.lineno,
-        columnNumber: event.colno
+        columnNumber: event.colno,
       };
-      
+
       setErrors(prev => [...prev.slice(-9), errorInfo]); // Keep last 10 errors
     };
 
@@ -209,18 +216,21 @@ const useErrorTracking = () => {
       const errorInfo: ErrorInfo = {
         message: `Unhandled Promise Rejection: ${event.reason}`,
         timestamp: Date.now(),
-        url: window.location.href
+        url: window.location.href,
       };
-      
+
       setErrors(prev => [...prev.slice(-9), errorInfo]);
     };
 
-    window.addEventListener("error", handleError);
-    window.addEventListener("unhandledrejection", handleUnhandledRejection);
+    window.addEventListener('error', handleError);
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
 
     return () => {
-      window.removeEventListener("error", handleError);
-      window.removeEventListener("unhandledrejection", handleUnhandledRejection);
+      window.removeEventListener('error', handleError);
+      window.removeEventListener(
+        'unhandledrejection',
+        handleUnhandledRejection
+      );
     };
   }, []);
 
@@ -231,33 +241,37 @@ const useErrorTracking = () => {
 const useInteractionTracking = () => {
   const [interactions, setInteractions] = useState<UserInteraction[]>([]);
 
-  const trackInteraction = useCallback((interaction: Omit<UserInteraction, "timestamp">) => {
-    const fullInteraction: UserInteraction = {
-      ...interaction,
-      timestamp: Date.now()
-    };
-    
-    setInteractions(prev => [...prev.slice(-49), fullInteraction]); // Keep last 50 interactions
-  }, []);
+  const trackInteraction = useCallback(
+    (interaction: Omit<UserInteraction, 'timestamp'>) => {
+      const fullInteraction: UserInteraction = {
+        ...interaction,
+        timestamp: Date.now(),
+      };
+
+      setInteractions(prev => [...prev.slice(-49), fullInteraction]); // Keep last 50 interactions
+    },
+    []
+  );
 
   useEffect(() => {
     // Track page views
     trackInteraction({
-      type: "page_view",
-      path: window.location.pathname
+      type: 'page_view',
+      path: window.location.pathname,
     });
 
     // Track clicks
     const handleClick = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
       trackInteraction({
-        type: "click",
-        element: target.tagName.toLowerCase() + (target.id ? `#${target.id}` : ""),
+        type: 'click',
+        element:
+          target.tagName.toLowerCase() + (target.id ? `#${target.id}` : ''),
         path: window.location.pathname,
         metadata: {
           x: event.clientX,
-          y: event.clientY
-        }
+          y: event.clientY,
+        },
       });
     };
 
@@ -267,22 +281,26 @@ const useInteractionTracking = () => {
       clearTimeout(scrollTimer);
       scrollTimer = setTimeout(() => {
         trackInteraction({
-          type: "scroll",
+          type: 'scroll',
           path: window.location.pathname,
           metadata: {
             scrollY: window.scrollY,
-            scrollPercent: Math.round((window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100)
-          }
+            scrollPercent: Math.round(
+              (window.scrollY /
+                (document.body.scrollHeight - window.innerHeight)) *
+                100
+            ),
+          },
         });
       }, 100);
     };
 
-    document.addEventListener("click", handleClick);
-    window.addEventListener("scroll", handleScroll, { passive: true });
+    document.addEventListener('click', handleClick);
+    window.addEventListener('scroll', handleScroll, { passive: true });
 
     return () => {
-      document.removeEventListener("click", handleClick);
-      window.removeEventListener("scroll", handleScroll);
+      document.removeEventListener('click', handleClick);
+      window.removeEventListener('scroll', handleScroll);
       clearTimeout(scrollTimer);
     };
   }, [trackInteraction]);
@@ -294,20 +312,20 @@ const useInteractionTracking = () => {
 const useAnalytics = () => {
   const [events, setEvents] = useState<AnalyticsEvent[]>([]);
 
-  const trackEvent = useCallback((event: Omit<AnalyticsEvent, "timestamp">) => {
+  const trackEvent = useCallback((event: Omit<AnalyticsEvent, 'timestamp'>) => {
     const fullEvent: AnalyticsEvent = {
       ...event,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
-    
+
     setEvents(prev => [...prev.slice(-99), fullEvent]); // Keep last 100 events
-    
+
     // Send to external analytics (Google Analytics, etc.)
-    if (typeof window !== "undefined" && (window as any).gtag) {
-      (window as any).gtag("event", event.name, {
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', event.name, {
         event_category: event.category,
         value: event.value,
-        ...event.properties
+        ...event.properties,
       });
     }
   }, []);
@@ -318,19 +336,42 @@ const useAnalytics = () => {
 // Performance score calculation
 const calculatePerformanceScore = (vitals: CoreWebVitals): number => {
   const scores = {
-    FCP: vitals.FCP <= PERFORMANCE_THRESHOLDS.FCP.good ? 100 : 
-         vitals.FCP <= PERFORMANCE_THRESHOLDS.FCP.needs_improvement ? 75 : 50,
-    LCP: vitals.LCP <= PERFORMANCE_THRESHOLDS.LCP.good ? 100 : 
-         vitals.LCP <= PERFORMANCE_THRESHOLDS.LCP.needs_improvement ? 75 : 50,
-    FID: vitals.FID <= PERFORMANCE_THRESHOLDS.FID.good ? 100 : 
-         vitals.FID <= PERFORMANCE_THRESHOLDS.FID.needs_improvement ? 75 : 50,
-    CLS: vitals.CLS <= PERFORMANCE_THRESHOLDS.CLS.good ? 100 : 
-         vitals.CLS <= PERFORMANCE_THRESHOLDS.CLS.needs_improvement ? 75 : 50,
-    TTFB: vitals.TTFB <= PERFORMANCE_THRESHOLDS.TTFB.good ? 100 : 
-          vitals.TTFB <= PERFORMANCE_THRESHOLDS.TTFB.needs_improvement ? 75 : 50
+    FCP:
+      vitals.FCP <= PERFORMANCE_THRESHOLDS.FCP.good
+        ? 100
+        : vitals.FCP <= PERFORMANCE_THRESHOLDS.FCP.needs_improvement
+          ? 75
+          : 50,
+    LCP:
+      vitals.LCP <= PERFORMANCE_THRESHOLDS.LCP.good
+        ? 100
+        : vitals.LCP <= PERFORMANCE_THRESHOLDS.LCP.needs_improvement
+          ? 75
+          : 50,
+    FID:
+      vitals.FID <= PERFORMANCE_THRESHOLDS.FID.good
+        ? 100
+        : vitals.FID <= PERFORMANCE_THRESHOLDS.FID.needs_improvement
+          ? 75
+          : 50,
+    CLS:
+      vitals.CLS <= PERFORMANCE_THRESHOLDS.CLS.good
+        ? 100
+        : vitals.CLS <= PERFORMANCE_THRESHOLDS.CLS.needs_improvement
+          ? 75
+          : 50,
+    TTFB:
+      vitals.TTFB <= PERFORMANCE_THRESHOLDS.TTFB.good
+        ? 100
+        : vitals.TTFB <= PERFORMANCE_THRESHOLDS.TTFB.needs_improvement
+          ? 75
+          : 50,
   };
 
-  return Math.round(Object.values(scores).reduce((sum, score) => sum + score, 0) / Object.values(scores).length);
+  return Math.round(
+    Object.values(scores).reduce((sum, score) => sum + score, 0) /
+      Object.values(scores).length
+  );
 };
 
 // Performance status component
@@ -340,33 +381,47 @@ interface PerformanceStatusProps {
   unit?: string;
 }
 
-const PerformanceStatus: React.FC<PerformanceStatusProps> = ({ metric, value, unit = "ms" }) => {
+const PerformanceStatus: React.FC<PerformanceStatusProps> = ({
+  metric,
+  value,
+  unit = 'ms',
+}) => {
   const threshold = PERFORMANCE_THRESHOLDS[metric];
   if (!threshold) return null;
 
-  const status = value <= threshold.good ? "good" : 
-                value <= threshold.needs_improvement ? "needs_improvement" : "poor";
+  const status =
+    value <= threshold.good
+      ? 'good'
+      : value <= threshold.needs_improvement
+        ? 'needs_improvement'
+        : 'poor';
 
   const statusConfig = {
-    good: { color: "text-green-600", bg: "bg-green-50", icon: CheckCircle },
-    needs_improvement: { color: "text-yellow-600", bg: "bg-yellow-50", icon: AlertTriangle },
-    poor: { color: "text-red-600", bg: "bg-red-50", icon: AlertTriangle }
+    good: { color: 'text-green-600', bg: 'bg-green-50', icon: CheckCircle },
+    needs_improvement: {
+      color: 'text-yellow-600',
+      bg: 'bg-yellow-50',
+      icon: AlertTriangle,
+    },
+    poor: { color: 'text-red-600', bg: 'bg-red-50', icon: AlertTriangle },
   };
 
   const config = statusConfig[status];
   const Icon = config.icon;
 
   return (
-    <div className={cn("p-3 rounded-lg", config.bg)}>
-      <div className="flex items-center justify-between mb-2">
+    <div className={cn('rounded-lg p-3', config.bg)}>
+      <div className="mb-2 flex items-center justify-between">
         <span className="text-sm font-medium">{metric}</span>
-        <Icon className={cn("w-4 h-4", config.color)} />
+        <Icon className={cn('h-4 w-4', config.color)} />
       </div>
-      <div className={cn("text-2xl font-bold", config.color)}>
-        {value.toFixed(metric === "CLS" ? 3 : 0)}{metric !== "CLS" && unit}
+      <div className={cn('text-2xl font-bold', config.color)}>
+        {value.toFixed(metric === 'CLS' ? 3 : 0)}
+        {metric !== 'CLS' && unit}
       </div>
-      <div className="text-xs text-muted-foreground mt-1">
-        Good: ≤{threshold.good}{metric !== "CLS" && unit}
+      <div className="mt-1 text-xs text-muted-foreground">
+        Good: ≤{threshold.good}
+        {metric !== 'CLS' && unit}
       </div>
     </div>
   );
@@ -390,13 +445,13 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
   enableErrorTracking = true,
   enableInteractionTracking = true,
   onMetricsUpdate,
-  onError
+  onError,
 }) => {
   const vitals = useCoreWebVitals();
   const errors = useErrorTracking();
   const { interactions, trackInteraction } = useInteractionTracking();
   const { events, trackEvent } = useAnalytics();
-  
+
   const [isVisible, setIsVisible] = useState(false);
   const [performanceScore, setPerformanceScore] = useState<number>(0);
 
@@ -429,18 +484,20 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
         performanceScore,
         interactionCount: interactions.length,
         errorCount: errors.length,
-        eventCount: events.length
+        eventCount: events.length,
       },
-      errors
+      errors,
     };
   }, [vitals, performanceScore, interactions, errors, events]);
 
   // Export performance data
   const exportMetrics = () => {
     const metrics = generateMetrics();
-    const blob = new Blob([JSON.stringify(metrics, null, 2)], { type: "application/json" });
+    const blob = new Blob([JSON.stringify(metrics, null, 2)], {
+      type: 'application/json',
+    });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
+    const a = document.createElement('a');
     a.href = url;
     a.download = `performance-metrics-${new Date().toISOString().split('T')[0]}.json`;
     document.body.appendChild(a);
@@ -455,24 +512,32 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
         variant="outline"
         size="sm"
         onClick={() => setIsVisible(true)}
-        className={cn("fixed bottom-4 right-4 z-50 gap-2", className)}
+        className={cn('fixed bottom-4 right-4 z-50 gap-2', className)}
       >
-        <Activity className="w-4 h-4" />
+        <Activity className="h-4 w-4" />
         Performance
       </Button>
     );
   }
 
   return (
-    <Card className={cn("fixed bottom-4 right-4 z-50 w-80", className)}>
+    <Card className={cn('fixed bottom-4 right-4 z-50 w-80', className)}>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Activity className="w-5 h-5" />
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Activity className="h-5 w-5" />
             Performance Monitor
           </CardTitle>
           <div className="flex items-center gap-2">
-            <Badge variant={performanceScore >= 90 ? "default" : performanceScore >= 75 ? "secondary" : "destructive"}>
+            <Badge
+              variant={
+                performanceScore >= 90
+                  ? 'default'
+                  : performanceScore >= 75
+                    ? 'secondary'
+                    : 'destructive'
+              }
+            >
               {performanceScore}/100
             </Badge>
             <Button
@@ -486,17 +551,17 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4 max-h-96 overflow-auto">
+      <CardContent className="max-h-96 space-y-4 overflow-auto">
         {/* Core Web Vitals */}
         <div className="space-y-3">
-          <h4 className="font-medium text-sm">Core Web Vitals</h4>
+          <h4 className="text-sm font-medium">Core Web Vitals</h4>
           <div className="grid grid-cols-2 gap-2">
             {Object.entries(vitals).map(([metric, value]) => (
               <PerformanceStatus
                 key={metric}
                 metric={metric as keyof CoreWebVitals}
                 value={value}
-                unit={metric === "CLS" ? "" : "ms"}
+                unit={metric === 'CLS' ? '' : 'ms'}
               />
             ))}
           </div>
@@ -505,29 +570,39 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
         {/* Device & Connection Info */}
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div className="flex items-center gap-2">
-            {detectDeviceType() === "mobile" ? <Smartphone className="w-4 h-4" /> :
-             detectDeviceType() === "tablet" ? <Monitor className="w-4 h-4" /> :
-             <Monitor className="w-4 h-4" />}
+            {detectDeviceType() === 'mobile' ? (
+              <Smartphone className="h-4 w-4" />
+            ) : detectDeviceType() === 'tablet' ? (
+              <Monitor className="h-4 w-4" />
+            ) : (
+              <Monitor className="h-4 w-4" />
+            )}
             <span className="capitalize">{detectDeviceType()}</span>
           </div>
           <div className="flex items-center gap-2">
-            <Globe className="w-4 h-4" />
-            <span>{getConnectionInfo()?.effectiveType || "Unknown"}</span>
+            <Globe className="h-4 w-4" />
+            <span>{getConnectionInfo()?.effectiveType || 'Unknown'}</span>
           </div>
         </div>
 
         {/* Quick Stats */}
         <div className="grid grid-cols-3 gap-4 text-center">
           <div>
-            <div className="text-lg font-bold text-primary">{interactions.length}</div>
+            <div className="text-lg font-bold text-primary">
+              {interactions.length}
+            </div>
             <div className="text-xs text-muted-foreground">Interactions</div>
           </div>
           <div>
-            <div className="text-lg font-bold text-green-600">{events.length}</div>
+            <div className="text-lg font-bold text-green-600">
+              {events.length}
+            </div>
             <div className="text-xs text-muted-foreground">Events</div>
           </div>
           <div>
-            <div className="text-lg font-bold text-red-600">{errors.length}</div>
+            <div className="text-lg font-bold text-red-600">
+              {errors.length}
+            </div>
             <div className="text-xs text-muted-foreground">Errors</div>
           </div>
         </div>
@@ -535,10 +610,13 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
         {/* Recent Errors */}
         {errors.length > 0 && (
           <div className="space-y-2">
-            <h4 className="font-medium text-sm text-red-600">Recent Errors</h4>
-            <div className="space-y-1 max-h-20 overflow-auto">
+            <h4 className="text-sm font-medium text-red-600">Recent Errors</h4>
+            <div className="max-h-20 space-y-1 overflow-auto">
               {errors.slice(-3).map((error, index) => (
-                <div key={index} className="text-xs p-2 bg-red-50 rounded text-red-800">
+                <div
+                  key={index}
+                  className="rounded bg-red-50 p-2 text-xs text-red-800"
+                >
                   {error.message.substring(0, 50)}...
                 </div>
               ))}
@@ -554,7 +632,7 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
             onClick={exportMetrics}
             className="flex-1 gap-2"
           >
-            <Download className="w-4 h-4" />
+            <Download className="h-4 w-4" />
             Export
           </Button>
           <Button
@@ -563,7 +641,7 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
             onClick={() => window.location.reload()}
             className="flex-1 gap-2"
           >
-            <TrendingUp className="w-4 h-4" />
+            <TrendingUp className="h-4 w-4" />
             Refresh
           </Button>
         </div>
@@ -582,34 +660,42 @@ export interface AnalyticsDashboardProps {
 export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
   events,
   interactions,
-  className
+  className,
 }) => {
-  const eventsByCategory = events.reduce((acc, event) => {
-    acc[event.category] = (acc[event.category] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  const eventsByCategory = events.reduce(
+    (acc, event) => {
+      acc[event.category] = (acc[event.category] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
 
-  const interactionsByType = interactions.reduce((acc, interaction) => {
-    acc[interaction.type] = (acc[interaction.type] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  const interactionsByType = interactions.reduce(
+    (acc, interaction) => {
+      acc[interaction.type] = (acc[interaction.type] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
 
   return (
     <Card className={className}>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <BarChart3 className="w-5 h-5" />
+          <BarChart3 className="h-5 w-5" />
           Analytics Dashboard
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Event Categories */}
         <div>
-          <h4 className="font-medium mb-3">Events by Category</h4>
+          <h4 className="mb-3 font-medium">Events by Category</h4>
           <div className="space-y-2">
             {Object.entries(eventsByCategory).map(([category, count]) => (
               <div key={category} className="flex items-center justify-between">
-                <span className="text-sm capitalize">{category.replace("_", " ")}</span>
+                <span className="text-sm capitalize">
+                  {category.replace('_', ' ')}
+                </span>
                 <Badge variant="outline">{count}</Badge>
               </div>
             ))}
@@ -618,11 +704,13 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
 
         {/* Interaction Types */}
         <div>
-          <h4 className="font-medium mb-3">Interactions by Type</h4>
+          <h4 className="mb-3 font-medium">Interactions by Type</h4>
           <div className="space-y-2">
             {Object.entries(interactionsByType).map(([type, count]) => (
               <div key={type} className="flex items-center justify-between">
-                <span className="text-sm capitalize">{type.replace("_", " ")}</span>
+                <span className="text-sm capitalize">
+                  {type.replace('_', ' ')}
+                </span>
                 <Badge variant="secondary">{count}</Badge>
               </div>
             ))}
@@ -631,15 +719,17 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
 
         {/* Recent Activity */}
         <div>
-          <h4 className="font-medium mb-3">Recent Activity</h4>
-          <div className="space-y-1 max-h-32 overflow-auto">
+          <h4 className="mb-3 font-medium">Recent Activity</h4>
+          <div className="max-h-32 space-y-1 overflow-auto">
             {[...events, ...interactions]
               .sort((a, b) => b.timestamp - a.timestamp)
               .slice(0, 5)
               .map((item, index) => (
-                <div key={index} className="text-xs p-2 bg-muted rounded">
-                  {"name" in item ? `Event: ${item.name}` : `${item.type} interaction`}
-                  <span className="text-muted-foreground ml-2">
+                <div key={index} className="rounded bg-muted p-2 text-xs">
+                  {'name' in item
+                    ? `Event: ${item.name}`
+                    : `${item.type} interaction`}
+                  <span className="ml-2 text-muted-foreground">
                     {new Date(item.timestamp).toLocaleTimeString()}
                   </span>
                 </div>

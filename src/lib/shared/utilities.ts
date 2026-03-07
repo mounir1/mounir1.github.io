@@ -3,8 +3,8 @@
  * Consolidates duplicate utilities from across the codebase
  */
 
-import { type ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
 /**
  * Utility function for merging Tailwind CSS classes
@@ -20,8 +20,15 @@ export const dateUtils = {
   /**
    * Format date to locale string
    */
-  format: (date: Date | string | number, locale = 'en-US', options?: Intl.DateTimeFormatOptions) => {
-    const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
+  format: (
+    date: Date | string | number,
+    locale = 'en-US',
+    options?: Intl.DateTimeFormatOptions
+  ) => {
+    const dateObj =
+      typeof date === 'string' || typeof date === 'number'
+        ? new Date(date)
+        : date;
     return new Intl.DateTimeFormat(locale, options).format(dateObj);
   },
 
@@ -29,17 +36,26 @@ export const dateUtils = {
    * Format date to relative time (e.g., "2 days ago")
    */
   formatRelative: (date: Date | string | number, locale = 'en-US') => {
-    const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
+    const dateObj =
+      typeof date === 'string' || typeof date === 'number'
+        ? new Date(date)
+        : date;
     const now = new Date();
-    const diffInSeconds = Math.floor((now.getTime() - dateObj.getTime()) / 1000);
-    
+    const diffInSeconds = Math.floor(
+      (now.getTime() - dateObj.getTime()) / 1000
+    );
+
     const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
-    
+
     if (diffInSeconds < 60) return rtf.format(-diffInSeconds, 'second');
-    if (diffInSeconds < 3600) return rtf.format(-Math.floor(diffInSeconds / 60), 'minute');
-    if (diffInSeconds < 86400) return rtf.format(-Math.floor(diffInSeconds / 3600), 'hour');
-    if (diffInSeconds < 2592000) return rtf.format(-Math.floor(diffInSeconds / 86400), 'day');
-    if (diffInSeconds < 31536000) return rtf.format(-Math.floor(diffInSeconds / 2592000), 'month');
+    if (diffInSeconds < 3600)
+      return rtf.format(-Math.floor(diffInSeconds / 60), 'minute');
+    if (diffInSeconds < 86400)
+      return rtf.format(-Math.floor(diffInSeconds / 3600), 'hour');
+    if (diffInSeconds < 2592000)
+      return rtf.format(-Math.floor(diffInSeconds / 86400), 'day');
+    if (diffInSeconds < 31536000)
+      return rtf.format(-Math.floor(diffInSeconds / 2592000), 'month');
     return rtf.format(-Math.floor(diffInSeconds / 31536000), 'year');
   },
 
@@ -65,14 +81,14 @@ export const dateUtils = {
   getRange: (start: Date, end: Date): Date[] => {
     const dates: Date[] = [];
     const currentDate = new Date(start);
-    
+
     while (currentDate <= end) {
       dates.push(new Date(currentDate));
       currentDate.setDate(currentDate.getDate() + 1);
     }
-    
+
     return dates;
-  }
+  },
 };
 
 /**
@@ -83,8 +99,9 @@ export const stringUtils = {
    * Convert to title case
    */
   toTitleCase: (str: string): string => {
-    return str.replace(/\w\S*/g, (txt) => 
-      txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+    return str.replace(
+      /\w\S*/g,
+      txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
     );
   },
 
@@ -103,7 +120,7 @@ export const stringUtils = {
    */
   toCamelCase: (str: string): string => {
     return str
-      .replace(/(?:^\w|[A-Z]|\b\w)/g, (word, index) => 
+      .replace(/(?:^\w|[A-Z]|\b\w)/g, (word, index) =>
         index === 0 ? word.toLowerCase() : word.toUpperCase()
       )
       .replace(/\s+/g, '');
@@ -152,7 +169,7 @@ export const stringUtils = {
       .map(word => word.charAt(0).toUpperCase())
       .slice(0, maxLength)
       .join('');
-  }
+  },
 };
 
 /**
@@ -169,10 +186,14 @@ export const numberUtils = {
   /**
    * Format as currency
    */
-  formatCurrency: (amount: number, currency = 'USD', locale = 'en-US'): string => {
+  formatCurrency: (
+    amount: number,
+    currency = 'USD',
+    locale = 'en-US'
+  ): string => {
     return new Intl.NumberFormat(locale, {
       style: 'currency',
-      currency
+      currency,
     }).format(amount);
   },
 
@@ -209,7 +230,7 @@ export const numberUtils = {
    */
   inRange: (num: number, min: number, max: number): boolean => {
     return num >= min && num <= max;
-  }
+  },
 };
 
 /**
@@ -240,12 +261,15 @@ export const arrayUtils = {
    * Group array by key
    */
   groupBy: <T>(arr: T[], key: keyof T): Record<string, T[]> => {
-    return arr.reduce((groups, item) => {
-      const value = String(item[key]);
-      groups[value] = groups[value] || [];
-      groups[value].push(item);
-      return groups;
-    }, {} as Record<string, T[]>);
+    return arr.reduce(
+      (groups, item) => {
+        const value = String(item[key]);
+        groups[value] = groups[value] || [];
+        groups[value].push(item);
+        return groups;
+      },
+      {} as Record<string, T[]>
+    );
   },
 
   /**
@@ -289,12 +313,18 @@ export const arrayUtils = {
   /**
    * Join array with proper grammar
    */
-  joinWithAnd: (arr: string[], separator = ', ', lastSeparator = ' and '): string => {
+  joinWithAnd: (
+    arr: string[],
+    separator = ', ',
+    lastSeparator = ' and '
+  ): string => {
     if (arr.length === 0) return '';
     if (arr.length === 1) return arr[0];
     if (arr.length === 2) return arr.join(lastSeparator);
-    return arr.slice(0, -1).join(separator) + lastSeparator + arr[arr.length - 1];
-  }
+    return (
+      arr.slice(0, -1).join(separator) + lastSeparator + arr[arr.length - 1]
+    );
+  },
 };
 
 /**
@@ -307,7 +337,8 @@ export const objectUtils = {
   deepClone: <T>(obj: T): T => {
     if (obj === null || typeof obj !== 'object') return obj;
     if (obj instanceof Date) return new Date(obj.getTime()) as unknown as T;
-    if (obj instanceof Array) return obj.map(item => objectUtils.deepClone(item)) as unknown as T;
+    if (obj instanceof Array)
+      return obj.map(item => objectUtils.deepClone(item)) as unknown as T;
     if (typeof obj === 'object') {
       const cloned = {} as T;
       Object.keys(obj).forEach(key => {
@@ -321,7 +352,10 @@ export const objectUtils = {
   /**
    * Deep merge objects
    */
-  deepMerge: <T extends Record<string, any>>(target: T, ...sources: Partial<T>[]): T => {
+  deepMerge: <T extends Record<string, any>>(
+    target: T,
+    ...sources: Partial<T>[]
+  ): T => {
     if (!sources.length) return target;
     const source = sources.shift();
 
@@ -352,14 +386,14 @@ export const objectUtils = {
   get: (obj: any, path: string, defaultValue?: any): any => {
     const keys = path.split('.');
     let result = obj;
-    
+
     for (const key of keys) {
       if (result == null || typeof result !== 'object') {
         return defaultValue;
       }
       result = result[key];
     }
-    
+
     return result !== undefined ? result : defaultValue;
   },
 
@@ -370,21 +404,24 @@ export const objectUtils = {
     const keys = path.split('.');
     const lastKey = keys.pop()!;
     let current = obj;
-    
+
     for (const key of keys) {
       if (!(key in current) || typeof current[key] !== 'object') {
         current[key] = {};
       }
       current = current[key];
     }
-    
+
     current[lastKey] = value;
   },
 
   /**
    * Pick properties from object
    */
-  pick: <T extends Record<string, any>, K extends keyof T>(obj: T, keys: K[]): Pick<T, K> => {
+  pick: <T extends Record<string, any>, K extends keyof T>(
+    obj: T,
+    keys: K[]
+  ): Pick<T, K> => {
     const result = {} as Pick<T, K>;
     keys.forEach(key => {
       if (key in obj) {
@@ -397,13 +434,16 @@ export const objectUtils = {
   /**
    * Omit properties from object
    */
-  omit: <T extends Record<string, any>, K extends keyof T>(obj: T, keys: K[]): Omit<T, K> => {
+  omit: <T extends Record<string, any>, K extends keyof T>(
+    obj: T,
+    keys: K[]
+  ): Omit<T, K> => {
     const result = { ...obj };
     keys.forEach(key => {
       delete result[key];
     });
     return result;
-  }
+  },
 };
 
 /**
@@ -474,7 +514,7 @@ export const validationUtils = {
    */
   matchesPattern: (value: string, pattern: RegExp): boolean => {
     return pattern.test(value);
-  }
+  },
 };
 
 /**
@@ -490,18 +530,18 @@ export const performanceUtils = {
     immediate = false
   ): ((...args: Parameters<T>) => void) => {
     let timeout: NodeJS.Timeout | null = null;
-    
+
     return (...args: Parameters<T>) => {
       const later = () => {
         timeout = null;
         if (!immediate) func(...args);
       };
-      
+
       const callNow = immediate && !timeout;
-      
+
       if (timeout) clearTimeout(timeout);
       timeout = setTimeout(later, wait);
-      
+
       if (callNow) func(...args);
     };
   },
@@ -514,12 +554,12 @@ export const performanceUtils = {
     limit: number
   ): ((...args: Parameters<T>) => void) => {
     let inThrottle: boolean;
-    
+
     return (...args: Parameters<T>) => {
       if (!inThrottle) {
         func(...args);
         inThrottle = true;
-        setTimeout(() => inThrottle = false, limit);
+        setTimeout(() => (inThrottle = false), limit);
       }
     };
   },
@@ -531,11 +571,11 @@ export const performanceUtils = {
     const start = performance.now();
     const result = fn();
     const end = performance.now();
-    
+
     if (label) {
       console.log(`${label}: ${end - start}ms`);
     }
-    
+
     return result;
   },
 
@@ -546,11 +586,11 @@ export const performanceUtils = {
     const start = performance.now();
     const result = await fn();
     const end = performance.now();
-    
+
     if (label) {
       console.log(`${label}: ${end - start}ms`);
     }
-    
+
     return result;
   },
 
@@ -559,19 +599,19 @@ export const performanceUtils = {
    */
   memoize: <T extends (...args: any[]) => any>(fn: T): T => {
     const cache = new Map();
-    
+
     return ((...args: Parameters<T>) => {
       const key = JSON.stringify(args);
-      
+
       if (cache.has(key)) {
         return cache.get(key);
       }
-      
+
       const result = fn(...args);
       cache.set(key, result);
       return result;
     }) as T;
-  }
+  },
 };
 
 /**
@@ -615,7 +655,10 @@ export const errorUtils = {
       const result = await fn();
       return [result, null];
     } catch (error) {
-      return [null, errorUtils.isError(error) ? error : new Error(String(error))];
+      return [
+        null,
+        errorUtils.isError(error) ? error : new Error(String(error)),
+      ];
     }
   },
 
@@ -627,9 +670,12 @@ export const errorUtils = {
       const result = fn();
       return [result, null];
     } catch (error) {
-      return [null, errorUtils.isError(error) ? error : new Error(String(error))];
+      return [
+        null,
+        errorUtils.isError(error) ? error : new Error(String(error)),
+      ];
     }
-  }
+  },
 };
 
 /**
@@ -653,7 +699,7 @@ export const storageUtils = {
   getItem: <T>(key: string, defaultValue?: T): T | null => {
     try {
       const item = localStorage.getItem(key);
-      return item ? JSON.parse(item) : defaultValue ?? null;
+      return item ? JSON.parse(item) : (defaultValue ?? null);
     } catch (error) {
       console.warn('Failed to read from localStorage:', error);
       return defaultValue ?? null;
@@ -694,7 +740,7 @@ export const storageUtils = {
     } catch {
       return false;
     }
-  }
+  },
 };
 
 /**
@@ -710,7 +756,7 @@ export const utils = {
   performance: performanceUtils,
   error: errorUtils,
   storage: storageUtils,
-  cn
+  cn,
 };
 
 export default utils;

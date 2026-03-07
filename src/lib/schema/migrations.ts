@@ -4,7 +4,10 @@
 
 import { z } from 'zod';
 import { MigrationStep, MigrationResult } from './types';
-import { legacyProjectTransformer, legacySkillTransformer } from './transformers';
+import {
+  legacyProjectTransformer,
+  legacySkillTransformer,
+} from './transformers';
 import { ProjectSchema, Project } from './projectSchema';
 import { SkillSchema, Skill } from './skillSchema';
 
@@ -27,17 +30,23 @@ export class MigrationRegistry {
     return migrations.map(m => m.version).sort();
   }
 
-  findMigrationPath(schemaName: string, fromVersion: string, toVersion: string): MigrationStep[] {
+  findMigrationPath(
+    schemaName: string,
+    fromVersion: string,
+    toVersion: string
+  ): MigrationStep[] {
     const migrations = this.getMigrations(schemaName);
     const path: MigrationStep[] = [];
 
     // Simple linear migration path for now
     // In a more complex system, you might need graph traversal
-    const sortedMigrations = migrations.sort((a, b) => a.version.localeCompare(b.version));
-    
+    const sortedMigrations = migrations.sort((a, b) =>
+      a.version.localeCompare(b.version)
+    );
+
     let startIndex = sortedMigrations.findIndex(m => m.version > fromVersion);
     let endIndex = sortedMigrations.findIndex(m => m.version > toVersion);
-    
+
     if (startIndex === -1) startIndex = 0;
     if (endIndex === -1) endIndex = sortedMigrations.length;
 
@@ -58,8 +67,12 @@ export class MigrationExecutor {
     toVersion: string
   ): Promise<MigrationResult> {
     const startTime = performance.now();
-    const migrationPath = this.registry.findMigrationPath(schemaName, fromVersion, toVersion);
-    
+    const migrationPath = this.registry.findMigrationPath(
+      schemaName,
+      fromVersion,
+      toVersion
+    );
+
     if (migrationPath.length === 0) {
       return {
         success: true,
@@ -79,14 +92,17 @@ export class MigrationExecutor {
       for (const migration of migrationPath) {
         // Validate data before migration if validator is provided
         if (migration.validate && !migration.validate(currentData)) {
-          errors.push(`Data validation failed for migration ${migration.version}`);
+          errors.push(
+            `Data validation failed for migration ${migration.version}`
+          );
           continue;
         }
 
         try {
           currentData = migration.up(currentData);
         } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : 'Unknown migration error';
+          const errorMessage =
+            error instanceof Error ? error.message : 'Unknown migration error';
           errors.push(`Migration ${migration.version} failed: ${errorMessage}`);
           break;
         }
@@ -103,7 +119,8 @@ export class MigrationExecutor {
         warnings,
       };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
       return {
         success: false,
         fromVersion,
@@ -120,11 +137,15 @@ export class MigrationExecutor {
     fromVersion: string,
     toVersion: string
   ): Promise<MigrationResult> {
-    const migrationPath = this.registry.findMigrationPath(schemaName, toVersion, fromVersion);
-    
+    const migrationPath = this.registry.findMigrationPath(
+      schemaName,
+      toVersion,
+      fromVersion
+    );
+
     // Reverse the path and use down migrations
     const reversePath = migrationPath.reverse();
-    
+
     let currentData = data;
     const errors: string[] = [];
     const warnings: string[] = [];
@@ -132,14 +153,17 @@ export class MigrationExecutor {
     try {
       for (const migration of reversePath) {
         if (!migration.down) {
-          warnings.push(`No rollback available for migration ${migration.version}`);
+          warnings.push(
+            `No rollback available for migration ${migration.version}`
+          );
           continue;
         }
 
         try {
           currentData = migration.down(currentData);
         } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : 'Unknown rollback error';
+          const errorMessage =
+            error instanceof Error ? error.message : 'Unknown rollback error';
           errors.push(`Rollback ${migration.version} failed: ${errorMessage}`);
           break;
         }
@@ -154,7 +178,8 @@ export class MigrationExecutor {
         warnings,
       };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
       return {
         success: false,
         fromVersion,
@@ -194,7 +219,7 @@ export const projectMigrations: MigrationStep[] = [
     description: 'Convert single image/logo to images array',
     up: (data: any) => {
       const images = [];
-      
+
       if (data.image) {
         images.push({
           url: data.image,
@@ -202,7 +227,7 @@ export const projectMigrations: MigrationStep[] = [
           isPrimary: true,
         });
       }
-      
+
       if (data.logo && data.logo !== data.image) {
         images.push({
           url: data.logo,
@@ -220,7 +245,7 @@ export const projectMigrations: MigrationStep[] = [
     down: (data: any) => {
       const primaryImage = data.images?.find((img: any) => img.isPrimary);
       const logoImage = data.images?.find((img: any) => !img.isPrimary);
-      
+
       return {
         ...data,
         image: primaryImage?.url || '',
@@ -233,7 +258,7 @@ export const projectMigrations: MigrationStep[] = [
     description: 'Convert individual URLs to links array',
     up: (data: any) => {
       const links = [];
-      
+
       if (data.liveUrl) {
         links.push({
           type: 'live',
@@ -242,7 +267,7 @@ export const projectMigrations: MigrationStep[] = [
           isPrimary: true,
         });
       }
-      
+
       if (data.githubUrl) {
         links.push({
           type: 'github',
@@ -251,7 +276,7 @@ export const projectMigrations: MigrationStep[] = [
           isPrimary: false,
         });
       }
-      
+
       if (data.demoUrl && data.demoUrl !== data.liveUrl) {
         links.push({
           type: 'demo',
@@ -260,7 +285,7 @@ export const projectMigrations: MigrationStep[] = [
           isPrimary: false,
         });
       }
-      
+
       if (data.caseStudyUrl) {
         links.push({
           type: 'case-study',
@@ -278,10 +303,14 @@ export const projectMigrations: MigrationStep[] = [
     },
     down: (data: any) => {
       const liveLink = data.links?.find((link: any) => link.type === 'live');
-      const githubLink = data.links?.find((link: any) => link.type === 'github');
+      const githubLink = data.links?.find(
+        (link: any) => link.type === 'github'
+      );
       const demoLink = data.links?.find((link: any) => link.type === 'demo');
-      const caseStudyLink = data.links?.find((link: any) => link.type === 'case-study');
-      
+      const caseStudyLink = data.links?.find(
+        (link: any) => link.type === 'case-study'
+      );
+
       return {
         ...data,
         liveUrl: liveLink?.url || '',
@@ -311,10 +340,15 @@ export const projectMigrations: MigrationStep[] = [
         tags: data.tags,
         image: data.images?.[0]?.url || '',
         logo: data.images?.find((img: any) => !img.isPrimary)?.url || '',
-        liveUrl: data.links?.find((link: any) => link.type === 'live')?.url || '',
-        githubUrl: data.links?.find((link: any) => link.type === 'github')?.url || '',
-        demoUrl: data.links?.find((link: any) => link.type === 'demo')?.url || '',
-        caseStudyUrl: data.links?.find((link: any) => link.type === 'case-study')?.url || '',
+        liveUrl:
+          data.links?.find((link: any) => link.type === 'live')?.url || '',
+        githubUrl:
+          data.links?.find((link: any) => link.type === 'github')?.url || '',
+        demoUrl:
+          data.links?.find((link: any) => link.type === 'demo')?.url || '',
+        caseStudyUrl:
+          data.links?.find((link: any) => link.type === 'case-study')?.url ||
+          '',
         featured: data.featured,
         disabled: data.disabled,
         priority: data.priority,
@@ -372,7 +406,7 @@ export const skillMigrations: MigrationStep[] = [
       const yearsOfExperience = data.yearsOfExperience || 0;
       const years = Math.floor(yearsOfExperience);
       const months = Math.round((yearsOfExperience - years) * 12);
-      
+
       const { yearsOfExperience: _, ...rest } = data;
       return {
         ...rest,
@@ -387,9 +421,10 @@ export const skillMigrations: MigrationStep[] = [
       };
     },
     down: (data: any) => {
-      const yearsOfExperience = data.experience ? 
-        data.experience.years + (data.experience.months / 12) : 0;
-      
+      const yearsOfExperience = data.experience
+        ? data.experience.years + data.experience.months / 12
+        : 0;
+
       return {
         ...data,
         yearsOfExperience,
@@ -422,14 +457,16 @@ export const skillMigrations: MigrationStep[] = [
           score: cert.score,
         };
       });
-      
+
       return {
         ...data,
         certifications,
       };
     },
     down: (data: any) => {
-      const certifications = (data.certifications || []).map((cert: any) => cert.name || cert);
+      const certifications = (data.certifications || []).map(
+        (cert: any) => cert.name || cert
+      );
       return {
         ...data,
         certifications,
@@ -445,16 +482,18 @@ export const skillMigrations: MigrationStep[] = [
     },
     down: (data: any) => {
       // Convert back to legacy format
-      const yearsOfExperience = data.experience ? 
-        data.experience.years + (data.experience.months / 12) : 0;
-      
+      const yearsOfExperience = data.experience
+        ? data.experience.years + data.experience.months / 12
+        : 0;
+
       return {
         name: data.name,
         category: data.category,
         level: data.level,
         yearsOfExperience,
         description: data.description,
-        certifications: data.certifications?.map((cert: any) => cert.name) || [],
+        certifications:
+          data.certifications?.map((cert: any) => cert.name) || [],
         projects: data.projects,
         icon: data.icon,
         color: data.color,
@@ -516,9 +555,13 @@ export class MigrationUtils {
 
   private static detectProjectVersion(data: any): string {
     // Check for v1.0.0 features
-    if (data.images && Array.isArray(data.images) && 
-        data.links && Array.isArray(data.links) &&
-        data.schemaVersion) {
+    if (
+      data.images &&
+      Array.isArray(data.images) &&
+      data.links &&
+      Array.isArray(data.links) &&
+      data.schemaVersion
+    ) {
       return '1.0.0';
     }
 
@@ -542,18 +585,25 @@ export class MigrationUtils {
 
   private static detectSkillVersion(data: any): string {
     // Check for v1.0.0 features
-    if (data.experience && typeof data.experience === 'object' &&
-        data.certifications && Array.isArray(data.certifications) &&
-        data.certifications.length > 0 && 
-        typeof data.certifications[0] === 'object' &&
-        data.schemaVersion) {
+    if (
+      data.experience &&
+      typeof data.experience === 'object' &&
+      data.certifications &&
+      Array.isArray(data.certifications) &&
+      data.certifications.length > 0 &&
+      typeof data.certifications[0] === 'object' &&
+      data.schemaVersion
+    ) {
       return '1.0.0';
     }
 
     // Check for v0.4.0 features (structured certifications)
-    if (data.certifications && Array.isArray(data.certifications) &&
-        data.certifications.length > 0 && 
-        typeof data.certifications[0] === 'object') {
+    if (
+      data.certifications &&
+      Array.isArray(data.certifications) &&
+      data.certifications.length > 0 &&
+      typeof data.certifications[0] === 'object'
+    ) {
       return '0.4.0';
     }
 
@@ -579,7 +629,7 @@ export class MigrationUtils {
     targetVersion = '1.0.0'
   ): Promise<MigrationResult> {
     const currentVersion = this.detectDataVersion(data, schemaType);
-    
+
     if (currentVersion === targetVersion) {
       return {
         success: true,
@@ -591,7 +641,12 @@ export class MigrationUtils {
       };
     }
 
-    return migrationExecutor.migrate(schemaType, data, currentVersion, targetVersion);
+    return migrationExecutor.migrate(
+      schemaType,
+      data,
+      currentVersion,
+      targetVersion
+    );
   }
 
   /**
@@ -615,8 +670,12 @@ export class MigrationUtils {
 
     for (let i = 0; i < items.length; i++) {
       try {
-        const result = await this.autoMigrate(items[i], schemaType, targetVersion);
-        
+        const result = await this.autoMigrate(
+          items[i],
+          schemaType,
+          targetVersion
+        );
+
         if (result.success) {
           successful.push(result.migratedData);
         } else {

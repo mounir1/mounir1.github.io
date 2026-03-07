@@ -37,7 +37,9 @@ export function useFirestoreCollection<T extends { id: string }>({
     const retryDelay = 2000;
 
     if (!isFirebaseEnabled || !db || !isOnline) {
-      console.log(`Using local ${entityName} data - Firebase disabled or offline`);
+      console.log(
+        `Using local ${entityName} data - Firebase disabled or offline`
+      );
       const localData = initialData.map((item, index) => ({
         ...item,
         id: `local-${entityName}-${index}`,
@@ -51,40 +53,67 @@ export function useFirestoreCollection<T extends { id: string }>({
     try {
       const q = firebaseQuery || query(collection(db, collectionName));
 
-      unsubscribe = onSnapshot(q,
-        (snapshot) => {
+      unsubscribe = onSnapshot(
+        q,
+        snapshot => {
           try {
-            const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as any[];
+            const items = snapshot.docs.map(doc => ({
+              id: doc.id,
+              ...doc.data(),
+            })) as any[];
             const validItems = items.filter(dataValidator);
             setData(validItems);
             setLoading(false);
             setError(null);
             retryCount = 0;
-            console.log(`✅ Loaded ${validItems.length} ${entityName}s from Firebase`);
+            console.log(
+              `✅ Loaded ${validItems.length} ${entityName}s from Firebase`
+            );
           } catch (processingError) {
-            console.error(`Error processing Firebase ${entityName} data:`, processingError);
+            console.error(
+              `Error processing Firebase ${entityName} data:`,
+              processingError
+            );
             setError(`Error processing ${entityName} data`);
           }
         },
-        (err) => {
+        err => {
           console.error(`Firebase listener error for ${entityName}s:`, err);
-          const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+          const errorMessage =
+            err instanceof Error ? err.message : 'Unknown error';
 
-          if (retryCount < maxRetries && (errorMessage.includes('network') || errorMessage.includes('unavailable'))) {
+          if (
+            retryCount < maxRetries &&
+            (errorMessage.includes('network') ||
+              errorMessage.includes('unavailable'))
+          ) {
             retryCount++;
-            console.log(`🔄 Retrying Firebase connection for ${entityName}s (attempt ${retryCount}/${maxRetries})`);
-            retryTimeout = setTimeout(() => setupListener(), retryDelay * retryCount);
+            console.log(
+              `🔄 Retrying Firebase connection for ${entityName}s (attempt ${retryCount}/${maxRetries})`
+            );
+            retryTimeout = setTimeout(
+              () => setupListener(),
+              retryDelay * retryCount
+            );
             return;
           }
 
-          setError(`Failed to load ${entityName}s. Showing local data instead.`);
-          const fallbackData = initialData.map((item, index) => ({ ...item, id: `fallback-${entityName}-${index}` })) as T[];
+          setError(
+            `Failed to load ${entityName}s. Showing local data instead.`
+          );
+          const fallbackData = initialData.map((item, index) => ({
+            ...item,
+            id: `fallback-${entityName}-${index}`,
+          })) as T[];
           setData(fallbackData);
           setLoading(false);
         }
       );
     } catch (setupError) {
-      console.error(`Error setting up Firebase listener for ${entityName}s:`, setupError);
+      console.error(
+        `Error setting up Firebase listener for ${entityName}s:`,
+        setupError
+      );
       setError('Failed to initialize data connection');
     }
 
@@ -92,7 +121,14 @@ export function useFirestoreCollection<T extends { id: string }>({
       if (unsubscribe) unsubscribe();
       if (retryTimeout) clearTimeout(retryTimeout);
     };
-  }, [isOnline, collectionName, firebaseQuery, initialData, dataValidator, entityName]);
+  }, [
+    isOnline,
+    collectionName,
+    firebaseQuery,
+    initialData,
+    dataValidator,
+    entityName,
+  ]);
 
   useEffect(() => {
     return setupListener();

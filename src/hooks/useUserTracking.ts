@@ -1,9 +1,16 @@
-import { useEffect, useRef, useCallback, useState } from "react";
+import { useEffect, useRef, useCallback, useState } from 'react';
 
 // Event types for tracking
 export interface UserEvent {
   id: string;
-  type: "click" | "scroll" | "keypress" | "focus" | "form_submit" | "page_view" | "custom";
+  type:
+    | 'click'
+    | 'scroll'
+    | 'keypress'
+    | 'focus'
+    | 'form_submit'
+    | 'page_view'
+    | 'custom';
   timestamp: number;
   target?: string;
   value?: any;
@@ -13,27 +20,27 @@ export interface UserEvent {
 }
 
 export interface PageViewEvent extends UserEvent {
-  type: "page_view";
+  type: 'page_view';
   path: string;
   referrer?: string;
   duration?: number;
 }
 
 export interface InteractionEvent extends UserEvent {
-  type: "click" | "focus" | "keypress";
+  type: 'click' | 'focus' | 'keypress';
   element: string;
   coordinates?: { x: number; y: number };
 }
 
 export interface ScrollEvent extends UserEvent {
-  type: "scroll";
+  type: 'scroll';
   scrollDepth: number;
   maxScroll: number;
-  direction: "up" | "down";
+  direction: 'up' | 'down';
 }
 
 export interface FormEvent extends UserEvent {
-  type: "form_submit";
+  type: 'form_submit';
   formId: string;
   fields: Record<string, any>;
   validationErrors?: string[];
@@ -41,11 +48,11 @@ export interface FormEvent extends UserEvent {
 
 // Tracking configuration
 export interface TrackingConfig {
-  enabledEvents: UserEvent["type"][];
+  enabledEvents: UserEvent['type'][];
   sampleRate: number; // 0-1, percentage of events to track
   batchSize: number;
   batchInterval: number; // ms
-  storage: "memory" | "localStorage" | "custom";
+  storage: 'memory' | 'localStorage' | 'custom';
   customStorage?: {
     store: (events: UserEvent[]) => Promise<void>;
     retrieve: () => Promise<UserEvent[]>;
@@ -60,16 +67,16 @@ export interface TrackingConfig {
 
 // Default configuration
 const DEFAULT_CONFIG: TrackingConfig = {
-  enabledEvents: ["click", "scroll", "page_view", "form_submit"],
+  enabledEvents: ['click', 'scroll', 'page_view', 'form_submit'],
   sampleRate: 1.0,
   batchSize: 50,
   batchInterval: 10000,
-  storage: "memory",
+  storage: 'memory',
   privacy: {
     anonymizeIPs: true,
     excludeElements: ['.sensitive', '[data-private]'],
-    hashSensitiveData: true
-  }
+    hashSensitiveData: true,
+  },
 };
 
 // User interaction tracking hook
@@ -78,12 +85,14 @@ export const useUserTracking = (config: Partial<TrackingConfig> = {}) => {
   const [events, setEvents] = useState<UserEvent[]>([]);
   const [sessionId] = useState(() => generateSessionId());
   const [isTracking, setIsTracking] = useState(true);
-  
+
   const eventQueue = useRef<UserEvent[]>([]);
   const batchTimer = useRef<NodeJS.Timeout>();
   const lastScrollDepth = useRef(0);
   const pageStartTime = useRef(Date.now());
-  const currentPath = useRef(typeof window !== "undefined" ? window.location.pathname : "/");
+  const currentPath = useRef(
+    typeof window !== 'undefined' ? window.location.pathname : '/'
+  );
 
   // Generate unique session ID
   function generateSessionId(): string {
@@ -96,12 +105,15 @@ export const useUserTracking = (config: Partial<TrackingConfig> = {}) => {
   }, []);
 
   // Check if element should be tracked
-  const shouldTrackElement = useCallback((element: Element): boolean => {
-    for (const selector of fullConfig.privacy.excludeElements) {
-      if (element.matches(selector)) return false;
-    }
-    return true;
-  }, [fullConfig.privacy.excludeElements]);
+  const shouldTrackElement = useCallback(
+    (element: Element): boolean => {
+      for (const selector of fullConfig.privacy.excludeElements) {
+        if (element.matches(selector)) return false;
+      }
+      return true;
+    },
+    [fullConfig.privacy.excludeElements]
+  );
 
   // Sample rate check
   const shouldSample = useCallback((): boolean => {
@@ -109,24 +121,27 @@ export const useUserTracking = (config: Partial<TrackingConfig> = {}) => {
   }, [fullConfig.sampleRate]);
 
   // Add event to queue
-  const trackEvent = useCallback((event: Omit<UserEvent, "id" | "sessionId" | "timestamp">) => {
-    if (!isTracking || !shouldSample()) return;
+  const trackEvent = useCallback(
+    (event: Omit<UserEvent, 'id' | 'sessionId' | 'timestamp'>) => {
+      if (!isTracking || !shouldSample()) return;
 
-    const fullEvent: UserEvent = {
-      ...event,
-      id: generateEventId(),
-      sessionId,
-      timestamp: Date.now()
-    };
+      const fullEvent: UserEvent = {
+        ...event,
+        id: generateEventId(),
+        sessionId,
+        timestamp: Date.now(),
+      };
 
-    eventQueue.current.push(fullEvent);
-    setEvents(prev => [...prev, fullEvent]);
+      eventQueue.current.push(fullEvent);
+      setEvents(prev => [...prev, fullEvent]);
 
-    // Batch processing
-    if (eventQueue.current.length >= fullConfig.batchSize) {
-      processBatch();
-    }
-  }, [isTracking, shouldSample, generateEventId, sessionId, fullConfig.batchSize]);
+      // Batch processing
+      if (eventQueue.current.length >= fullConfig.batchSize) {
+        processBatch();
+      }
+    },
+    [isTracking, shouldSample, generateEventId, sessionId, fullConfig.batchSize]
+  );
 
   // Process event batch
   const processBatch = useCallback(() => {
@@ -136,12 +151,17 @@ export const useUserTracking = (config: Partial<TrackingConfig> = {}) => {
     eventQueue.current = [];
 
     // Store or send batch
-    if (fullConfig.storage === "localStorage") {
+    if (fullConfig.storage === 'localStorage') {
       try {
-        const existing = JSON.parse(localStorage.getItem("user_tracking_events") || "[]");
-        localStorage.setItem("user_tracking_events", JSON.stringify([...existing, ...batch]));
+        const existing = JSON.parse(
+          localStorage.getItem('user_tracking_events') || '[]'
+        );
+        localStorage.setItem(
+          'user_tracking_events',
+          JSON.stringify([...existing, ...batch])
+        );
       } catch (error) {
-        console.error("Failed to store tracking events:", error);
+        console.error('Failed to store tracking events:', error);
       }
     } else if (fullConfig.customStorage) {
       fullConfig.customStorage.store(batch).catch(console.error);
@@ -163,14 +183,14 @@ export const useUserTracking = (config: Partial<TrackingConfig> = {}) => {
 
   // Track page views
   useEffect(() => {
-    if (!fullConfig.enabledEvents.includes("page_view")) return;
+    if (!fullConfig.enabledEvents.includes('page_view')) return;
 
     const trackPageView = () => {
       const now = Date.now();
       const duration = now - pageStartTime.current;
-      
+
       trackEvent({
-        type: "page_view",
+        type: 'page_view',
         path: window.location.pathname,
         referrer: document.referrer,
         duration,
@@ -178,8 +198,8 @@ export const useUserTracking = (config: Partial<TrackingConfig> = {}) => {
           title: document.title,
           userAgent: navigator.userAgent,
           screenResolution: `${screen.width}x${screen.height}`,
-          viewport: `${window.innerWidth}x${window.innerHeight}`
-        }
+          viewport: `${window.innerWidth}x${window.innerHeight}`,
+        },
       } as PageViewEvent);
 
       pageStartTime.current = now;
@@ -195,22 +215,22 @@ export const useUserTracking = (config: Partial<TrackingConfig> = {}) => {
       }
     };
 
-    window.addEventListener("popstate", handlePopState);
-    return () => window.removeEventListener("popstate", handlePopState);
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
   }, [trackEvent, fullConfig.enabledEvents]);
 
   // Track clicks
   useEffect(() => {
-    if (!fullConfig.enabledEvents.includes("click")) return;
+    if (!fullConfig.enabledEvents.includes('click')) return;
 
     const handleClick = (e: MouseEvent) => {
       const target = e.target as Element;
       if (!shouldTrackElement(target)) return;
 
       const elementSelector = getElementSelector(target);
-      
+
       trackEvent({
-        type: "click",
+        type: 'click',
         target: elementSelector,
         element: target.tagName.toLowerCase(),
         coordinates: { x: e.clientX, y: e.clientY },
@@ -218,57 +238,59 @@ export const useUserTracking = (config: Partial<TrackingConfig> = {}) => {
           text: target.textContent?.slice(0, 100),
           href: (target as HTMLAnchorElement).href,
           id: target.id,
-          className: target.className
-        }
+          className: target.className,
+        },
       } as InteractionEvent);
     };
 
-    document.addEventListener("click", handleClick, true);
-    return () => document.removeEventListener("click", handleClick, true);
+    document.addEventListener('click', handleClick, true);
+    return () => document.removeEventListener('click', handleClick, true);
   }, [trackEvent, fullConfig.enabledEvents, shouldTrackElement]);
 
   // Track scrolling
   useEffect(() => {
-    if (!fullConfig.enabledEvents.includes("scroll")) return;
+    if (!fullConfig.enabledEvents.includes('scroll')) return;
 
     let ticking = false;
 
     const handleScroll = () => {
       if (!ticking) {
         requestAnimationFrame(() => {
-          const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-          const documentHeight = document.documentElement.scrollHeight - window.innerHeight;
+          const scrollTop =
+            window.pageYOffset || document.documentElement.scrollTop;
+          const documentHeight =
+            document.documentElement.scrollHeight - window.innerHeight;
           const scrollDepth = Math.round((scrollTop / documentHeight) * 100);
-          
+
           if (Math.abs(scrollDepth - lastScrollDepth.current) >= 10) {
             trackEvent({
-              type: "scroll",
+              type: 'scroll',
               scrollDepth,
               maxScroll: documentHeight,
-              direction: scrollDepth > lastScrollDepth.current ? "down" : "up",
+              direction: scrollDepth > lastScrollDepth.current ? 'down' : 'up',
               metadata: {
                 scrollTop,
                 documentHeight: document.documentElement.scrollHeight,
-                viewportHeight: window.innerHeight
-              }
+                viewportHeight: window.innerHeight,
+              },
             } as ScrollEvent);
 
             lastScrollDepth.current = scrollDepth;
           }
-          
+
           ticking = false;
         });
         ticking = true;
       }
     };
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
   }, [trackEvent, fullConfig.enabledEvents]);
 
   // Track form submissions
   useEffect(() => {
-    if (!fullConfig.enabledEvents.includes("form_submit")) return;
+    if (!fullConfig.enabledEvents.includes('form_submit')) return;
 
     const handleFormSubmit = (e: SubmitEvent) => {
       const form = e.target as HTMLFormElement;
@@ -276,7 +298,7 @@ export const useUserTracking = (config: Partial<TrackingConfig> = {}) => {
 
       const formData = new FormData(form);
       const fields: Record<string, any> = {};
-      
+
       for (const [key, value] of formData.entries()) {
         // Hash sensitive data if configured
         if (fullConfig.privacy.hashSensitiveData && isSensitiveField(key)) {
@@ -287,58 +309,63 @@ export const useUserTracking = (config: Partial<TrackingConfig> = {}) => {
       }
 
       trackEvent({
-        type: "form_submit",
+        type: 'form_submit',
         formId: form.id || getElementSelector(form),
         fields,
         metadata: {
           action: form.action,
           method: form.method,
-          fieldCount: Object.keys(fields).length
-        }
+          fieldCount: Object.keys(fields).length,
+        },
       } as FormEvent);
     };
 
-    document.addEventListener("submit", handleFormSubmit, true);
-    return () => document.removeEventListener("submit", handleFormSubmit, true);
-  }, [trackEvent, fullConfig.enabledEvents, fullConfig.privacy.hashSensitiveData, shouldTrackElement]);
+    document.addEventListener('submit', handleFormSubmit, true);
+    return () => document.removeEventListener('submit', handleFormSubmit, true);
+  }, [
+    trackEvent,
+    fullConfig.enabledEvents,
+    fullConfig.privacy.hashSensitiveData,
+    shouldTrackElement,
+  ]);
 
   // Track keyboard interactions
   useEffect(() => {
-    if (!fullConfig.enabledEvents.includes("keypress")) return;
+    if (!fullConfig.enabledEvents.includes('keypress')) return;
 
     const handleKeyPress = (e: KeyboardEvent) => {
       const target = e.target as Element;
       if (!shouldTrackElement(target)) return;
 
       // Only track significant keys
-      if (["Enter", "Escape", "Tab", " "].includes(e.key)) {
+      if (['Enter', 'Escape', 'Tab', ' '].includes(e.key)) {
         trackEvent({
-          type: "keypress",
+          type: 'keypress',
           target: getElementSelector(target),
           value: e.key,
           metadata: {
             altKey: e.altKey,
             ctrlKey: e.ctrlKey,
             shiftKey: e.shiftKey,
-            metaKey: e.metaKey
-          }
+            metaKey: e.metaKey,
+          },
         });
       }
     };
 
-    document.addEventListener("keydown", handleKeyPress, true);
-    return () => document.removeEventListener("keydown", handleKeyPress, true);
+    document.addEventListener('keydown', handleKeyPress, true);
+    return () => document.removeEventListener('keydown', handleKeyPress, true);
   }, [trackEvent, fullConfig.enabledEvents, shouldTrackElement]);
 
   // Get element selector
   function getElementSelector(element: Element): string {
     if (element.id) return `#${element.id}`;
-    
+
     let selector = element.tagName.toLowerCase();
     if (element.className) {
       selector += `.${element.className.split(' ').join('.')}`;
     }
-    
+
     return selector;
   }
 
@@ -351,9 +378,9 @@ export const useUserTracking = (config: Partial<TrackingConfig> = {}) => {
       /credit.card/i,
       /card.number/i,
       /cvv/i,
-      /security.code/i
+      /security.code/i,
     ];
-    
+
     return sensitivePatterns.some(pattern => pattern.test(fieldName));
   }
 
@@ -362,7 +389,7 @@ export const useUserTracking = (config: Partial<TrackingConfig> = {}) => {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
       const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash;
     }
     return `hash_${Math.abs(hash)}`;
@@ -377,22 +404,27 @@ export const useUserTracking = (config: Partial<TrackingConfig> = {}) => {
   const clearEvents = useCallback(() => {
     setEvents([]);
     eventQueue.current = [];
-    
-    if (fullConfig.storage === "localStorage") {
-      localStorage.removeItem("user_tracking_events");
+
+    if (fullConfig.storage === 'localStorage') {
+      localStorage.removeItem('user_tracking_events');
     }
   }, [fullConfig.storage]);
 
   // Analytics helpers
   const getEventStats = useCallback(() => {
-    const stats = events.reduce((acc, event) => {
-      acc[event.type] = (acc[event.type] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const stats = events.reduce(
+      (acc, event) => {
+        acc[event.type] = (acc[event.type] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
 
     const totalEvents = events.length;
     const uniquePages = new Set(
-      events.filter(e => e.type === "page_view").map(e => (e as PageViewEvent).path)
+      events
+        .filter(e => e.type === 'page_view')
+        .map(e => (e as PageViewEvent).path)
     ).size;
 
     return {
@@ -400,7 +432,7 @@ export const useUserTracking = (config: Partial<TrackingConfig> = {}) => {
       eventsByType: stats,
       uniquePages,
       sessionDuration: Date.now() - pageStartTime.current,
-      sessionId
+      sessionId,
     };
   }, [events, sessionId]);
 
@@ -413,7 +445,7 @@ export const useUserTracking = (config: Partial<TrackingConfig> = {}) => {
     exportEvents,
     clearEvents,
     getEventStats,
-    processBatch
+    processBatch,
   };
 };
 

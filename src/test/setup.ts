@@ -1,30 +1,30 @@
-import '@testing-library/jest-dom'
-import { expect, afterEach, vi } from 'vitest'
-import { cleanup } from '@testing-library/react'
-import * as matchers from '@testing-library/jest-dom/matchers'
-import React from 'react'
+import '@testing-library/jest-dom';
+import { expect, afterEach, vi } from 'vitest';
+import { cleanup } from '@testing-library/react';
+import * as matchers from '@testing-library/jest-dom/matchers';
+import React from 'react';
 
 // Extend Vitest's expect with jest-dom matchers
-expect.extend(matchers)
+expect.extend(matchers);
 
 // Cleanup after each test case
 afterEach(() => {
-  cleanup()
-})
+  cleanup();
+});
 
 // Mock IntersectionObserver
 global.IntersectionObserver = vi.fn().mockImplementation(() => ({
   observe: vi.fn(),
   unobserve: vi.fn(),
   disconnect: vi.fn(),
-}))
+}));
 
 // Mock ResizeObserver
 global.ResizeObserver = vi.fn().mockImplementation(() => ({
   observe: vi.fn(),
   unobserve: vi.fn(),
   disconnect: vi.fn(),
-}))
+}));
 
 // Mock matchMedia
 Object.defineProperty(window, 'matchMedia', {
@@ -39,13 +39,13 @@ Object.defineProperty(window, 'matchMedia', {
     removeEventListener: vi.fn(),
     dispatchEvent: vi.fn(),
   })),
-})
+});
 
 // Mock scrollTo
 Object.defineProperty(window, 'scrollTo', {
   writable: true,
   value: vi.fn(),
-})
+});
 
 // Mock localStorage
 const localStorageMock = {
@@ -53,10 +53,10 @@ const localStorageMock = {
   setItem: vi.fn(),
   removeItem: vi.fn(),
   clear: vi.fn(),
-}
+};
 Object.defineProperty(window, 'localStorage', {
   value: localStorageMock,
-})
+});
 
 // Mock sessionStorage
 const sessionStorageMock = {
@@ -64,10 +64,10 @@ const sessionStorageMock = {
   setItem: vi.fn(),
   removeItem: vi.fn(),
   clear: vi.fn(),
-}
+};
 Object.defineProperty(window, 'sessionStorage', {
   value: sessionStorageMock,
-})
+});
 
 // Mock Firebase
 vi.mock('@/lib/firebase', () => ({
@@ -76,17 +76,17 @@ vi.mock('@/lib/firebase', () => ({
   },
   db: {},
   isFirebaseEnabled: false,
-}))
+}));
 
 // Mock Firebase Auth functions
 vi.mock('firebase/auth', () => ({
   signInWithEmailAndPassword: vi.fn(),
   signOut: vi.fn(),
   onAuthStateChanged: vi.fn((auth, callback) => {
-    return () => {}
+    return () => {};
   }),
   getAuth: vi.fn(),
-}))
+}));
 
 // Mock Firebase Firestore functions
 vi.mock('firebase/firestore', () => ({
@@ -102,7 +102,7 @@ vi.mock('firebase/firestore', () => ({
   where: vi.fn(),
   orderBy: vi.fn(),
   limit: vi.fn(),
-}))
+}));
 
 // Mock Framer Motion
 vi.mock('framer-motion', () => ({
@@ -130,7 +130,7 @@ vi.mock('framer-motion', () => ({
     set: vi.fn(),
   }),
   useInView: () => true,
-}))
+}));
 
 // Mock next-themes
 vi.mock('next-themes', () => ({
@@ -142,18 +142,18 @@ vi.mock('next-themes', () => ({
     systemTheme: 'light',
   }),
   ThemeProvider: ({ children }: { children: React.ReactNode }) => children,
-}))
+}));
 
 // Mock React Router
 vi.mock('react-router-dom', () => ({
   useNavigate: () => vi.fn(),
   useLocation: () => ({ pathname: '/' }),
   useParams: () => ({}),
-  Link: ({ children, to }: { children: React.ReactNode; to: string }) => 
+  Link: ({ children, to }: { children: React.ReactNode; to: string }) =>
     React.createElement('a', { href: to }, children),
-  NavLink: ({ children, to }: { children: React.ReactNode; to: string }) => 
+  NavLink: ({ children, to }: { children: React.ReactNode; to: string }) =>
     React.createElement('a', { href: to }, children),
   BrowserRouter: ({ children }: { children: React.ReactNode }) => children,
   Routes: ({ children }: { children: React.ReactNode }) => children,
   Route: ({ element }: { element: React.ReactNode }) => element,
-}))
+}));
