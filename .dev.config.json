@@ -1,0 +1,65 @@
+{
+  "project": {
+    "name": "Admin Dashboard Optimization",
+    "type": "react-typescript",
+    "framework": "vite"
+  },
+  "paths": {
+    "components": "src/components",
+    "pages": "src/pages",
+    "hooks": "src/hooks",
+    "utils": "src/utils",
+    "types": "src/types",
+    "admin": "src/components/admin"
+  },
+  "generators": {
+    "component": {
+      "defaultPath": "components",
+      "includeStories": true,
+      "includeTests": true,
+      "includeIndex": true
+    },
+    "page": {
+      "defaultPath": "pages",
+      "includeTests": true,
+      "adminPath": "pages/admin"
+    },
+    "hook": {
+      "defaultPath": "hooks",
+      "includeTests": true,
+      "defaultType": "custom"
+    }
+  },
+  "quality": {
+    "eslint": {
+      "maxWarnings": 0,
+      "cache": true
+    },
+    "prettier": {
+      "requireConfig": true
+    },
+    "typescript": {
+      "strict": true,
+      "noEmit": true
+    }
+  },
+  "performance": {
+    "budgets": {
+      "maxBundleSize": "500kb",
+      "maxChunkSize": "200kb"
+    },
+    "lighthouse": {
+      "performance": 90,
+      "accessibility": 95,
+      "bestPractices": 90,
+      "seo": 90
+    }
+  },
+  "git": {
+    "hooks": {
+      "preCommit": ["lint-staged"],
+      "prePush": ["quality"],
+      "commitMsg": []
+    }
+  }
+}

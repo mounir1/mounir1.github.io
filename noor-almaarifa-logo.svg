@@ -1,0 +1,39 @@
+<svg width="130" height="32" viewBox="0 0 130 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Noor Al Maarifa Logo -->
+  <defs>
+    <linearGradient id="noorGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#059669" />
+      <stop offset="50%" stop-color="#10B981" />
+      <stop offset="100%" stop-color="#34D399" />
+    </linearGradient>
+    <linearGradient id="lightGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FCD34D" />
+      <stop offset="100%" stop-color="#F59E0B" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Icon - Book with light rays -->
+  <g transform="translate(2, 4)">
+    <!-- Book -->
+    <rect x="4" y="6" width="16" height="12" fill="url(#noorGradient)" rx="2"/>
+    <rect x="6" y="8" width="12" height="1" fill="white" opacity="0.8" rx="0.5"/>
+    <rect x="6" y="10" width="12" height="1" fill="white" opacity="0.6" rx="0.5"/>
+    <rect x="6" y="12" width="8" height="1" fill="white" opacity="0.4" rx="0.5"/>
+    
+    <!-- Light rays -->
+    <path d="M12 2 L13 6 L11 6 Z" fill="url(#lightGradient)"/>
+    <path d="M8 4 L10 7 L8 8 Z" fill="url(#lightGradient)" opacity="0.8"/>
+    <path d="M16 4 L14 7 L16 8 Z" fill="url(#lightGradient)" opacity="0.8"/>
+    
+    <!-- Central light -->
+    <circle cx="12" cy="3" r="1.5" fill="url(#lightGradient)"/>
+  </g>
+  
+  <!-- Text -->
+  <text x="28" y="12" font-family="'Inter', sans-serif" font-size="8" font-weight="700" fill="#065F46">
+    Noor Al Maarifa
+  </text>
+  <text x="28" y="22" font-family="'Inter', sans-serif" font-size="6" font-weight="500" fill="#6B7280">
+    Educational Platform
+  </text>
+</svg>
