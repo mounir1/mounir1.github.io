@@ -1,0 +1,110 @@
+{
+  "indexes": [
+    {
+      "_comment": "Projects: active (not disabled) ordered by priority desc, then createdAt desc",
+      "collectionGroup": "projects",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "disabled",  "order": "ASCENDING"  },
+        { "fieldPath": "priority",  "order": "DESCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Projects: featured ones ordered by priority",
+      "collectionGroup": "projects",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "featured",  "order": "ASCENDING"  },
+        { "fieldPath": "disabled",  "order": "ASCENDING"  },
+        { "fieldPath": "priority",  "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Projects: by status + priority for admin filtering",
+      "collectionGroup": "projects",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status",    "order": "ASCENDING"  },
+        { "fieldPath": "disabled",  "order": "ASCENDING"  },
+        { "fieldPath": "priority",  "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Projects: by category for filtering",
+      "collectionGroup": "projects",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "category",  "order": "ASCENDING"  },
+        { "fieldPath": "disabled",  "order": "ASCENDING"  },
+        { "fieldPath": "priority",  "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Experiences: active ordered by priority + startDate",
+      "collectionGroup": "experiences",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "disabled",   "order": "ASCENDING"  },
+        { "fieldPath": "priority",   "order": "DESCENDING" },
+        { "fieldPath": "startDate",  "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Skills: active ordered by priority + level",
+      "collectionGroup": "skills",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "disabled",  "order": "ASCENDING"  },
+        { "fieldPath": "priority",  "order": "DESCENDING" },
+        { "fieldPath": "level",     "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Skills: by category + level for grouped view",
+      "collectionGroup": "skills",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "category",  "order": "ASCENDING"  },
+        { "fieldPath": "disabled",  "order": "ASCENDING"  },
+        { "fieldPath": "level",     "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Testimonials: active featured ones",
+      "collectionGroup": "testimonials",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "featured",  "order": "ASCENDING"  },
+        { "fieldPath": "disabled",  "order": "ASCENDING"  },
+        { "fieldPath": "priority",  "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Analytics: by type + timestamp for dashboards",
+      "collectionGroup": "analytics",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "type",      "order": "ASCENDING"  },
+        { "fieldPath": "timestamp", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "_comment": "Analytics: by sessionId for session replay",
+      "collectionGroup": "analytics",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "sessionId", "order": "ASCENDING"  },
+        { "fieldPath": "timestamp", "order": "ASCENDING"  }
+      ]
+    }
+  ],
+  "fieldOverrides": [
+    {
+      "_comment": "Disable automatic single-field indexes on analytics.metadata (nested map)",
+      "collectionGroup": "analytics",
+      "fieldPath": "metadata",
+      "indexes": []
+    }
+  ]
+}

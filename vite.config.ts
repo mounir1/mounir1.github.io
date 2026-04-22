@@ -2,12 +2,10 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 
-// https://vitejs.dev/config/
 export default defineConfig({
   server: {
     host: "::",
     port: 8080,
-    open: true,
     cors: true,
   },
   plugins: [react()],
@@ -17,15 +15,28 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: 'dist',
+    outDir: "dist",
     sourcemap: false,
-    minify: 'terser',
+    minify: "terser",
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+        passes: 2,
+        pure_funcs: ["console.log", "console.debug", "console.info"],
+      },
+      mangle: { safari10: true },
+    },
+    chunkSizeWarningLimit: 600,
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom'],
-          firebase: ['firebase/app', 'firebase/auth', 'firebase/firestore'],
-          ui: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-tabs'],
+        manualChunks(id: string) {
+          if (id.includes("firebase")) return "firebase";
+          if (id.includes("react-dom") || id.includes("node_modules/react")) return "vendor";
+          if (id.includes("@radix-ui")) return "ui";
+          if (id.includes("lucide-react")) return "icons";
+          if (id.includes("/pages/Admin") || id.includes("/components/admin/")) return "admin";
+          if (id.includes("node_modules")) return "vendor";
         },
       },
     },

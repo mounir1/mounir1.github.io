@@ -3,6 +3,10 @@ import App from './App.tsx'
 import './index.css'
 import { ErrorBoundary } from './components/ui/error-boundary'
 import { registerServiceWorker } from './utils/sw-registration'
+import { initPerformanceMonitoring } from './lib/performance'
+
+// Start Web Vitals collection immediately (non-blocking)
+initPerformanceMonitoring();
 
 // Register service worker for offline functionality
 if ('serviceWorker' in navigator) {
