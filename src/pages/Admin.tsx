@@ -23,11 +23,14 @@ import { ProfessionalSignature } from "@/components/ui/signature";
 import { DataManager } from "@/components/admin/DataManager";
 import { ExperienceManager } from "@/components/admin/ExperienceManager";
 import { SkillsManager } from "@/components/admin/SkillsManager";
+import { TestimonialsManager } from "@/components/admin/TestimonialsManager";
+import { AnalyticsDashboard } from "@/components/admin/AnalyticsDashboard";
 import { PerformanceDashboard } from "@/components/admin/PerformanceDashboard";
 import { DataQualityDashboard } from "@/components/admin/DataQualityDashboard";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import {
   Activity, BarChart3, Briefcase, Code2, Database, Edit,
-  ExternalLink, Eye, EyeOff, Github, Globe, Plus, Settings,
+  ExternalLink, Eye, EyeOff, Github, Globe, MessageSquare, Plus, Settings,
   Shield, Star, Trash2, TrendingUp, Upload, Zap,
 } from "lucide-react";
 
