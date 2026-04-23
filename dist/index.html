@@ -5,6 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
+    <!-- SPA redirect decode (GitHub Pages 404 → index redirect) -->
+    <script>
+      (function() {
+        var redirect = sessionStorage.redirect;
+        delete sessionStorage.redirect;
+        if (redirect && redirect !== location.href) {
+          history.replaceState(null, null, redirect);
+        }
+        // Decode ?p= param from 404.html redirect
+        var search = window.location.search;
+        if (search.slice(1,3) === 'p=') {
+          var decoded = '/' + search.slice(3).replace(/~and~/g, '&');
+          window.history.replaceState(null, null,
+            decoded + (window.location.hash || '')
+          );
+        }
+      })();
+    </script>
+
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-96R4Z44Y80"></script>
     <script>
@@ -37,14 +56,14 @@
     <meta name="ICBM" content="36.7538, 3.0588">
     
     <!-- Canonical URL -->
-    <link rel="canonical" href="https://mounir1.github.io/">
+    <link rel="canonical" href="https://mounir.bio/">
     
     <!-- Open Graph / Facebook / LinkedIn -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://mounir1.github.io/">
+    <meta property="og:url" content="https://mounir.bio/">
     <meta property="og:title" content="Mounir Abderrahmani | Senior Full-Stack Developer & Software Engineer">
     <meta property="og:description" content="Senior Full-Stack Developer with 10+ years of experience. Expertise in React, Node.js, ExtJS, and enterprise solutions. Available for remote work worldwide.">
-    <meta property="og:image" content="https://mounir1.github.io/profile.webp">
+    <meta property="og:image" content="https://mounir.bio/profile.webp">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:image:alt" content="Mounir Abderrahmani - Senior Full-Stack Developer">
@@ -53,10 +72,10 @@
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://mounir1.github.io/">
+    <meta property="twitter:url" content="https://mounir.bio/">
     <meta property="twitter:title" content="Mounir Abderrahmani | Senior Full-Stack Developer">
     <meta property="twitter:description" content="Senior Full-Stack Developer specializing in modern web technologies and enterprise solutions. 10+ years experience.">
-    <meta property="twitter:image" content="https://mounir1.github.io/profile.webp">
+    <meta property="twitter:image" content="https://mounir.bio/profile.webp">
     <meta property="twitter:image:alt" content="Mounir Abderrahmani - Senior Full-Stack Developer">
     <meta name="twitter:creator" content="@mounir1badi">
     <meta name="twitter:site" content="@mounir1badi">
@@ -67,16 +86,16 @@
       {
         "@context": "https://schema.org",
         "@type": "Person",
-        "@id": "https://mounir1.github.io/#person",
+        "@id": "https://mounir.bio/#person",
         "name": "Mounir Abderrahmani",
         "alternateName": ["mounir1", "mounir webdev", "Mounir"],
         "jobTitle": "Senior Full-Stack Developer & Software Engineer",
         "description": "Award-winning Senior Full-Stack Developer with 10+ years of experience in React, Node.js, ExtJS, and Cloud Technologies. Specializing in enterprise solutions and modern web applications.",
-        "url": "https://mounir1.github.io",
-        "mainEntityOfPage": "https://mounir1.github.io",
+        "url": "https://mounir.bio",
+        "mainEntityOfPage": "https://mounir.bio",
         "image": {
           "@type": "ImageObject",
-          "url": "https://mounir1.github.io/profile.webp",
+          "url": "https://mounir.bio/profile.webp",
           "width": 400,
           "height": 400,
           "caption": "Mounir Abderrahmani - Senior Full-Stack Developer"
@@ -111,7 +130,7 @@
           "https://linkedin.com/in/mounir1badi",
           "https://github.com/mounir1",
           "https://twitter.com/mounir1badi",
-          "https://mounir1.github.io",
+          "https://mounir.bio",
           "https://gravatar.com/mounirwebdev",
           "https://stackoverflow.com/users/mounir1",
           "https://dev.to/mounir1",
@@ -191,18 +210,18 @@
       {
         "@context": "https://schema.org",
         "@type": "Organization",
-        "@id": "https://mounir1.github.io/#organization",
+        "@id": "https://mounir.bio/#organization",
         "name": "Mounir Abderrahmani - Web Development Services",
         "alternateName": "Mounir WebDev",
-        "url": "https://mounir1.github.io",
+        "url": "https://mounir.bio",
         "logo": {
           "@type": "ImageObject",
-          "url": "https://mounir1.github.io/mounir-icon.svg"
+          "url": "https://mounir.bio/mounir-icon.svg"
         },
-        "image": "https://mounir1.github.io/profile.webp",
+        "image": "https://mounir.bio/profile.webp",
         "description": "Professional web development services specializing in full-stack development, enterprise solutions, and e-commerce platforms.",
         "founder": {
-          "@id": "https://mounir1.github.io/#person"
+          "@id": "https://mounir.bio/#person"
         },
         "contactPoint": {
           "@type": "ContactPoint",
@@ -236,29 +255,29 @@
       {
         "@context": "https://schema.org",
         "@type": "WebSite",
-        "@id": "https://mounir1.github.io/#website",
-        "url": "https://mounir1.github.io",
+        "@id": "https://mounir.bio/#website",
+        "url": "https://mounir.bio",
         "name": "Mounir Abderrahmani Portfolio",
         "description": "Professional portfolio of Mounir Abderrahmani, Senior Full-Stack Developer specializing in modern web technologies.",
         "publisher": {
-          "@id": "https://mounir1.github.io/#person"
+          "@id": "https://mounir.bio/#person"
         },
         "potentialAction": {
           "@type": "SearchAction",
-          "target": "https://mounir1.github.io/?s={search_term_string}",
+          "target": "https://mounir.bio/?s={search_term_string}",
           "query-input": "required name=search_term_string"
         },
         "mainEntity": {
-          "@id": "https://mounir1.github.io/#person"
+          "@id": "https://mounir.bio/#person"
         }
       },
       {
         "@context": "https://schema.org",
         "@type": "ProfessionalService",
-        "@id": "https://mounir1.github.io/#service",
+        "@id": "https://mounir.bio/#service",
         "name": "Web Development Services",
         "provider": {
-          "@id": "https://mounir1.github.io/#person"
+          "@id": "https://mounir.bio/#person"
         },
         "serviceType": "Web Development",
         "description": "Professional web development services including full-stack development, e-commerce solutions, and enterprise applications.",
@@ -357,17 +376,17 @@
     <meta name="copyright" content="Mounir Abderrahmani">
     <meta name="reply-to" content="mounir.webdev@gmail.com">
     <meta name="owner" content="Mounir Abderrahmani">
-    <meta name="url" content="https://mounir1.github.io">
-    <meta name="identifier-URL" content="https://mounir1.github.io">
+    <meta name="url" content="https://mounir.bio">
+    <meta name="identifier-URL" content="https://mounir.bio">
     <meta name="directory" content="submission">
     <meta name="pagename" content="Mounir Abderrahmani Portfolio">
     <meta name="designer" content="Mounir Abderrahmani">
     
     <!-- Alternative Language Support -->
-    <link rel="alternate" hreflang="en" href="https://mounir1.github.io/">
-    <link rel="alternate" hreflang="ar" href="https://mounir1.github.io/ar/">
-    <link rel="alternate" hreflang="fr" href="https://mounir1.github.io/fr/">
-    <link rel="alternate" hreflang="x-default" href="https://mounir1.github.io/">
+    <link rel="alternate" hreflang="en" href="https://mounir.bio/">
+    <link rel="alternate" hreflang="ar" href="https://mounir.bio/ar/">
+    <link rel="alternate" hreflang="fr" href="https://mounir.bio/fr/">
+    <link rel="alternate" hreflang="x-default" href="https://mounir.bio/">
     
     <!-- Cross-Domain Verification -->
     <link rel="me" href="https://github.com/mounir1">
@@ -383,14 +402,14 @@
     <meta property="business:contact_data:country_name" content="Algeria">
     <meta property="business:contact_data:email" content="mounir.webdev@gmail.com">
     <meta property="business:contact_data:phone_number" content="+213674094855">
-    <meta property="business:contact_data:website" content="https://mounir1.github.io">
-    <script type="module" crossorigin src="/assets/index-CJUbX1DZ.js"></script>
+    <meta property="business:contact_data:website" content="https://mounir.bio">
+    <script type="module" crossorigin src="/assets/index-D4wGG42r.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/router-DIn5tzY6.js">
     <link rel="modulepreload" crossorigin href="/assets/vendor-DrNhH7GM.js">
     <link rel="modulepreload" crossorigin href="/assets/ui-D4yzix1-.js">
     <link rel="modulepreload" crossorigin href="/assets/icons-CbjwywV6.js">
     <link rel="modulepreload" crossorigin href="/assets/firebase-DqHOwl6o.js">
-    <link rel="stylesheet" crossorigin href="/assets/index-CkZY0ATf.css">
+    <link rel="stylesheet" crossorigin href="/assets/index-BtSBQbXI.css">
   </head>
 
   <body>
