@@ -10,7 +10,9 @@ export default defineConfig(({ mode }) => ({
     open: true,
     cors: true,
   },
-  plugins: [react()],
+  plugins: [
+    react(),
+  ],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
@@ -24,13 +26,21 @@ export default defineConfig(({ mode }) => ({
   },
   build: {
     outDir: 'dist',
-    sourcemap: true,
-    minify: mode === 'production' ? 'terser' : false,
-    target: 'es2020',
+    sourcemap: false, // Disable sourcemaps for production to reduce size
+    minify: 'terser',
+    target: 'esnext', // Modern target for smaller bundles
     reportCompressedSize: false,
-    chunkSizeWarningLimit: 500,
+    chunkSizeWarningLimit: 300, // Lower warning limit
     rollupOptions: {
       output: {
+        manualChunks: {
+          // Split vendor chunks for better caching
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', 'lucide-react'],
+          'animation-vendor': ['framer-motion'],
+          'forms-vendor': ['react-hook-form', '@hookform/resolvers', 'zod'],
+          'theme-vendor': ['next-themes', 'sonner'],
+        },
         chunkFileNames: (chunkInfo) => {
           const facadeModuleId = chunkInfo.facadeModuleId ? chunkInfo.facadeModuleId.split('/').pop() : 'chunk';
           return `assets/js/[name]-[hash].js`;
@@ -48,27 +58,34 @@ export default defineConfig(({ mode }) => ({
           return `assets/[name]-[hash][extname]`;
         },
       },
-      // keep default dependency graph ordering to avoid premature execution
     },
     terserOptions: {
       compress: {
-        drop_console: mode === 'production',
-        drop_debugger: mode === 'production',
-        pure_funcs: mode === 'production' ? ['console.log', 'console.warn'] : [],
+        drop_console: true,
+        drop_debugger: true,
+        pure_funcs: ['console.log', 'console.warn'],
+        passes: 2, // Multiple passes for better minification
       },
       mangle: {
         safari10: true,
       },
+      format: {
+        comments: false, // Remove comments
+      },
     },
     commonjsOptions: {
       transformMixedEsModules: true
-    }
+    },
+    // Enable CSS code splitting
+    cssCodeSplit: true,
+    // Enable assets as inline base64 for small files
+    assetsInlineLimit: 4096, // 4kb
   },
   base: mode === 'production' ? '/' : '/',
   optimizeDeps: {
     include: [
-      'react', 
-      'react-dom', 
+      'react',
+      'react-dom',
       'react-router-dom',
       'react-hook-form',
       'framer-motion',
@@ -80,9 +97,23 @@ export default defineConfig(({ mode }) => ({
       'use-callback-ref'
     ],
     exclude: ['@firebase/app-check'],
+    // Force pre-bundling for faster dev startup
+    force: false,
   },
   esbuild: {
-    drop: mode === 'production' ? ['console', 'debugger'] : [],
+    drop: ['console', 'debugger'],
     legalComments: 'none',
+    // Enable tree shaking
+    treeShaking: true,
+    // Optimize for size
+    minifyIdentifiers: true,
+    minifySyntax: true,
+    minifyWhitespace: true,
+  },
+  // Enable CSS modules for better scoping
+  css: {
+    modules: {
+      localsConvention: 'camelCaseOnly',
+    },
   },
 }));
