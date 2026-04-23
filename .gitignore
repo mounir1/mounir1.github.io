@@ -12,6 +12,13 @@ dist
 dist-ssr
 *.local
 
+# Environment files - NEVER commit these
+.env
+.env.local
+.env.*.local
+.env.development.local
+.env.production.local
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -22,3 +29,18 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Build artifacts
+*.msi
+*.exe
+*.dmg
+
+# Firebase
+.firebase/
+.firebaserc.local
+
+# Vite cache
+.vite/
+
+# OS files
+Thumbs.db
