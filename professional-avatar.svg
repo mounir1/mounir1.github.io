@@ -1,0 +1,71 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Professional Avatar for Mounir Abderrahmani -->
+  <defs>
+    <linearGradient id="avatarBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4361ee" />
+      <stop offset="50%" stop-color="#7209b7" />
+      <stop offset="100%" stop-color="#f72585" />
+    </linearGradient>
+    <linearGradient id="avatarAccent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#f8fafc" />
+    </linearGradient>
+    <filter id="avatarGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background Circle -->
+  <circle cx="100" cy="100" r="95" fill="url(#avatarBg)" filter="url(#avatarGlow)" opacity="0.9"/>
+  
+  <!-- Inner Circle -->
+  <circle cx="100" cy="100" r="85" fill="url(#avatarAccent)" opacity="0.1"/>
+  
+  <!-- Professional Figure -->
+  <!-- Head -->
+  <circle cx="100" cy="75" r="25" fill="url(#avatarAccent)" opacity="0.9"/>
+  
+  <!-- Body/Suit -->
+  <path d="M75 95 Q100 90 125 95 L125 140 Q100 145 75 140 Z" fill="url(#avatarAccent)" opacity="0.8"/>
+  
+  <!-- Tie/Professional Detail -->
+  <path d="M95 95 Q100 90 105 95 L105 125 Q100 130 95 125 Z" fill="url(#avatarBg)" opacity="0.6"/>
+  
+  <!-- Collar -->
+  <path d="M85 95 Q100 85 115 95 L110 105 Q100 100 90 105 Z" fill="url(#avatarAccent)" opacity="0.7"/>
+  
+  <!-- Tech Elements -->
+  <!-- Code Brackets -->
+  <text x="60" y="160" font-family="'JetBrains Mono', monospace" font-size="16" font-weight="bold" fill="url(#avatarAccent)" opacity="0.7">
+    &lt;/&gt;
+  </text>
+  
+  <!-- React Symbol -->
+  <circle cx="140" cy="50" r="3" fill="none" stroke="url(#avatarAccent)" stroke-width="1" opacity="0.6"/>
+  <circle cx="140" cy="50" r="8" fill="none" stroke="url(#avatarAccent)" stroke-width="1" opacity="0.4"/>
+  <circle cx="140" cy="50" r="13" fill="none" stroke="url(#avatarAccent)" stroke-width="1" opacity="0.3"/>
+  
+  <!-- Node.js Inspired -->
+  <path d="M50 45 L60 50 L60 60 L50 65 L40 60 L40 50 Z" fill="none" stroke="url(#avatarAccent)" stroke-width="1.5" opacity="0.5"/>
+  
+  <!-- Database Symbol -->
+  <ellipse cx="150" cy="160" rx="8" ry="3" fill="none" stroke="url(#avatarAccent)" stroke-width="1" opacity="0.5"/>
+  <ellipse cx="150" cy="165" rx="8" ry="3" fill="none" stroke="url(#avatarAccent)" stroke-width="1" opacity="0.5"/>
+  <ellipse cx="150" cy="170" rx="8" ry="3" fill="none" stroke="url(#avatarAccent)" stroke-width="1" opacity="0.5"/>
+  
+  <!-- Decorative Elements -->
+  <circle cx="30" cy="100" r="2" fill="url(#avatarAccent)" opacity="0.6" class="animate-pulse"/>
+  <circle cx="170" cy="100" r="2" fill="url(#avatarAccent)" opacity="0.6" class="animate-pulse" style="animation-delay: 1s"/>
+  <circle cx="100" cy="30" r="1.5" fill="url(#avatarAccent)" opacity="0.5" class="animate-pulse" style="animation-delay: 2s"/>
+  <circle cx="100" cy="170" r="1.5" fill="url(#avatarAccent)" opacity="0.5" class="animate-pulse" style="animation-delay: 0.5s"/>
+  
+  <!-- Professional Badge -->
+  <circle cx="130" cy="130" r="12" fill="url(#avatarBg)" opacity="0.8"/>
+  <text x="130" y="135" font-family="'Inter', sans-serif" font-size="8" font-weight="bold" fill="white" text-anchor="middle">
+    MAB
+  </text>
+</svg>
