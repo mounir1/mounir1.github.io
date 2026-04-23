@@ -33,16 +33,10 @@ export default defineConfig(({ mode }) => ({
           "ui-vendor": [
             "@radix-ui/react-dialog",
             "@radix-ui/react-dropdown-menu",
+            "@radix-ui/react-tooltip",
             "lucide-react",
           ],
           "forms-vendor": ["react-hook-form", "@hookform/resolvers", "zod"],
-          firebase: [
-            "firebase/app",
-            "firebase/auth",
-            "firebase/firestore",
-            "firebase/storage",
-            "firebase/analytics",
-          ],
         },
         chunkFileNames: "assets/js/[name]-[hash].js",
         entryFileNames: "assets/js/[name]-[hash].js",
