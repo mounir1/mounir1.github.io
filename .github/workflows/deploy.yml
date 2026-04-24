@@ -53,7 +53,7 @@ jobs:
         continue-on-error: true
 
       - name: Build production
-        run: npm run build:prod
+        run: npm run build
 
       - name: Copy CNAME to dist
         run: cp CNAME dist/CNAME
@@ -72,24 +72,5 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-        env:
-          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
-
-      - name: Check performance budgets
-        run: node scripts/performance-enforcer.js
-        continue-on-error: true
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
-      - name: Upload performance reports
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: performance-reports
-          path: |
-            performance-reports/
-            bundle-report.json
-            lighthouse-reports/
-          retention-days: 30
 
 

@@ -10,10 +10,7 @@ export default tseslint.config(
       "dist",
       "node_modules",
       "*.config.js",
-      "*.config.ts",
-      "vite.config.ts",
-      "playwright.config.ts",
-      "vitest.config.ts"
+      "*.config.ts"
     ] 
   },
   {
