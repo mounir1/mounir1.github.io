@@ -2,72 +2,80 @@ import { ProjectInput } from "@/hooks/useProjects";
 
 export const initialProjects: ProjectInput[] = [
   {
-    title: "HoTech Systems - Enterprise Integration Platform",
-    description: "Comprehensive enterprise integration platform with real-time data synchronization and advanced analytics dashboard.",
-    longDescription: "Built a complete enterprise integration platform for HoTech Systems, featuring real-time data synchronization across multiple systems, advanced analytics dashboard, and automated workflow management. The platform handles over 10,000 transactions daily with 99.9% uptime. Implemented microservices architecture with Docker containers and Kubernetes orchestration.",
+    title: "HoTech Systems - Hospitality Digital Transformation Platform",
+    description: "Digital transformation platform for the hospitality industry — Otello GEM guest experience management, DashBoss real-time operations dashboard, and GuestApp mobile engagement. Powering 300,000+ hotel rooms across 10+ countries.",
+    longDescription: "Led full-stack development and enterprise integration for HoTech Systems, a global hospitality technology leader with 20+ years of experience and 2,000+ client installations worldwide. Built and integrated three flagship products: Otello GEM (Guest Experience Management) for touchless personalized guest journeys and real-time revenue optimization; DashBoss, a real-time mobile operations dashboard for department-level KPI monitoring; and GuestApp, the guest-facing mobile platform for customizing travel experiences. Implemented 100% integration capability with existing hotel systems, serving 120,000+ active users across 10+ countries and 300,000+ hotel rooms.",
     category: "Enterprise Integration",
     status: "completed",
     achievements: [
-      "Reduced data processing time by 75%",
-      "Achieved 99.9% system uptime",
-      "Integrated 15+ enterprise systems seamlessly",
-      "Processed over 1M transactions monthly",
-      "Implemented real-time monitoring dashboard",
-      "Built automated failover mechanisms",
-      "Reduced manual intervention by 90%"
+      "Integrated platform powers 300,000+ hotel rooms globally",
+      "Serving 120,000+ active users across 10+ countries",
+      "2,000+ successful client installations worldwide",
+      "Implemented touchless/contactless guest journey system",
+      "Built Otello GEM for real-time guest experience & revenue optimization",
+      "Developed DashBoss real-time mobile KPI dashboard",
+      "Delivered GuestApp for personalized guest engagement",
+      "Achieved 100% integration with existing hotel management systems",
+      "20+ year platform with 99.9% uptime SLA",
+      "Reduced data processing time by 75%"
     ],
-    technologies: ["React", "Node.js", "TypeScript", "PostgreSQL", "Redis", "Docker", "AWS", "WebSocket", "Kubernetes", "Nginx"],
-    tags: ["enterprise", "integration", "real-time", "scalable", "microservices", "b2b"],
+    technologies: ["React", "Node.js", "TypeScript", "PostgreSQL", "Redis", "Docker", "AWS", "WebSocket", "Kubernetes", "Nginx", "REST APIs", "Mobile PWA"],
+    tags: ["hospitality", "enterprise", "integration", "real-time", "scalable", "microservices", "b2b", "saas", "hotel-tech", "guest-experience"],
     image: "https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&h=600&fit=crop",
     logo: "/hotech-logo.svg",
-    icon: "🏢",
+    icon: "🏨",
     liveUrl: "https://hotech.systems",
     githubUrl: "",
-    demoUrl: "",
-    caseStudyUrl: "",
+    demoUrl: "https://en.hotech.systems",
+    caseStudyUrl: "https://hotech.systems/about-hotech",
     featured: true,
     disabled: false,
-    priority: 95,
+    priority: 98,
     startDate: "2023-06-01",
     endDate: "2024-02-15",
     duration: "8 months",
     clientInfo: {
       name: "HoTech Systems",
-      industry: "Technology Integration",
+      industry: "Hospitality Technology",
       size: "enterprise",
-      location: "International",
+      location: "International (10+ countries)",
       website: "https://hotech.systems",
       isPublic: true
     },
     metrics: {
-      usersReached: 10000,
+      usersReached: 120000,
       performanceImprovement: "75% faster processing",
-      revenueImpact: "$2M+ cost savings",
+      revenueImpact: "Revenue optimization for 300K+ rooms",
       uptime: "99.9%",
       customMetrics: {
-        "transactions_monthly": 1000000,
+        "hotel_rooms_managed": "300,000+",
+        "active_users": "120,000+",
+        "countries_served": "10+",
+        "client_installations": "2,000+",
+        "years_in_operation": "20+",
         "systems_integrated": 15,
-        "cost_savings": "40%",
         "automation_level": "90%"
       }
     },
     challenges: [
-      "Complex legacy system integration",
-      "Real-time data synchronization across multiple databases",
-      "High availability requirements with zero downtime",
-      "Scalability for growing transaction volume"
+      "Integrating with 100+ diverse legacy hotel management systems",
+      "Real-time data synchronization for 300K+ rooms simultaneously",
+      "Building touchless contactless guest journey across all touchpoints",
+      "Multi-country, multi-language deployment at scale",
+      "Revenue optimization with real-time analytics across departments"
     ],
     solutions: [
-      "Implemented microservices architecture with Docker",
-      "Built event-driven data synchronization system",
-      "Created automated failover and monitoring systems",
-      "Designed horizontal scaling with Kubernetes"
+      "Built universal hotel systems integration layer with REST & WebSocket APIs",
+      "Implemented event-driven microservices for real-time room/guest data sync",
+      "Developed Otello GEM for end-to-end personalized touchless guest journeys",
+      "Created DashBoss real-time mobile dashboard for department-level KPIs",
+      "Designed GuestApp PWA for mobile-first guest engagement and customization"
     ],
     teamSize: 5,
-    role: "Lead Full-Stack Developer & Architect",
+    role: "Lead Full-Stack Developer & Integration Architect",
     createdAt: Date.now() - 86400000 * 30,
     updatedAt: Date.now() - 86400000 * 5,
-    version: 1
+    version: 2
   },
   {
     title: "TechnoStationery E-commerce Platform",
@@ -136,6 +144,71 @@ export const initialProjects: ProjectInput[] = [
     version: 1
   },
   {
+    title: "MAB Modules — Magento / Adobe Commerce Extension Library",
+    description: "Open-source library of production-ready Magento 2 / Adobe Commerce modules. Covers checkout optimization, B2B workflows, custom payment integrations, and performance enhancements — published at mab-modules.github.io.",
+    longDescription: "MAB Modules is an open-source collection of professional-grade Magento 2 and Adobe Commerce extensions built for real-world enterprise deployments. Each module is built with clean architecture, fully tested, and designed to drop into any Adobe Commerce installation without conflicts. The library covers checkout UX improvements, B2B quote and approval workflows, custom payment provider integrations, multi-store catalog management, advanced SEO tooling, and performance optimization utilities. All modules follow Adobe Commerce coding standards and are distributed with full documentation at mab-modules.github.io.",
+    category: "E-commerce",
+    status: "maintenance",
+    achievements: [
+      "Published open-source Adobe Commerce module library at mab-modules.github.io",
+      "Built production-grade checkout optimization modules",
+      "Developed B2B quote & approval workflow extensions",
+      "Created custom payment gateway integration modules",
+      "Implemented advanced SEO & sitemap generation modules",
+      "All modules follow Adobe Commerce coding standards",
+      "Actively maintained with Magento 2.x / Adobe Commerce compatibility"
+    ],
+    technologies: ["Magento 2", "Adobe Commerce", "PHP", "XML", "JavaScript", "LESS", "Composer", "PHPUnit", "MySQL", "GraphQL"],
+    tags: ["magento", "adobe-commerce", "modules", "open-source", "ecommerce", "extensions", "php", "b2b"],
+    image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&h=600&fit=crop",
+    logo: "/magento-logo.svg",
+    icon: "🧩",
+    liveUrl: "https://mab-modules.github.io",
+    githubUrl: "https://github.com/mab-modules",
+    demoUrl: "https://mab-modules.github.io",
+    caseStudyUrl: "",
+    featured: true,
+    disabled: false,
+    priority: 92,
+    startDate: "2022-01-01",
+    endDate: "",
+    duration: "Ongoing",
+    clientInfo: {
+      name: "Open Source Community",
+      industry: "E-commerce / Adobe Commerce Ecosystem",
+      size: "enterprise",
+      location: "International",
+      website: "https://mab-modules.github.io",
+      isPublic: true
+    },
+    metrics: {
+      performanceImprovement: "Checkout conversion improvements",
+      customMetrics: {
+        "module_types": "Checkout, B2B, Payments, SEO, Performance",
+        "platform": "Adobe Commerce / Magento 2.x",
+        "distribution": "mab-modules.github.io",
+        "standard": "Adobe Commerce Coding Standards"
+      }
+    },
+    challenges: [
+      "Maintaining compatibility across multiple Adobe Commerce versions",
+      "Conflict-free integration with third-party extensions",
+      "Complex B2B workflow requirements across diverse client setups",
+      "Keeping documentation current for all module releases"
+    ],
+    solutions: [
+      "Built version-aware compatibility layer for Magento 2.3 through Adobe Commerce 2.4.x",
+      "Used dependency injection and event/plugin architecture for conflict-free modules",
+      "Modular design with separate packages per business domain",
+      "Auto-generated API docs and README per module at mab-modules.github.io"
+    ],
+    teamSize: 2,
+    role: "Lead Developer & Maintainer",
+    createdAt: Date.now() - 86400000 * 180,
+    updatedAt: Date.now() - 86400000 * 2,
+    version: 1
+  },
+  {
     title: "ETL Data Processing Platform",
     description: "High-performance ETL platform for processing large datasets with automated data validation and transformation pipelines.",
     longDescription: "Built a robust ETL (Extract, Transform, Load) platform capable of processing terabytes of data daily. Features include automated data validation, transformation pipelines, error handling, and comprehensive monitoring with alerting systems. Implemented using Apache Airflow for workflow orchestration and Kubernetes for scalable processing.",
@@ -201,28 +274,30 @@ export const initialProjects: ProjectInput[] = [
     version: 1
   },
   {
-    title: "Magento E-commerce Solutions",
-    description: "Custom Magento development and optimization for enterprise e-commerce platforms with advanced features.",
-    longDescription: "Developed and optimized multiple Magento e-commerce platforms for enterprise clients, featuring custom modules, payment integrations, inventory management, and performance optimizations. Specialized in Magento 2.x development with custom themes, extensions, and multi-store configurations. Implemented advanced SEO, caching strategies, and third-party integrations.",
+    title: "Adobe Commerce (Magento) — Enterprise E-commerce Solutions",
+    description: "Custom Adobe Commerce (Magento) development and optimization for enterprise e-commerce platforms. 15+ stores built, 25+ custom modules, 10+ payment gateways — powered by Adobe's leading commerce platform.",
+    longDescription: "Developed and optimized 15+ enterprise Adobe Commerce (Magento 2.x) e-commerce platforms for B2B and B2C clients, leveraging Adobe's industry-leading commerce infrastructure. Built custom extensions, payment integrations, inventory management systems, and performance optimization layers. Specialized in Magento 2.x to Adobe Commerce migrations, custom theme development, multi-store configurations, and advanced SEO strategies. Implemented Adobe-recommended caching with Varnish, Elasticsearch full-text search, and Redis session management for high-traffic stores.",
     category: "E-commerce",
     status: "completed",
     achievements: [
-      "Built 15+ custom Magento stores",
-      "Improved site performance by 65%",
-      "Integrated 10+ payment gateways",
-      "Developed 25+ custom modules",
-      "Managed multi-store configurations",
-      "Implemented advanced SEO strategies",
-      "Reduced server response time by 70%"
+      "Built 15+ enterprise Adobe Commerce / Magento stores",
+      "Improved site performance by 65% with Varnish + Redis caching",
+      "Integrated 10+ payment gateways (Stripe, PayPal, local processors)",
+      "Developed 25+ custom Adobe Commerce modules and extensions",
+      "Managed complex multi-store, multi-language configurations",
+      "Implemented advanced SEO resulting in 200% organic traffic increase",
+      "Reduced server response time by 70% through optimization",
+      "Completed Magento 1.x to Adobe Commerce 2.x migrations"
     ],
-    technologies: ["Magento", "PHP", "MySQL", "JavaScript", "LESS", "XML", "Composer", "Redis", "Elasticsearch", "Varnish"],
-    tags: ["magento", "ecommerce", "php", "enterprise", "optimization", "b2b", "b2c"],
+    technologies: ["Adobe Commerce", "Magento 2.x", "PHP", "MySQL", "JavaScript", "LESS", "XML", "Composer", "Redis", "Elasticsearch", "Varnish", "GraphQL"],
+    tags: ["adobe-commerce", "magento", "ecommerce", "php", "enterprise", "optimization", "b2b", "b2c", "adobe"],
     image: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&h=600&fit=crop",
     logo: "/magento-logo.svg",
     icon: "🛍️",
-    liveUrl: "",
+    liveUrl: "https://business.adobe.com/products/magento/magento-commerce.html",
     githubUrl: "",
     demoUrl: "",
+    caseStudyUrl: "",
     featured: true,
     disabled: false,
     priority: 87,
@@ -230,7 +305,7 @@ export const initialProjects: ProjectInput[] = [
     endDate: "2022-12-30",
     duration: "18 months",
     clientInfo: {
-      name: "Multiple Enterprise Clients",
+      name: "Multiple Enterprise Clients (Adobe Commerce)",
       industry: "E-commerce",
       size: "enterprise",
       location: "International",
@@ -244,26 +319,27 @@ export const initialProjects: ProjectInput[] = [
         "custom_modules": 25,
         "payment_gateways": 10,
         "performance_improvement": "65%",
-        "seo_improvement": "200%"
+        "seo_improvement": "200%",
+        "platform": "Adobe Commerce (Magento)"
       }
     },
     challenges: [
-      "Legacy Magento 1.x to 2.x migrations",
-      "Performance optimization for large catalogs",
-      "Complex B2B pricing and workflow requirements",
-      "Multi-store and multi-language implementations"
+      "Legacy Magento 1.x to Adobe Commerce 2.x migrations at scale",
+      "Performance optimization for large product catalogs (100K+ SKUs)",
+      "Complex B2B pricing, quoting, and approval workflow requirements",
+      "Multi-store and multi-language global deployments"
     ],
     solutions: [
-      "Developed automated migration tools and scripts",
-      "Implemented advanced caching and indexing strategies",
-      "Built custom B2B modules with approval workflows",
-      "Created scalable multi-store architecture"
+      "Developed automated Magento 1.x to Adobe Commerce 2.x migration scripts",
+      "Implemented full-page caching with Varnish + Redis for sub-200ms response",
+      "Built custom B2B Adobe Commerce modules with approval workflows",
+      "Created scalable multi-store architecture with shared catalog management"
     ],
     teamSize: 6,
-    role: "Senior Magento Developer & Technical Lead",
+    role: "Senior Adobe Commerce Developer & Technical Lead",
     createdAt: Date.now() - 86400000 * 200,
     updatedAt: Date.now() - 86400000 * 30,
-    version: 1
+    version: 2
   },
   {
     title: "JSKit Development Toolkit",

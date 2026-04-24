@@ -14,14 +14,14 @@ import { addDoc, collection, doc, updateDoc, deleteDoc } from "firebase/firestor
 import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "firebase/auth";
 import { ProfessionalSignature } from "@/components/ui/signature";
 import { DataManager } from "@/components/admin/DataManager";
-import { 
-  BarChart3, 
-  Plus, 
-  Edit, 
-  Trash2, 
-  Eye, 
-  EyeOff, 
-  Star, 
+import {
+  BarChart3,
+  Plus,
+  Edit,
+  Trash2,
+  Eye,
+  EyeOff,
+  Star,
   Calendar,
   Globe,
   Github,
@@ -30,7 +30,11 @@ import {
   Users,
   TrendingUp,
   Database,
-  Upload
+  Upload,
+  Link,
+  Clock,
+  Save,
+  X
 } from "lucide-react";
 
 export default function Admin() {
@@ -42,6 +46,51 @@ export default function Admin() {
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const { projects, loading } = useProjects();
+
+  // Links Manager state
+  const [links, setLinks] = useState<{id: string; label: string; url: string; category: string; description: string}[]>(() => {
+    try { return JSON.parse(localStorage.getItem("portfolio_links") || "[]"); } catch { return []; }
+  });
+  const [newLink, setNewLink] = useState({ label: "", url: "", category: "Enterprise Solutions", description: "" });
+  const [editingLink, setEditingLink] = useState<string | null>(null);
+
+  // Upcoming Projects state
+  const [upcomingProjects, setUpcomingProjects] = useState<{id: string; title: string; description: string; status: string; targetDate: string; technologies: string; priority: number}[]>(() => {
+    try { return JSON.parse(localStorage.getItem("portfolio_upcoming") || "[]"); } catch { return []; }
+  });
+  const [newUpcoming, setNewUpcoming] = useState({ title: "", description: "", status: "planned", targetDate: "", technologies: "", priority: 50 });
+
+  function saveLinks(updated: typeof links) {
+    setLinks(updated);
+    localStorage.setItem("portfolio_links", JSON.stringify(updated));
+  }
+
+  function saveUpcoming(updated: typeof upcomingProjects) {
+    setUpcomingProjects(updated);
+    localStorage.setItem("portfolio_upcoming", JSON.stringify(updated));
+  }
+
+  function addLink() {
+    if (!newLink.label || !newLink.url) return;
+    const updated = [...links, { ...newLink, id: Date.now().toString() }];
+    saveLinks(updated);
+    setNewLink({ label: "", url: "", category: "Enterprise Solutions", description: "" });
+  }
+
+  function removeLink(id: string) {
+    saveLinks(links.filter(l => l.id !== id));
+  }
+
+  function addUpcomingProject() {
+    if (!newUpcoming.title) return;
+    const updated = [...upcomingProjects, { ...newUpcoming, id: Date.now().toString() }];
+    saveUpcoming(updated);
+    setNewUpcoming({ title: "", description: "", status: "planned", targetDate: "", technologies: "", priority: 50 });
+  }
+
+  function removeUpcoming(id: string) {
+    saveUpcoming(upcomingProjects.filter(p => p.id !== id));
+  }
 
   useEffect(() => {
     if (!auth) return;
@@ -392,7 +441,7 @@ export default function Admin() {
 
         {/* Main Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:grid-cols-4">
+          <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 gap-1">
             <TabsTrigger value="overview" className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
               Overview
@@ -408,6 +457,14 @@ export default function Admin() {
             <TabsTrigger value="add-project" className="flex items-center gap-2">
               <Plus className="h-4 w-4" />
               Add Project
+            </TabsTrigger>
+            <TabsTrigger value="links" className="flex items-center gap-2">
+              <Link className="h-4 w-4" />
+              Links
+            </TabsTrigger>
+            <TabsTrigger value="upcoming" className="flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              Upcoming
             </TabsTrigger>
           </TabsList>
 
@@ -470,8 +527,24 @@ export default function Admin() {
                     <Database className="h-4 w-4 mr-2" />
                     Manage Projects
                   </Button>
-                  <Button 
-                    onClick={() => window.open("/", "_blank")} 
+                  <Button
+                    onClick={() => setActiveTab("links")}
+                    className="w-full justify-start"
+                    variant="outline"
+                  >
+                    <Link className="h-4 w-4 mr-2" />
+                    Manage Links
+                  </Button>
+                  <Button
+                    onClick={() => setActiveTab("upcoming")}
+                    className="w-full justify-start"
+                    variant="outline"
+                  >
+                    <Clock className="h-4 w-4 mr-2" />
+                    Upcoming Projects
+                  </Button>
+                  <Button
+                    onClick={() => window.open("/", "_blank")}
                     className="w-full justify-start"
                     variant="outline"
                   >
@@ -589,6 +662,230 @@ export default function Admin() {
                     ))}
                   </div>
                 )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Links Manager Tab */}
+          <TabsContent value="links" className="space-y-6">
+            <Card className="border-0 shadow-medium">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Link className="h-5 w-5" />
+                  Links Manager
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">Manage portfolio links, project URLs, and external references displayed on the site.</p>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Add New Link Form */}
+                <div className="border rounded-lg p-4 space-y-4 bg-muted/10">
+                  <h3 className="font-semibold">Add New Link</h3>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Label</Label>
+                      <Input
+                        placeholder="hotech.systems"
+                        value={newLink.label}
+                        onChange={e => setNewLink(p => ({ ...p, label: e.target.value }))}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>URL</Label>
+                      <Input
+                        placeholder="https://hotech.systems"
+                        value={newLink.url}
+                        onChange={e => setNewLink(p => ({ ...p, url: e.target.value }))}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Category</Label>
+                      <Select value={newLink.category} onValueChange={v => setNewLink(p => ({ ...p, category: v }))}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Enterprise Solutions">Enterprise Solutions</SelectItem>
+                          <SelectItem value="Web Applications">Web Applications</SelectItem>
+                          <SelectItem value="Open Source">Open Source</SelectItem>
+                          <SelectItem value="MAB Modules">MAB Modules</SelectItem>
+                          <SelectItem value="Adobe Commerce">Adobe Commerce</SelectItem>
+                          <SelectItem value="Other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Description</Label>
+                      <Input
+                        placeholder="Brief description..."
+                        value={newLink.description}
+                        onChange={e => setNewLink(p => ({ ...p, description: e.target.value }))}
+                      />
+                    </div>
+                  </div>
+                  <Button onClick={addLink} className="w-full">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Link
+                  </Button>
+                </div>
+
+                {/* Pre-populated default links */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold">Saved Links ({links.length})</h3>
+                    {links.length === 0 && (
+                      <Button variant="outline" size="sm" onClick={() => saveLinks([
+                        { id: "1", label: "hotech.systems", url: "https://hotech.systems", category: "Enterprise Solutions", description: "Hospitality digital transformation platform" },
+                        { id: "2", label: "HoTech EN", url: "https://en.hotech.systems", category: "Enterprise Solutions", description: "English portal for HoTech Systems" },
+                        { id: "3", label: "technostationery.com", url: "https://technostationery.com", category: "Enterprise Solutions", description: "E-commerce for office supplies" },
+                        { id: "4", label: "ETL Platform", url: "https://etl.techno-dz.com", category: "Enterprise Solutions", description: "ETL data processing platform" },
+                        { id: "5", label: "MAB Modules", url: "https://mab-modules.github.io", category: "MAB Modules", description: "Open-source Adobe Commerce module library" },
+                        { id: "6", label: "JSKit App", url: "https://jskit-app.web.app", category: "Web Applications", description: "JavaScript development toolkit" },
+                        { id: "7", label: "Noor Al Maarifa", url: "https://www.nooralmaarifa.com", category: "Web Applications", description: "Educational platform" },
+                        { id: "8", label: "IT Collaborator", url: "https://it-collaborator-techno.web.app", category: "Web Applications", description: "Project management platform" },
+                      ])}>
+                        Load Defaults
+                      </Button>
+                    )}
+                  </div>
+                  {links.length === 0 ? (
+                    <p className="text-muted-foreground text-sm py-4 text-center">No links saved yet. Add a link above or click "Load Defaults".</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {links.map(link => (
+                        <div key={link.id} className="flex items-center justify-between p-3 border rounded-lg">
+                          <div className="flex items-center gap-3 flex-1">
+                            <Badge variant="outline" className="text-xs shrink-0">{link.category}</Badge>
+                            <div>
+                              <div className="font-medium text-sm">{link.label}</div>
+                              <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline">{link.url}</a>
+                              {link.description && <div className="text-xs text-muted-foreground">{link.description}</div>}
+                            </div>
+                          </div>
+                          <Button size="sm" variant="outline" onClick={() => removeLink(link.id)} className="text-red-600 hover:text-red-700 shrink-0">
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Upcoming Projects Tab */}
+          <TabsContent value="upcoming" className="space-y-6">
+            <Card className="border-0 shadow-medium">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Clock className="h-5 w-5" />
+                  Upcoming Projects
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">Track planned and in-development projects for the portfolio roadmap.</p>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Add Upcoming Project Form */}
+                <div className="border rounded-lg p-4 space-y-4 bg-muted/10">
+                  <h3 className="font-semibold">Add Upcoming Project</h3>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Project Title *</Label>
+                      <Input
+                        placeholder="New SaaS Platform"
+                        value={newUpcoming.title}
+                        onChange={e => setNewUpcoming(p => ({ ...p, title: e.target.value }))}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Status</Label>
+                      <Select value={newUpcoming.status} onValueChange={v => setNewUpcoming(p => ({ ...p, status: v }))}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="planned">Planned</SelectItem>
+                          <SelectItem value="in-development">In Development</SelectItem>
+                          <SelectItem value="beta">Beta</SelectItem>
+                          <SelectItem value="soon">Coming Soon</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Target Date</Label>
+                      <Input
+                        type="date"
+                        value={newUpcoming.targetDate}
+                        onChange={e => setNewUpcoming(p => ({ ...p, targetDate: e.target.value }))}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Priority (1–100)</Label>
+                      <Input
+                        type="number"
+                        min="1"
+                        max="100"
+                        value={newUpcoming.priority}
+                        onChange={e => setNewUpcoming(p => ({ ...p, priority: Number(e.target.value) }))}
+                      />
+                    </div>
+                    <div className="space-y-2 md:col-span-2">
+                      <Label>Description</Label>
+                      <Textarea
+                        placeholder="What will this project do?"
+                        value={newUpcoming.description}
+                        onChange={e => setNewUpcoming(p => ({ ...p, description: e.target.value }))}
+                        rows={2}
+                      />
+                    </div>
+                    <div className="space-y-2 md:col-span-2">
+                      <Label>Technologies (comma separated)</Label>
+                      <Input
+                        placeholder="React, Node.js, TypeScript..."
+                        value={newUpcoming.technologies}
+                        onChange={e => setNewUpcoming(p => ({ ...p, technologies: e.target.value }))}
+                      />
+                    </div>
+                  </div>
+                  <Button onClick={addUpcomingProject} className="w-full">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Upcoming Project
+                  </Button>
+                </div>
+
+                {/* Upcoming Projects List */}
+                <div className="space-y-2">
+                  <h3 className="font-semibold">Upcoming Projects ({upcomingProjects.length})</h3>
+                  {upcomingProjects.length === 0 ? (
+                    <p className="text-muted-foreground text-sm py-4 text-center">No upcoming projects added yet. Plan something!</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {upcomingProjects.sort((a,b) => b.priority - a.priority).map(project => (
+                        <div key={project.id} className="flex items-start justify-between p-4 border rounded-lg">
+                          <div className="flex-1 space-y-1">
+                            <div className="flex items-center gap-2">
+                              <h4 className="font-semibold">{project.title}</h4>
+                              <Badge variant={project.status === 'in-development' ? 'default' : 'outline'} className="text-xs">
+                                {project.status}
+                              </Badge>
+                              <Badge variant="outline" className="text-xs">P{project.priority}</Badge>
+                            </div>
+                            {project.description && <p className="text-sm text-muted-foreground">{project.description}</p>}
+                            <div className="flex flex-wrap gap-2 text-xs">
+                              {project.technologies && project.technologies.split(",").map((t, i) => (
+                                <Badge key={i} variant="outline" className="text-xs">{t.trim()}</Badge>
+                              ))}
+                              {project.targetDate && (
+                                <span className="flex items-center gap-1 text-muted-foreground">
+                                  <Calendar className="h-3 w-3" />
+                                  {project.targetDate}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <Button size="sm" variant="outline" onClick={() => removeUpcoming(project.id)} className="text-red-600 hover:text-red-700 shrink-0 ml-3">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

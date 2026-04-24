@@ -87,12 +87,13 @@ const Index = () => {
               <p className="text-muted-foreground mb-6">Explore some of my recent projects and professional collaborations</p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid md:grid-cols-3 gap-4">
               <div className="space-y-3">
                 <h4 className="font-semibold text-primary">Enterprise Solutions</h4>
                 <div className="flex flex-wrap gap-3 text-sm">
                   {[
                     { href: "https://hotech.systems", label: "hotech.systems" },
+                    { href: "https://en.hotech.systems", label: "HoTech EN" },
                     { href: "https://technostationery.com", label: "technostationery.com" },
                     { href: "https://etl.techno-dz.com", label: "ETL Platform" },
                   ].map(({ href, label }) => (
@@ -105,6 +106,29 @@ const Index = () => {
                     >
                       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M4.083 9h1.946c.089-1.546.383-2.97.837-4.118A6.004 6.004 0 004.083 9zM10 2a8 8 0 100 16 8 8 0 000-16zm0 2c-.076 0-.232.032-.465.262-.238.234-.497.623-.737 1.182-.389.907-.673 2.142-.766 3.556h3.936c-.093-1.414-.377-2.649-.766-3.556-.24-.559-.5-.948-.737-1.182C10.232 4.032 10.076 4 10 4zm3.971 5c-.089-1.546-.383-2.97-.837-4.118A6.004 6.004 0 0115.917 9h-1.946zm-2.003 2H8.032c.093 1.414.377 2.649.766 3.556.24.559.5.948.737 1.182.233.23.389.262.465.262.076 0 .232-.032.465-.262.238-.234.498-.623.737-1.182.389-.907.673-2.142.766-3.556zm1.166 4.118c.454-1.147.748-2.572.837-4.118h1.946a6.004 6.004 0 01-2.783 4.118zm-6.268 0C6.412 13.97 6.118 12.546 6.03 11H4.083a6.004 6.004 0 002.783 4.118z" clipRule="evenodd" />
+                      </svg>
+                      {label}
+                    </a>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <h4 className="font-semibold text-primary">MAB Modules & Adobe Commerce</h4>
+                <div className="flex flex-wrap gap-3 text-sm">
+                  {[
+                    { href: "https://mab-modules.github.io", label: "mab-modules.github.io" },
+                    { href: "https://github.com/mab-modules", label: "GitHub: mab-modules" },
+                  ].map(({ href, label }) => (
+                    <a
+                      key={href}
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-card/50 rounded-lg text-muted-foreground hover:text-primary hover:bg-card/80 transition-all duration-300 hover:scale-105 border border-border/50"
+                    >
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
                       </svg>
                       {label}
                     </a>
