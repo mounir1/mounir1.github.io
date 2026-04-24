@@ -1,84 +1,61 @@
-const CACHE_NAME = 'mounir-portfolio-v1';
-const STATIC_CACHE_NAME = 'mounir-portfolio-static-v1';
-const DYNAMIC_CACHE_NAME = 'mounir-portfolio-dynamic-v1';
+/**
+ * Service Worker for Offline Caching and Performance
+ * Optimized for GitHub Pages
+ */
 
-// Cache essential resources
-const STATIC_FILES = [
+const CACHE_NAME = 'mounir-portfolio-v1';
+const STATIC_CACHE = 'static-v1';
+const DYNAMIC_CACHE = 'dynamic-v1';
+
+// Assets to cache immediately
+const STATIC_ASSETS = [
   '/',
   '/index.html',
+  '/offline.html',
+  '/site.webmanifest',
   '/mounir-icon.svg',
   '/favicon.ico',
   '/favicon.svg',
-  '/site.webmanifest',
-  '/offline.html',
+  '/profile.webp',
+  '/robots.txt',
+  '/sitemap.xml',
 ];
 
-// Cache dynamic resources with these patterns
-const CACHE_PATTERNS = [
-  /\.(?:png|jpg|jpeg|svg|gif|webp)$/,
-  /\.(?:js|css)$/,
-  /\/assets\//,
-];
-
-// Network-first resources (always try network first)
-const NETWORK_FIRST_PATTERNS = [
-  /\/api\//,
-  /firebase/,
-  /googleapis/,
-];
-
-// Install event - cache static resources
-self.addEventListener('install', event => {
-  console.log('[SW] Installing service worker...');
-  
+// Install event - cache static assets
+self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(STATIC_CACHE_NAME)
-      .then(cache => {
-        console.log('[SW] Caching static files');
-        return cache.addAll(STATIC_FILES.map(url => new Request(url, {credentials: 'same-origin'})));
-      })
-      .then(() => {
-        console.log('[SW] Static files cached');
-        return self.skipWaiting();
-      })
-      .catch(error => {
-        console.error('[SW] Failed to cache static files:', error);
-      })
+    caches.open(STATIC_CACHE).then((cache) => {
+      console.log('[Service Worker] Caching static assets');
+      return cache.addAll(STATIC_ASSETS).catch(err => {
+        console.log('[Service Worker] Failed to cache some assets:', err);
+        // Continue even if some assets fail to cache
+        return Promise.resolve();
+      });
+    })
   );
+  self.skipWaiting();
 });
 
 // Activate event - clean up old caches
-self.addEventListener('activate', event => {
-  console.log('[SW] Activating service worker...');
-  
+self.addEventListener('activate', (event) => {
   event.waitUntil(
-    Promise.all([
-      // Clean up old caches
-      caches.keys().then(cacheNames => {
-        return Promise.all(
-          cacheNames
-            .filter(cacheName => {
-              return cacheName !== STATIC_CACHE_NAME && 
-                     cacheName !== DYNAMIC_CACHE_NAME &&
-                     (cacheName.startsWith('mounir-portfolio-') || cacheName.startsWith('workbox-'));
-            })
-            .map(cacheName => {
-              console.log('[SW] Deleting old cache:', cacheName);
-              return caches.delete(cacheName);
-            })
-        );
-      }),
-      // Take control of all pages
-      self.clients.claim()
-    ]).then(() => {
-      console.log('[SW] Service worker activated');
+    caches.keys().then((keys) => {
+      return Promise.all(
+        keys
+          .filter((key) => key !== STATIC_CACHE && key !== DYNAMIC_CACHE)
+          .map((key) => {
+            console.log('[Service Worker] Deleting old cache:', key);
+            return caches.delete(key);
+          })
+      );
     })
   );
+  self.clients.claim();
 });
 
-// Fetch event - implement caching strategies
-self.addEventListener('fetch', event => {
-  const request = event.request;
+// Fetch event - serve from cache, fallback to network
+self.addEventListener('fetch', (event) => {
+  const { request } = event;
   const url = new URL(request.url);
 
   // Skip non-GET requests
@@ -86,206 +63,160 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Skip chrome extensions and other protocols
-  if (!request.url.startsWith('http')) {
+  // Skip chrome-extension and other non-http(s) requests
+  if (!url.protocol.startsWith('http')) {
     return;
   }
 
-  // Handle different types of requests
-  if (isNetworkFirst(request)) {
-    event.respondWith(networkFirst(request));
-  } else if (isStaticAsset(request)) {
-    event.respondWith(cacheFirst(request));
-  } else {
-    event.respondWith(staleWhileRevalidate(request));
+  // Handle Google Fonts
+  if (url.origin === 'https://fonts.googleapis.com' || 
+      url.origin === 'https://fonts.gstatic.com') {
+    event.respondWith(
+      caches.open(STATIC_CACHE).then((cache) => {
+        return fetch(request).then((response) => {
+          cache.put(request, response.clone());
+          return response;
+        }).catch(() => {
+          return cache.match(request);
+        });
+      })
+    );
+    return;
   }
-});
 
-// Check if request should use network-first strategy
-function isNetworkFirst(request) {
-  return NETWORK_FIRST_PATTERNS.some(pattern => pattern.test(request.url));
-}
-
-// Check if request is for static asset
-function isStaticAsset(request) {
-  return CACHE_PATTERNS.some(pattern => pattern.test(request.url));
-}
-
-// Network-first strategy (for API calls, Firebase, etc.)
-async function networkFirst(request) {
-  try {
-    const networkResponse = await fetch(request);
-    
-    if (networkResponse.ok) {
-      const cache = await caches.open(DYNAMIC_CACHE_NAME);
-      cache.put(request, networkResponse.clone());
-    }
-    
-    return networkResponse;
-  } catch (error) {
-    console.log('[SW] Network failed, trying cache for:', request.url);
-    const cachedResponse = await caches.match(request);
-    
-    if (cachedResponse) {
-      return cachedResponse;
-    }
-    
-    // Return offline page for navigation requests
-    if (request.destination === 'document') {
-      const offlineResponse = await caches.match('/offline.html');
-      return offlineResponse || new Response('Offline', { status: 503 });
-    }
-    
-    throw error;
+  // Handle Google Analytics and Clarity
+  if (url.origin.includes('google-analytics') || 
+      url.origin.includes('googletagmanager') ||
+      url.origin.includes('clarity.ms')) {
+    event.respondWith(
+      fetch(request).catch(() => {
+        // Return empty response for analytics if offline
+        return new Response('', { status: 200 });
+      })
+    );
+    return;
   }
-}
 
-// Cache-first strategy (for static assets)
-async function cacheFirst(request) {
-  const cachedResponse = await caches.match(request);
-  
-  if (cachedResponse) {
-    return cachedResponse;
-  }
-  
-  try {
-    const networkResponse = await fetch(request);
-    
-    if (networkResponse.ok) {
-      const cache = await caches.open(DYNAMIC_CACHE_NAME);
-      cache.put(request, networkResponse.clone());
-    }
-    
-    return networkResponse;
-  } catch (error) {
-    console.error('[SW] Failed to fetch:', request.url, error);
-    
-    // Return a placeholder for images
-    if (request.destination === 'image') {
-      return new Response(
-        '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect width="200" height="200" fill="#f0f0f0"/><text x="100" y="100" text-anchor="middle" dy=".3em" font-family="sans-serif" font-size="14" fill="#666">Image unavailable</text></svg>',
-        { headers: { 'Content-Type': 'image/svg+xml' } }
-      );
-    }
-    
-    throw error;
-  }
-}
+  // Handle same-origin requests
+  if (url.origin === location.origin) {
+    event.respondWith(
+      caches.match(request).then((cachedResponse) => {
+        if (cachedResponse) {
+          // Return cached version
+          return cachedResponse;
+        }
 
-// Stale-while-revalidate strategy (for HTML pages)
-async function staleWhileRevalidate(request) {
-  const cache = await caches.open(DYNAMIC_CACHE_NAME);
-  const cachedResponse = await cache.match(request);
-  
-  // Fetch from network in background
-  const fetchPromise = fetch(request).then(networkResponse => {
-    if (networkResponse.ok) {
-      cache.put(request, networkResponse.clone());
-    }
-    return networkResponse;
-  }).catch(error => {
-    console.error('[SW] Network fetch failed:', request.url, error);
-    return null;
-  });
-  
-  // Return cached response immediately if available, otherwise wait for network
-  if (cachedResponse) {
-    // Update cache in background
-    fetchPromise.catch(() => {}); // Ignore errors for background updates
-    return cachedResponse;
-  } else {
-    const networkResponse = await fetchPromise;
-    
-    if (networkResponse) {
-      return networkResponse;
-    }
-    
-    // Return offline page for navigation requests
-    if (request.destination === 'document') {
-      const offlineResponse = await caches.match('/offline.html');
-      return offlineResponse || new Response('Offline', { status: 503 });
-    }
-    
-    throw new Error('Network unavailable and no cache available');
-  }
-}
+        // Fetch from network
+        return fetch(request).then((networkResponse) => {
+          // Don't cache non-successful responses
+          if (!networkResponse || networkResponse.status !== 200) {
+            return networkResponse;
+          }
 
-// Message handling for manual cache updates
-self.addEventListener('message', event => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
-  
-  if (event.data && event.data.type === 'UPDATE_CACHE') {
-    updateCache();
-  }
-});
+          // Don't cache HTML pages with query parameters
+          if (request.destination === 'document' && url.search) {
+            return networkResponse;
+          }
 
-// Update cache manually
-async function updateCache() {
-  try {
-    const cache = await caches.open(STATIC_CACHE_NAME);
-    await cache.addAll(STATIC_FILES);
-    console.log('[SW] Cache updated successfully');
-  } catch (error) {
-    console.error('[SW] Failed to update cache:', error);
+          // Clone the response
+          const responseToCache = networkResponse.clone();
+
+          // Cache the response
+          caches.open(DYNAMIC_CACHE).then((cache) => {
+            cache.put(request, responseToCache);
+          });
+
+          return networkResponse;
+        }).catch(() => {
+          // If fetch fails, return offline page for navigation requests
+          if (request.destination === 'document') {
+            return caches.match('/offline.html');
+          }
+
+          // Return a generic offline response for other requests
+          return new Response('Offline', { status: 503 });
+        });
+      })
+    );
+    return;
   }
-}
 
-// Background sync for offline actions
-self.addEventListener('sync', event => {
-  if (event.tag === 'background-sync') {
-    event.waitUntil(doBackgroundSync());
-  }
-});
+  // Handle third-party assets (images, scripts, etc.)
+  event.respondWith(
+    caches.open(DYNAMIC_CACHE).then((cache) => {
+      return cache.match(request).then((cachedResponse) => {
+        if (cachedResponse) {
+          return cachedResponse;
+        }
 
-async function doBackgroundSync() {
-  console.log('[SW] Performing background sync');
-  // Implement background sync logic here
-  // For example, sync offline form submissions, analytics, etc.
-}
-
-// Push notifications (if needed in future)
-self.addEventListener('push', event => {
-  console.log('[SW] Push message received');
-  
-  const options = {
-    body: event.data ? event.data.text() : 'New update available',
-    icon: '/mounir-icon.svg',
-    badge: '/mounir-icon.svg',
-    vibrate: [100, 50, 100],
-    data: {
-      dateOfArrival: Date.now(),
-      primaryKey: 1
-    },
-    actions: [
-      {
-        action: 'explore',
-        title: 'Explore',
-        icon: '/mounir-icon.svg'
-      },
-      {
-        action: 'close',
-        title: 'Close',
-        icon: '/mounir-icon.svg'
-      }
-    ]
-  };
-  
-  event.waitUntil(
-    self.registration.showNotification('Mounir Portfolio', options)
+        return fetch(request).then((networkResponse) => {
+          // Cache successful responses
+          if (networkResponse && networkResponse.status === 200) {
+            cache.put(request, networkResponse.clone());
+          }
+          return networkResponse;
+        }).catch(() => {
+          // Return cached version if available, otherwise return error
+          return cache.match(request);
+        });
+      });
+    })
   );
 });
 
-// Handle notification clicks
-self.addEventListener('notificationclick', event => {
-  console.log('[SW] Notification click received');
-  
-  event.notification.close();
-  
-  if (event.action === 'explore') {
+// Handle messages from the main thread
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+
+  if (event.data && event.data.type === 'CLEAR_CACHE') {
     event.waitUntil(
-      clients.openWindow('/')
+      caches.keys().then((keys) => {
+        return Promise.all(
+          keys.map((key) => caches.delete(key))
+        );
+      }).then(() => {
+        return self.clients.matchAll().then((clients) => {
+          clients.forEach((client) => {
+            client.navigate(client.url);
+          });
+        });
+      })
+    );
+  }
+});
+
+// Background sync for offline form submissions
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'sync-contact-form') {
+    event.waitUntil(
+      // Process queued form submissions
+      Promise.resolve().then(() => {
+        console.log('[Service Worker] Syncing contact form submissions');
+        // Add your sync logic here
+      })
+    );
+  }
+});
+
+// Push notifications (if needed in the future)
+self.addEventListener('push', (event) => {
+  if (event.data) {
+    const data = event.data.json();
+    const options = {
+      body: data.body || 'New notification',
+      icon: '/mounir-icon.svg',
+      badge: '/mounir-icon.svg',
+      vibrate: [100, 50, 100],
+      data: {
+        dateOfArrival: Date.now(),
+        primaryKey: 1,
+      },
+    };
+
+    event.waitUntil(
+      self.registration.showNotification(data.title || 'Notification', options)
     );
   }
 });
