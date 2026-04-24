@@ -1,0 +1,22 @@
+{
+  "name": "Mounir Abderrahmani - Portfolio",
+  "short_name": "Mounir Portfolio",
+  "description": "Senior Full-Stack Developer & Software Engineer Portfolio",
+  "icons": [
+    {
+      "src": "/mounir-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    }
+  ],
+  "theme_color": "#8b5cf6",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "scope": "/",
+  "start_url": "/"
+}
