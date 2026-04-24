@@ -43,7 +43,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   };
 
   return (
-    <div className={cn('min-h-screen bg-gradient-subtle', className)}>
+    <div className={cn('min-h-screen bg-gradient-to-br from-background via-background to-muted/20', className)}>
       {/* Responsive grid container */}
       <div
         className={cn(
@@ -53,8 +53,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
           'space-y-6 lg:space-y-8'
         )}
       >
-        {/* Responsive content area */}
-        <div className="w-full">{children}</div>
+        {/* Responsive content area with subtle animation */}
+        <div className="w-full animate-in fade-in duration-500">{children}</div>
       </div>
     </div>
   );

@@ -261,6 +261,7 @@ export const ProjectSchema = z
     // Legacy/Flat fields for form compatibility
     image: urlSchema,
     logo: urlSchema,
+    bannerImage: urlSchema,
     liveUrl: urlSchema,
     githubUrl: githubUrlSchema,
     demoUrl: urlSchema,

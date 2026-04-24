@@ -78,6 +78,7 @@ import { ProjectSchema } from '@/lib/schema/projectSchema';
 import { ProjectCategory, ProjectStatus } from '@/lib/schema/types';
 import { DataExportManager } from '@/components/admin/DataExportManager';
 import { ImageUpload } from '@/components/admin/ImageUpload';
+import { BrandAssetPicker } from '@/components/admin/BrandAssetPicker';
 
 export function ProjectsManager() {
   const { projects, loading, refetch } = useProjects();
@@ -92,6 +93,8 @@ export function ProjectsManager() {
   const [imagePath, setImagePath] = useState<string>('');
   const [logoUrl, setLogoUrl] = useState<string>('');
   const [logoPath, setLogoPath] = useState<string>('');
+  const [bannerUrl, setBannerUrl] = useState<string>('');
+  const [bannerPath, setBannerPath] = useState<string>('');
 
   // Form setup
   const form = useForm<ProjectInput>({
@@ -107,6 +110,7 @@ export function ProjectsManager() {
       tags: [],
       image: '',
       logo: '',
+      bannerImage: '',
       icon: '',
       liveUrl: '',
       githubUrl: '',
@@ -169,6 +173,7 @@ export function ProjectsManager() {
           ...values,
           image: imageUrl || values.image,
           logo: logoUrl || values.logo,
+          bannerImage: bannerUrl || values.bannerImage,
           version: (projectToEdit.version || 1) + 1,
         });
 
@@ -182,6 +187,7 @@ export function ProjectsManager() {
           ...values,
           image: imageUrl || values.image,
           logo: logoUrl || values.logo,
+          bannerImage: bannerUrl || values.bannerImage,
           version: 1,
         };
 
@@ -236,6 +242,7 @@ export function ProjectsManager() {
       tags: [],
       image: '',
       logo: '',
+      bannerImage: '',
       icon: '',
       liveUrl: '',
       githubUrl: '',
@@ -284,6 +291,7 @@ export function ProjectsManager() {
         tags: project.tags || [],
         image: project.image || '',
         logo: project.logo || '',
+        bannerImage: project.bannerImage || '',
         icon: project.icon || '',
         liveUrl: project.liveUrl || '',
         githubUrl: project.githubUrl || '',
@@ -317,6 +325,7 @@ export function ProjectsManager() {
       });
       setImageUrl(project.image || '');
       setLogoUrl(project.logo || '');
+      setBannerUrl(project.bannerImage || '');
       setIsFormOpen(true);
     },
     [form]
@@ -411,6 +420,8 @@ export function ProjectsManager() {
     setImagePath('');
     setLogoUrl('');
     setLogoPath('');
+    setBannerUrl('');
+    setBannerPath('');
     setIsFormOpen(true);
   }, [resetForm]);
 
@@ -565,6 +576,8 @@ export function ProjectsManager() {
             setImagePath('');
             setLogoUrl('');
             setLogoPath('');
+            setBannerUrl('');
+            setBannerPath('');
           }
         }}
       >
@@ -1270,7 +1283,37 @@ export function ProjectsManager() {
                     currentImageUrl={logoUrl}
                     folder="project-logos"
                   />
+                  <div className="mt-4">
+                    <BrandAssetPicker
+                      onAssetSelect={(logoUrl, iconUrl, colors) => {
+                        setLogoUrl(logoUrl);
+                        form.setValue('logo', logoUrl);
+                        if (iconUrl && !logoUrl) {
+                          setLogoUrl(iconUrl);
+                          form.setValue('logo', iconUrl);
+                        }
+                      }}
+                      currentLogoUrl={logoUrl}
+                      label="Or fetch from Brandfetch"
+                    />
+                  </div>
                 </div>
+              </div>
+
+              <div className="pt-4">
+                <FormLabel>Project Banner Image</FormLabel>
+                <FormDescription className="mb-2">
+                  Upload a wide banner image (recommended: 1200x400px) for project hero sections and featured displays
+                </FormDescription>
+                <ImageUpload
+                  onUploadComplete={(url, path) => {
+                    setBannerUrl(url);
+                    setBannerPath(path);
+                    form.setValue('bannerImage', url);
+                  }}
+                  currentImageUrl={bannerUrl}
+                  folder="project-banners"
+                />
               </div>
 
               <div className="flex items-center gap-6 pt-4">
@@ -1330,6 +1373,8 @@ export function ProjectsManager() {
                     setImagePath('');
                     setLogoUrl('');
                     setLogoPath('');
+                    setBannerUrl('');
+                    setBannerPath('');
                   }}
                   className="border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground"
                 >
@@ -1497,6 +1542,19 @@ export function ProjectsManager() {
                     </div>
                   </div>
                 </div>
+
+                {selectedProject.bannerImage && (
+                  <div>
+                    <h3 className="mb-2 text-lg font-semibold">
+                      Project Banner
+                    </h3>
+                    <img
+                      src={selectedProject.bannerImage}
+                      alt={`${selectedProject.title} banner`}
+                      className="w-full max-h-64 rounded-lg border object-cover"
+                    />
+                  </div>
+                )}
 
                 {selectedProject.image && (
                   <div>

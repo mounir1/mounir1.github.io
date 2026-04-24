@@ -17,6 +17,7 @@ export interface Project {
   caseStudyUrl?: string;
   images?: string[];
   image?: string; // For backward compatibility
+  bannerImage?: string; // Project banner/banner image for hero sections
   logo?: string;
   icon?: string;
   achievements?: string[];
@@ -68,6 +69,7 @@ export interface ProjectInput {
   caseStudyUrl?: string;
   images?: string[];
   image?: string;
+  bannerImage?: string;
   logo?: string;
   icon?: string;
   achievements?: string[];
