@@ -55,4 +55,4 @@ jobs:
         publish_branch: gh-pages
         keep_files: false
         enable_jekyll: false
-        cname: mounir.bio
+
