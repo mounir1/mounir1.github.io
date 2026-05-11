@@ -32,7 +32,35 @@ export type ExperienceInput = Omit<Experience, "id">;
 
 export const EXPERIENCE_COLLECTION = "experiences";
 
-export function useExperience() {
+export const DEFAULT_EXPERIENCE: ExperienceInput = {
+  title: "",
+  company: "",
+  companyUrl: "",
+  companyLogo: "",
+  location: "",
+  type: "full-time",
+  startDate: "",
+  endDate: "",
+  current: false,
+  description: "",
+  achievements: [],
+  technologies: [],
+  projects: [],
+  skills: [],
+  responsibilities: [],
+  featured: false,
+  disabled: false,
+  priority: 50,
+  icon: "",
+  createdAt: Date.now(),
+  updatedAt: Date.now(),
+};
+
+/**
+ * @param adminMode - When true, fetches ALL experiences including disabled ones.
+ *                    Use in admin panels. Default: false (public view).
+ */
+export function useExperience(adminMode = false) {
   const [experiences, setExperiences] = useState<Experience[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -40,10 +68,10 @@ export function useExperience() {
   useEffect(() => {
     // Use local data when Firebase is not enabled (development mode)
     if (!isFirebaseEnabled || !db) {
-      console.log('Using local experience data - Firebase disabled in development');
+      console.log("Using local experience data — Firebase disabled in development");
       const localExperience: Experience[] = initialExperience.map((exp, index) => ({
         id: `local-exp-${index}`,
-        ...exp
+        ...exp,
       }));
       setExperiences(localExperience);
       setLoading(false);
@@ -51,33 +79,38 @@ export function useExperience() {
       return;
     }
 
-    // Use Firebase in production
-    const q = query(
-      collection(db, EXPERIENCE_COLLECTION),
-      where("disabled", "==", false),
-      orderBy("priority", "desc"),
-      orderBy("startDate", "desc")
-    );
+    // Build query — admin sees all, public only sees non-disabled
+    const q = adminMode
+      ? query(
+          collection(db, EXPERIENCE_COLLECTION),
+          orderBy("priority", "desc"),
+          orderBy("startDate", "desc")
+        )
+      : query(
+          collection(db, EXPERIENCE_COLLECTION),
+          where("disabled", "==", false),
+          orderBy("priority", "desc"),
+          orderBy("startDate", "desc")
+        );
 
     const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
-        const experienceData = snapshot.docs.map(doc => ({
+        const experienceData = snapshot.docs.map((doc) => ({
           id: doc.id,
-          ...doc.data()
+          ...doc.data(),
         })) as Experience[];
-        
+
         setExperiences(experienceData);
         setLoading(false);
         setError(null);
       },
       (err) => {
         console.error("Error fetching experience from Firebase:", err);
-        console.log('Falling back to local experience data');
-        // Fallback to local data on Firebase error
+        console.log("Falling back to local experience data");
         const localExperience: Experience[] = initialExperience.map((exp, index) => ({
           id: `fallback-exp-${index}`,
-          ...exp
+          ...exp,
         }));
         setExperiences(localExperience);
         setLoading(false);
@@ -86,11 +119,7 @@ export function useExperience() {
     );
 
     return () => unsubscribe();
-  }, []);
+  }, [adminMode]);
 
-  return {
-    experiences,
-    loading,
-    error
-  };
+  return { experiences, loading, error };
 }

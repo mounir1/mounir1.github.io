@@ -1,0 +1,94 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── Helper functions ───────────────────────────────────────────────────
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner() {
+      // Replace with your actual Firebase Auth UID for production
+      // You can find it in Firebase Console → Authentication → Users
+      return request.auth != null && (
+        request.auth.token.email == "mounir.webdev@gmail.com" ||
+        request.auth.uid == "REPLACE_WITH_YOUR_FIREBASE_UID"
+      );
+    }
+
+    function isValidString(field, maxLen) {
+      return field is string && field.size() <= maxLen;
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    // ─── PUBLIC READ collections (portfolio content) ────────────────────────
+
+    // Projects — public read, owner write
+    match /projects/{docId} {
+      allow read: if true;
+      allow create, update, delete: if isOwner();
+    }
+
+    // Experience — public read (filtered by disabled=false on client)
+    match /experiences/{docId} {
+      allow read: if true;
+      allow create, update, delete: if isOwner();
+    }
+
+    // Skills — public read
+    match /skills/{docId} {
+      allow read: if true;
+      allow create, update, delete: if isOwner();
+    }
+
+    // Testimonials — public read (filtered by disabled=false on client)
+    match /testimonials/{docId} {
+      allow read: if true;
+      allow create, update, delete: if isOwner();
+    }
+
+    // Links — public read (portfolio footer links)
+    match /links/{docId} {
+      allow read: if true;
+      allow create, update, delete: if isOwner();
+    }
+
+    // Upcoming projects — public read
+    match /upcoming_projects/{docId} {
+      allow read: if true;
+      allow create, update, delete: if isOwner();
+    }
+
+    // Site settings — public read (needed for hero stats, feature flags etc.)
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if isOwner();
+    }
+
+    // ─── RESTRICTED collections ─────────────────────────────────────────────
+
+    // Contact messages — public CREATE only (form submissions), owner read/update
+    match /contact_messages/{docId} {
+      // Anyone can submit a contact form
+      allow create: if
+        hasRequiredFields(["name", "email", "message", "type", "createdAt"]) &&
+        isValidString(request.resource.data.name, 100) &&
+        isValidString(request.resource.data.email, 200) &&
+        isValidString(request.resource.data.message, 5000) &&
+        // Prevent abuse: ensure status is "unread" on create
+        request.resource.data.status == "unread";
+      // Only owner can read messages and update status
+      allow read, update, delete: if isOwner();
+    }
+
+    // ─── Block everything else by default ───────────────────────────────────
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
