@@ -1,10 +1,4 @@
-import {
-  ref,
-  uploadBytes,
-  getDownloadURL,
-  deleteObject,
-} from 'firebase/storage';
-import { storage } from '@/lib/firebase';
+import { getFirebaseStorage } from '@/lib/firebase';
 import { toast } from '@/hooks/use-toast';
 
 export interface UploadResult {
@@ -13,20 +7,21 @@ export interface UploadResult {
 }
 
 /**
- * Upload an image file to Firebase Storage
- * @param file The file to upload
- * @param path The storage path where to upload the file
- * @returns Promise resolving to the download URL and storage path
+ * Upload an image file to Firebase Storage.
+ * firebase/storage is lazy-loaded on first call — it never lands in the
+ * synchronous entry bundle.
  */
 export async function uploadImage(
   file: File,
   path: string
 ): Promise<UploadResult> {
+  const storage = await getFirebaseStorage();
   if (!storage) {
     throw new Error('Firebase Storage is not initialized');
   }
 
   try {
+    const { ref, uploadBytes, getDownloadURL } = await import('firebase/storage');
     const storageRef = ref(storage, path);
     const snapshot = await uploadBytes(storageRef, file);
     const url = await getDownloadURL(snapshot.ref);
@@ -42,15 +37,16 @@ export async function uploadImage(
 }
 
 /**
- * Delete an image from Firebase Storage
- * @param path The storage path of the file to delete
+ * Delete an image from Firebase Storage.
  */
 export async function deleteImage(path: string): Promise<void> {
+  const storage = await getFirebaseStorage();
   if (!storage) {
     throw new Error('Firebase Storage is not initialized');
   }
 
   try {
+    const { ref, deleteObject } = await import('firebase/storage');
     const storageRef = ref(storage, path);
     await deleteObject(storageRef);
   } catch (error) {
@@ -60,22 +56,18 @@ export async function deleteImage(path: string): Promise<void> {
 }
 
 /**
- * Upload an image with automatic path generation
- * @param file The file to upload
- * @param folder The folder name in storage (e.g., 'projects', 'skills')
- * @param fileName Optional custom file name
- * @returns Promise resolving to the download URL and storage path
+ * Upload an image with automatic path generation.
  */
 export async function uploadImageAutoPath(
   file: File,
   folder: string,
   fileName?: string
 ): Promise<UploadResult> {
+  const storage = await getFirebaseStorage();
   if (!storage) {
     throw new Error('Firebase Storage is not initialized');
   }
 
-  // Generate a unique file name if not provided
   const timestamp = Date.now();
   const randomString = Math.random().toString(36).substring(2, 15);
   const extension = file.name.split('.').pop() || 'jpg';
@@ -86,26 +78,20 @@ export async function uploadImageAutoPath(
 }
 
 /**
- * Validate image file before upload
- * @param file The file to validate
- * @param maxSizeMB Maximum file size in MB (default: 5MB)
- * @returns Validation result
+ * Validate image file before upload.
  */
 export function validateImageFile(
   file: File,
   maxSizeMB: number = 5
 ): { valid: boolean; error?: string } {
-  // Check file type
   const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
   if (!allowedTypes.includes(file.type)) {
     return {
       valid: false,
-      error:
-        'Invalid file type. Please upload a JPEG, PNG, WebP, or GIF image.',
+      error: 'Invalid file type. Please upload a JPEG, PNG, WebP, or GIF image.',
     };
   }
 
-  // Check file size
   const maxSizeBytes = maxSizeMB * 1024 * 1024;
   if (file.size > maxSizeBytes) {
     return {

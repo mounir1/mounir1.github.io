@@ -4,14 +4,14 @@ import {
   type Firestore,
   connectFirestoreEmulator,
 } from 'firebase/firestore';
-import {
-  getAuth,
-  type Auth,
-  connectAuthEmulator,
-  GithubAuthProvider,
-} from 'firebase/auth';
-import { getAnalytics, type Analytics } from 'firebase/analytics';
-import { getStorage, type FirebaseStorage } from 'firebase/storage';
+
+// Auth, Storage, and Analytics are lazy-loaded on demand to keep the
+// synchronous entry-point bundle as small as possible.
+// – firebase/auth    → loaded only when Admin page mounts
+// – firebase/storage → loaded only when image-upload is triggered
+// – firebase/analytics → loaded only in production after page is interactive
+// (no static re-exports of firebase/auth|storage|analytics — even type-only
+//  re-exports can cause Rollup to trace those modules into the entry chunk)
 
 // ─── Production Firebase configuration (from env vars only) ──────────────────
 const productionConfig = {
@@ -29,7 +29,6 @@ const hasRequiredConfig = Boolean(
   productionConfig.apiKey &&
   productionConfig.authDomain &&
   productionConfig.projectId &&
-  // Guard against placeholder values that are not real credentials
   !productionConfig.apiKey.startsWith('demo') &&
   !productionConfig.apiKey.startsWith('mock') &&
   productionConfig.apiKey !== 'undefined'
@@ -39,49 +38,35 @@ const hasRequiredConfig = Boolean(
 // - Production: always attempt (will surface real errors if misconfigured)
 // - Development: only enable when real env vars are present OR emulator flag set
 export const isFirebaseEnabled: boolean = (() => {
-  if (import.meta.env.PROD) return true;          // Production: always on
-  if (import.meta.env.VITE_FIREBASE_ENABLE_DEV === 'true') return true; // explicit dev flag
-  return hasRequiredConfig;                        // Dev: only with real config
+  if (import.meta.env.PROD) return true;
+  if (import.meta.env.VITE_FIREBASE_ENABLE_DEV === 'true') return true;
+  return hasRequiredConfig;
 })();
 
-// ─── Firebase instances ───────────────────────────────────────────────────────
-let app:       FirebaseApp      | undefined;
-let db:        Firestore        | undefined;
-let auth:      Auth             | undefined;
-let analytics: Analytics        | undefined;
-let storage:   FirebaseStorage  | undefined;
+// ─── Core Firebase instances (synchronous — needed on every page load) ────────
+let app: FirebaseApp | undefined;
+let db:  Firestore   | undefined;
 
 if (isFirebaseEnabled && hasRequiredConfig) {
   try {
-    app     = getApps().length ? getApps()[0] : initializeApp(productionConfig);
-    db      = getFirestore(app);
-    auth    = getAuth(app);
-    storage = getStorage(app);
+    app = getApps().length ? getApps()[0] : initializeApp(productionConfig);
+    db  = getFirestore(app);
 
-    // Analytics: production only, browser only
-    if (typeof window !== 'undefined' && import.meta.env.PROD) {
-      analytics = getAnalytics(app);
-    }
-
-    // Emulators: dev only, when explicitly enabled
+    // Firestore emulator: dev only, when explicitly enabled
     if (
       import.meta.env.DEV &&
       typeof window !== 'undefined' &&
       import.meta.env.VITE_FIREBASE_USE_EMULATORS === 'true'
     ) {
       try {
-        connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true });
         connectFirestoreEmulator(db, 'localhost', 8081);
-        console.log('🔧 Firebase Emulators connected');
       } catch {
-        console.log('Firebase emulators not available — using production services');
+        // emulator not running — fall through silently
       }
     }
-
-    console.log(`🔥 Firebase initialised (project: ${productionConfig.projectId})`);
   } catch (error) {
     console.error('❌ Firebase initialisation failed:', error);
-    app = db = auth = analytics = storage = undefined;
+    app = db = undefined;
   }
 } else if (isFirebaseEnabled && !hasRequiredConfig) {
   console.warn(
@@ -91,4 +76,47 @@ if (isFirebaseEnabled && hasRequiredConfig) {
   );
 }
 
-export { app, db, auth, analytics, storage, GithubAuthProvider };
+export { app, db };
+
+// ─── Lazy auth loader ─────────────────────────────────────────────────────────
+// Call this inside the Admin page / auth hook — not at module load time.
+// Returns { auth, GithubAuthProvider } after dynamic import resolves.
+export async function getFirebaseAuth() {
+  if (!app) return { auth: undefined, GithubAuthProvider: undefined };
+  const {
+    getAuth,
+    connectAuthEmulator,
+    GithubAuthProvider,
+  } = await import('firebase/auth');
+  const auth = getAuth(app);
+  if (
+    import.meta.env.DEV &&
+    typeof window !== 'undefined' &&
+    import.meta.env.VITE_FIREBASE_USE_EMULATORS === 'true'
+  ) {
+    try { connectAuthEmulator(auth, 'http://localhost:9099', { disableWarnings: true }); }
+    catch { /* emulator not running */ }
+  }
+  return { auth, GithubAuthProvider };
+}
+
+// ─── Lazy storage loader ──────────────────────────────────────────────────────
+// Call this in image-upload.ts — not at module load time.
+export async function getFirebaseStorage() {
+  if (!app) return undefined;
+  const { getStorage } = await import('firebase/storage');
+  return getStorage(app);
+}
+
+// ─── Lazy analytics loader ────────────────────────────────────────────────────
+// Called once after the page is interactive, production only.
+export async function initFirebaseAnalytics() {
+  if (!app || !import.meta.env.PROD || typeof window === 'undefined') return;
+  if (!productionConfig.measurementId) return;
+  try {
+    const { getAnalytics } = await import('firebase/analytics');
+    getAnalytics(app);
+  } catch {
+    // analytics failure must never break the app
+  }
+}

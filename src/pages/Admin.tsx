@@ -1,6 +1,9 @@
-import { useEffect, useState } from "react";
-import { auth, isFirebaseEnabled, db } from "@/lib/firebase";
-import { onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut } from "firebase/auth";
+import { useEffect, useState, useRef } from "react";
+import { isFirebaseEnabled, db, getFirebaseAuth } from "@/lib/firebase";
+// Auth types sourced inline to avoid any static module reference to firebase/auth
+// that would pull the auth SDK into the synchronous entry chunk.
+type Auth = import("firebase/auth").Auth;
+type User = import("firebase/auth").User;
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -25,7 +28,7 @@ import { useContactMessages } from "@/hooks/useContactMessages";
 import {
   BarChart3, Database, Briefcase, Wrench, MessageSquareQuote,
   Link, Clock, Mail, Settings, Upload, LogOut, ExternalLink,
-  User,
+  User as UserIcon,
 } from "lucide-react";
 
 // ─── Tab config ──────────────────────────────────────────────────────────────
@@ -70,7 +73,7 @@ function AdminUnavailable() {
 
 // ─── Login Screen ─────────────────────────────────────────────────────────────
 
-function AdminLogin() {
+function AdminLogin({ auth }: { auth: Auth }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -78,10 +81,10 @@ function AdminLogin() {
 
   async function handleEmail(e: React.FormEvent) {
     e.preventDefault();
-    if (!auth) return;
     setLoading(true);
     setError(null);
     try {
+      const { signInWithEmailAndPassword } = await import("firebase/auth");
       await signInWithEmailAndPassword(auth, email, password);
     } catch (err: any) {
       setError(err.message ?? "Login failed.");
@@ -91,10 +94,10 @@ function AdminLogin() {
   }
 
   async function handleGoogle() {
-    if (!auth) return;
     setLoading(true);
     setError(null);
     try {
+      const { signInWithPopup, GoogleAuthProvider } = await import("firebase/auth");
       await signInWithPopup(auth, new GoogleAuthProvider());
     } catch (err: any) {
       if (err.code !== "auth/popup-closed-by-user") {
@@ -183,12 +186,13 @@ function AdminLogin() {
 
 // ─── Main Admin Shell ─────────────────────────────────────────────────────────
 
-function AdminShell({ user }: { user: NonNullable<ReturnType<typeof auth.currentUser>> }) {
+function AdminShell({ user, auth }: { user: User; auth: Auth }) {
   const [activeTab, setActiveTab] = useState<TabId>("overview");
   const { unreadCount } = useContactMessages();
 
   async function handleLogout() {
-    if (auth) await signOut(auth);
+    const { signOut } = await import("firebase/auth");
+    await signOut(auth);
   }
 
   return (
@@ -206,7 +210,7 @@ function AdminShell({ user }: { user: NonNullable<ReturnType<typeof auth.current
 
           <div className="flex items-center gap-3">
             <div className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground">
-              <User className="h-4 w-4" />
+              <UserIcon className="h-4 w-4" />
               <span className="max-w-40 truncate">{user.email}</span>
             </div>
             <ProfessionalSignature />
@@ -314,26 +318,49 @@ function AdminShell({ user }: { user: NonNullable<ReturnType<typeof auth.current
 // ─── Root Export ──────────────────────────────────────────────────────────────
 
 export default function Admin() {
-  const [user, setUser] = useState(() => auth?.currentUser ?? null);
+  const [user, setUser] = useState<User | null>(null);
+  const [auth, setAuth] = useState<Auth | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
+  const unsubRef = useRef<(() => void) | null>(null);
 
+  // Lazy-load firebase/auth only when Admin page mounts
   useEffect(() => {
-    if (!auth) {
+    if (!isFirebaseEnabled || !db) {
       setAuthChecked(true);
       return;
     }
-    const unsub = onAuthStateChanged(auth, (u) => {
-      setUser(u);
-      setAuthChecked(true);
+
+    let cancelled = false;
+
+    getFirebaseAuth().then(({ auth: lazyAuth }) => {
+      if (cancelled || !lazyAuth) {
+        setAuthChecked(true);
+        return;
+      }
+      setAuth(lazyAuth);
+
+      // Listen for auth state changes
+      import("firebase/auth").then(({ onAuthStateChanged }) => {
+        if (cancelled) return;
+        const unsub = onAuthStateChanged(lazyAuth, (u) => {
+          setUser(u);
+          setAuthChecked(true);
+        });
+        unsubRef.current = unsub;
+      });
     });
-    return () => unsub();
+
+    return () => {
+      cancelled = true;
+      unsubRef.current?.();
+    };
   }, []);
 
   // Firebase not configured at all
-  if (!isFirebaseEnabled || !db || !auth) return <AdminUnavailable />;
+  if (!isFirebaseEnabled || !db) return <AdminUnavailable />;
 
-  // Still checking auth state
-  if (!authChecked) {
+  // Still loading auth module / checking auth state
+  if (!authChecked || !auth) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-subtle">
         <div className="flex flex-col items-center gap-4">
@@ -345,8 +372,8 @@ export default function Admin() {
   }
 
   // Not logged in
-  if (!user) return <AdminLogin />;
+  if (!user) return <AdminLogin auth={auth} />;
 
   // Logged in — render full admin
-  return <AdminShell user={user as any} />;
+  return <AdminShell user={user} auth={auth} />;
 }

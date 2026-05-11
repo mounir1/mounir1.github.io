@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" fill="none">
+  <rect width="200" height="60" rx="8" fill="#714B67"/>
+  <circle cx="22" cy="20" r="7" fill="#ffffff" opacity="0.95"/>
+  <circle cx="38" cy="20" r="7" fill="#ffffff" opacity="0.95"/>
+  <circle cx="54" cy="20" r="7" fill="#ffffff" opacity="0.95"/>
+  <circle cx="30" cy="34" r="7" fill="#ffffff" opacity="0.95"/>
+  <circle cx="46" cy="34" r="7" fill="#ffffff" opacity="0.95"/>
+  <text x="72" y="38" font-family="Arial, sans-serif" font-weight="700" font-size="26" fill="#ffffff" letter-spacing="-0.5">Odoo</text>
+</svg>

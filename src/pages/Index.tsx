@@ -1,14 +1,17 @@
 import { Suspense, lazy } from "react";
+// ── Above-fold: loaded eagerly (critical render path) ─────────────────────────
 import { Navigation } from "@/components/ui/navigation";
 import { Hero } from "@/components/sections/hero";
-import { Experience } from "@/components/sections/experience";
-import { Skills } from "@/components/sections/skills";
-import { Projects } from "@/components/sections/projects";
-import { Contact } from "@/components/sections/contact";
-import { Testimonials } from "@/components/sections/testimonials";
 import { Signature } from "@/components/ui/signature";
 import { useSettings } from "@/hooks/useSettings";
 import { useLinks } from "@/hooks/useLinks";
+
+// ── Below-fold: lazy-loaded into separate async chunks ────────────────────────
+const Experience   = lazy(() => import("@/components/sections/experience").then(m => ({ default: m.Experience })));
+const Skills       = lazy(() => import("@/components/sections/skills").then(m => ({ default: m.Skills })));
+const Projects     = lazy(() => import("@/components/sections/projects").then(m => ({ default: m.Projects })));
+const Testimonials = lazy(() => import("@/components/sections/testimonials").then(m => ({ default: m.Testimonials })));
+const Contact      = lazy(() => import("@/components/sections/contact").then(m => ({ default: m.Contact })));
 
 // ─── Section Error Boundary (lightweight inline version) ─────────────────────
 import React from "react";
@@ -35,6 +38,25 @@ class SectionErrorBoundary extends React.Component<
     }
     return this.props.children;
   }
+}
+
+// ─── Lightweight section skeleton shown while lazy chunks load ────────────────
+function SectionSkeleton() {
+  return (
+    <section className="py-20 px-6">
+      <div className="max-w-6xl mx-auto space-y-8 animate-pulse">
+        <div className="text-center space-y-3">
+          <div className="h-8 w-48 bg-muted/50 rounded-lg mx-auto" />
+          <div className="h-4 w-72 bg-muted/30 rounded mx-auto" />
+        </div>
+        <div className="grid md:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-48 bg-muted/20 rounded-xl border border-border/30" />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
 }
 
 // ─── Footer Links (dynamic from Firebase) ─────────────────────────────────────
@@ -94,25 +116,28 @@ const STATIC_FOOTER_LINKS = [
   {
     category: "Enterprise Solutions",
     links: [
-      { href: "https://hotech.systems",         label: "hotech.systems" },
-      { href: "https://en.hotech.systems",       label: "HoTech EN" },
-      { href: "https://technostationery.com",    label: "technostationery.com" },
-      { href: "https://etl.techno-dz.com",       label: "ETL Platform" },
+      { href: "https://hotech.systems",                  label: "hotech.systems" },
+      { href: "https://en.hotech.systems",               label: "HoTech EN" },
+      { href: "https://technostationery.com",            label: "technostationery.com" },
+      { href: "https://dashboard.technostationery.com",  label: "Dashboard · AI · Monitoring" },
+      { href: "https://etl.techno-dz.com",               label: "ETL Platform" },
     ],
   },
   {
-    category: "MAB Modules & Adobe Commerce",
+    category: "Magento & Adobe Commerce",
     links: [
-      { href: "https://mab-modules.github.io",  label: "mab-modules.github.io" },
+      { href: "https://mab-modules.github.io",   label: "mab-modules.github.io" },
+      { href: "https://mounirtms.github.io",     label: "mounirtms.github.io" },
       { href: "https://github.com/mab-modules",  label: "GitHub: mab-modules" },
+      { href: "https://github.com/mounirtms",    label: "GitHub: mounirtms" },
     ],
   },
   {
     category: "Web Applications",
     links: [
-      { href: "https://jskit-app.web.app",                    label: "JSKit App" },
-      { href: "https://www.nooralmaarifa.com",                 label: "Noor Al Maarifa" },
-      { href: "https://it-collaborator-techno.web.app",        label: "IT Collaborator" },
+      { href: "https://jskit-app.web.app",                  label: "JSKit App" },
+      { href: "https://www.nooralmaarifa.com",               label: "Noor Al Maarifa" },
+      { href: "https://it-collaborator-techno.web.app",      label: "IT Collaborator" },
     ],
   },
 ];
@@ -157,33 +182,43 @@ const Index = () => {
       <Navigation />
 
       <main>
+        {/* ── Above fold: Hero loads eagerly ───────────────────────────────── */}
         <SectionErrorBoundary name="Hero">
           <Hero />
         </SectionErrorBoundary>
 
+        {/* ── Below fold: each section is a separate lazy async chunk ─────── */}
         <SectionErrorBoundary name="Experience">
-          <Experience />
+          <Suspense fallback={<SectionSkeleton />}>
+            <Experience />
+          </Suspense>
         </SectionErrorBoundary>
 
         <SectionErrorBoundary name="Skills">
-          <Skills />
+          <Suspense fallback={<SectionSkeleton />}>
+            <Skills />
+          </Suspense>
         </SectionErrorBoundary>
 
         <SectionErrorBoundary name="Projects">
-          <Projects />
+          <Suspense fallback={<SectionSkeleton />}>
+            <Projects />
+          </Suspense>
         </SectionErrorBoundary>
 
-        {/* Testimonials — shown only when feature flag is on and there are testimonials */}
         {settings.features.showTestimonials && (
           <SectionErrorBoundary name="Testimonials">
-            <Testimonials />
+            <Suspense fallback={<SectionSkeleton />}>
+              <Testimonials />
+            </Suspense>
           </SectionErrorBoundary>
         )}
 
-        {/* Contact form — shown only when feature flag is on */}
         {settings.features.showContactForm && (
           <SectionErrorBoundary name="Contact">
-            <Contact />
+            <Suspense fallback={<SectionSkeleton />}>
+              <Contact />
+            </Suspense>
           </SectionErrorBoundary>
         )}
       </main>
