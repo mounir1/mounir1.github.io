@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" fill="none">
+  <rect width="200" height="60" rx="8" fill="#1A1A2E"/>
+  <polygon points="18,12 34,12 42,26 34,40 18,40 10,26" fill="#E94560" opacity="0.9"/>
+  <text x="16" y="32" font-family="Arial, sans-serif" font-weight="900" font-size="13" fill="#ffffff" letter-spacing="0.5">TMS</text>
+  <text x="52" y="34" font-family="Arial, sans-serif" font-weight="700" font-size="17" fill="#ffffff" letter-spacing="0.3">mounirtms</text>
+  <text x="52" y="48" font-family="Arial, sans-serif" font-weight="400" font-size="10" fill="#E94560" letter-spacing="1">MAGENTO MODULES</text>
+</svg>
