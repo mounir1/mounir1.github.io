@@ -3,7 +3,7 @@ import { collection, query, orderBy, onSnapshot, where } from "firebase/firestor
 import { db, isFirebaseEnabled } from "@/lib/firebase";
 import { initialSkills } from "@/data/initial-skills";
 
-export type SkillCategory = 
+export type SkillCategory =
   | "Frontend Development"
   | "Backend Development"
   | "Database"
@@ -13,7 +13,14 @@ export type SkillCategory =
   | "Design"
   | "Project Management"
   | "Languages"
+  | "Frameworks"
+  | "Testing"
   | "Tools"
+  | "ERP Solutions"
+  | "Retail Solutions"
+  | "E-commerce"
+  | "Hospitality Solutions"
+  | "LMS & Education"
   | "Other";
 
 export interface Skill {

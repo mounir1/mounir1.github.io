@@ -1,11 +1,20 @@
-import { ProjectInput } from "@/hooks/useProjects";
+import type { ProjectInput } from "@/hooks/useProjects";
+
+// ─── Available logos in /public/ ─────────────────────────────────────────────
+// /hotech-logo.svg  /technostationery-logo.svg  /magento-logo.svg
+// /etl-platform-logo.svg  /jskit-logo.svg  /noor-almaarifa-logo.svg
+// /it-collaborator-logo.svg
+// Missing: odoo, cegid, moodle, openproject, jira → use emoji icon fallback
 
 export const initialProjects: ProjectInput[] = [
+  // ── 1. HoTech Systems ──────────────────────────────────────────────────────
   {
-    title: "HoTech Systems - Hospitality Digital Transformation Platform",
-    description: "Digital transformation platform for the hospitality industry — Otello GEM guest experience management, DashBoss real-time operations dashboard, and GuestApp mobile engagement. Powering 300,000+ hotel rooms across 10+ countries.",
-    longDescription: "Led full-stack development and enterprise integration for HoTech Systems, a global hospitality technology leader with 20+ years of experience and 2,000+ client installations worldwide. Built and integrated three flagship products: Otello GEM (Guest Experience Management) for touchless personalized guest journeys and real-time revenue optimization; DashBoss, a real-time mobile operations dashboard for department-level KPI monitoring; and GuestApp, the guest-facing mobile platform for customizing travel experiences. Implemented 100% integration capability with existing hotel systems, serving 120,000+ active users across 10+ countries and 300,000+ hotel rooms.",
-    category: "Enterprise Integration",
+    title: "HoTech Systems — Hospitality Digital Transformation",
+    description:
+      "Digital transformation platform for the hospitality industry — Otello GEM guest experience management, DashBoss real-time operations dashboard, and GuestApp mobile engagement. Powering 300,000+ hotel rooms across 10+ countries.",
+    longDescription:
+      "Led full-stack development and enterprise integration for HoTech Systems, a global hospitality technology leader with 20+ years of experience and 2,000+ client installations worldwide. Built and integrated three flagship products: Otello GEM (Guest Experience Management) for touchless personalized guest journeys and real-time revenue optimization; DashBoss, a real-time mobile operations dashboard for department-level KPI monitoring; and GuestApp, the guest-facing mobile platform for customizing travel experiences. Implemented 100% integration capability with existing hotel systems, serving 120,000+ active users across 10+ countries and 300,000+ hotel rooms.",
+    category: "Hospitality Solutions",
     status: "completed",
     achievements: [
       "Integrated platform powers 300,000+ hotel rooms globally",
@@ -16,11 +25,12 @@ export const initialProjects: ProjectInput[] = [
       "Developed DashBoss real-time mobile KPI dashboard",
       "Delivered GuestApp for personalized guest engagement",
       "Achieved 100% integration with existing hotel management systems",
-      "20+ year platform with 99.9% uptime SLA",
-      "Reduced data processing time by 75%"
     ],
-    technologies: ["React", "Node.js", "TypeScript", "PostgreSQL", "Redis", "Docker", "AWS", "WebSocket", "Kubernetes", "Nginx", "REST APIs", "Mobile PWA"],
-    tags: ["hospitality", "enterprise", "integration", "real-time", "scalable", "microservices", "b2b", "saas", "hotel-tech", "guest-experience"],
+    technologies: [
+      "React", "Node.js", "TypeScript", "PostgreSQL", "Redis",
+      "Docker", "AWS", "WebSocket", "Kubernetes", "Nginx", "REST APIs", "Mobile PWA",
+    ],
+    tags: ["hospitality", "enterprise", "integration", "real-time", "scalable", "microservices", "hotel-tech"],
     image: "https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&h=600&fit=crop",
     logo: "/hotech-logo.svg",
     icon: "🏨",
@@ -30,7 +40,7 @@ export const initialProjects: ProjectInput[] = [
     caseStudyUrl: "https://hotech.systems/about-hotech",
     featured: true,
     disabled: false,
-    priority: 98,
+    priority: 100,
     startDate: "2023-06-01",
     endDate: "2024-02-15",
     duration: "8 months",
@@ -40,7 +50,7 @@ export const initialProjects: ProjectInput[] = [
       size: "enterprise",
       location: "International (10+ countries)",
       website: "https://hotech.systems",
-      isPublic: true
+      isPublic: true,
     },
     metrics: {
       usersReached: 120000,
@@ -48,39 +58,109 @@ export const initialProjects: ProjectInput[] = [
       revenueImpact: "Revenue optimization for 300K+ rooms",
       uptime: "99.9%",
       customMetrics: {
-        "hotel_rooms_managed": "300,000+",
-        "active_users": "120,000+",
-        "countries_served": "10+",
-        "client_installations": "2,000+",
-        "years_in_operation": "20+",
-        "systems_integrated": 15,
-        "automation_level": "90%"
-      }
+        hotel_rooms_managed: "300,000+",
+        active_users: "120,000+",
+        countries_served: "10+",
+        client_installations: "2,000+",
+        systems_integrated: 15,
+      },
     },
     challenges: [
       "Integrating with 100+ diverse legacy hotel management systems",
       "Real-time data synchronization for 300K+ rooms simultaneously",
       "Building touchless contactless guest journey across all touchpoints",
       "Multi-country, multi-language deployment at scale",
-      "Revenue optimization with real-time analytics across departments"
     ],
     solutions: [
       "Built universal hotel systems integration layer with REST & WebSocket APIs",
       "Implemented event-driven microservices for real-time room/guest data sync",
       "Developed Otello GEM for end-to-end personalized touchless guest journeys",
       "Created DashBoss real-time mobile dashboard for department-level KPIs",
-      "Designed GuestApp PWA for mobile-first guest engagement and customization"
     ],
     teamSize: 5,
     role: "Lead Full-Stack Developer & Integration Architect",
-    createdAt: Date.now() - 86400000 * 30,
-    updatedAt: Date.now() - 86400000 * 5,
-    version: 2
+    createdAt: 1706745600000,
+    updatedAt: 1706745600000,
+    version: 2,
   },
+
+  // ── 2. MAB Modules — Magento / Adobe Commerce ──────────────────────────────
+  {
+    title: "MAB Modules — Adobe Commerce Extension Library",
+    description:
+      "Open-source library of production-ready Magento 2 / Adobe Commerce modules. Covers checkout optimization, B2B workflows, custom payment integrations, and performance enhancements — published at mab-modules.github.io.",
+    longDescription:
+      "MAB Modules is an open-source collection of professional-grade Magento 2 and Adobe Commerce extensions built for real-world enterprise deployments. Each module is built with clean architecture, fully tested, and designed to drop into any Adobe Commerce installation without conflicts. The library covers checkout UX improvements, B2B quote and approval workflows, custom payment provider integrations, multi-store catalog management, advanced SEO tooling, and performance optimization utilities.",
+    category: "E-commerce",
+    status: "maintenance",
+    achievements: [
+      "Published open-source Adobe Commerce module library at mab-modules.github.io",
+      "Built production-grade checkout optimization modules",
+      "Developed B2B quote & approval workflow extensions",
+      "Created custom payment gateway integration modules",
+      "Implemented advanced SEO & sitemap generation modules",
+      "All modules follow Adobe Commerce coding standards",
+      "Actively maintained with Magento 2.x / Adobe Commerce compatibility",
+    ],
+    technologies: [
+      "Magento 2", "Adobe Commerce", "PHP", "XML", "JavaScript",
+      "LESS", "Composer", "PHPUnit", "MySQL", "GraphQL",
+    ],
+    tags: ["magento", "adobe-commerce", "modules", "open-source", "ecommerce", "extensions", "php", "b2b"],
+    image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&h=600&fit=crop",
+    logo: "/magento-logo.svg",
+    icon: "🧩",
+    liveUrl: "https://mab-modules.github.io",
+    githubUrl: "https://github.com/mab-modules",
+    demoUrl: "https://mab-modules.github.io",
+    caseStudyUrl: "",
+    featured: true,
+    disabled: false,
+    priority: 95,
+    startDate: "2022-01-01",
+    endDate: "",
+    duration: "Ongoing",
+    clientInfo: {
+      name: "Open Source Community",
+      industry: "E-commerce / Adobe Commerce Ecosystem",
+      size: "enterprise",
+      location: "International",
+      website: "https://mab-modules.github.io",
+      isPublic: true,
+    },
+    metrics: {
+      performanceImprovement: "Checkout conversion improvements",
+      customMetrics: {
+        module_types: "Checkout, B2B, Payments, SEO, Performance",
+        platform: "Adobe Commerce / Magento 2.x",
+        distribution: "mab-modules.github.io",
+        standard: "Adobe Commerce Coding Standards",
+      },
+    },
+    challenges: [
+      "Maintaining compatibility across multiple Adobe Commerce versions",
+      "Conflict-free integration with third-party extensions",
+      "Complex B2B workflow requirements across diverse client setups",
+    ],
+    solutions: [
+      "Built version-aware compatibility layer for Magento 2.3 through Adobe Commerce 2.4.x",
+      "Used dependency injection and event/plugin architecture for conflict-free modules",
+      "Modular design with separate packages per business domain",
+    ],
+    teamSize: 2,
+    role: "Lead Developer & Maintainer",
+    createdAt: 1672531200000,
+    updatedAt: 1706745600000,
+    version: 1,
+  },
+
+  // ── 3. TechnoStationery E-commerce ─────────────────────────────────────────
   {
     title: "TechnoStationery E-commerce Platform",
-    description: "Modern e-commerce platform with advanced inventory management, multi-payment gateway integration, and real-time analytics.",
-    longDescription: "Developed a comprehensive e-commerce solution for TechnoStationery with advanced features including inventory management, multi-payment gateway integration, customer analytics, and automated order processing. The platform supports multiple currencies and languages with real-time inventory tracking and automated reorder points.",
+    description:
+      "Modern e-commerce platform with advanced inventory management, multi-payment gateway integration, and real-time analytics.",
+    longDescription:
+      "Developed a comprehensive e-commerce solution for TechnoStationery with advanced features including inventory management, multi-payment gateway integration, customer analytics, and automated order processing. The platform supports multiple currencies and languages with real-time inventory tracking and automated reorder points.",
     category: "E-commerce",
     status: "completed",
     achievements: [
@@ -90,9 +170,12 @@ export const initialProjects: ProjectInput[] = [
       "Achieved 2-second page load times",
       "Integrated 5+ payment gateways",
       "Built automated inventory management",
-      "Implemented customer loyalty program"
+      "Implemented customer loyalty program",
     ],
-    technologies: ["React", "Next.js", "Stripe", "PayPal", "MongoDB", "Node.js", "Tailwind CSS", "Vercel", "Algolia", "SendGrid"],
+    technologies: [
+      "React", "Next.js", "Stripe", "PayPal", "MongoDB",
+      "Node.js", "Tailwind CSS", "Vercel", "Algolia", "SendGrid",
+    ],
     tags: ["ecommerce", "payments", "inventory", "analytics", "responsive", "b2c"],
     image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=600&fit=crop",
     logo: "/technostationery-logo.svg",
@@ -100,6 +183,7 @@ export const initialProjects: ProjectInput[] = [
     liveUrl: "https://technostationery.com",
     githubUrl: "",
     demoUrl: "",
+    caseStudyUrl: "",
     featured: true,
     disabled: false,
     priority: 90,
@@ -112,171 +196,177 @@ export const initialProjects: ProjectInput[] = [
       size: "medium",
       location: "Algeria",
       website: "https://technostationery.com",
-      isPublic: true
+      isPublic: true,
     },
     metrics: {
       usersReached: 5000,
       performanceImprovement: "300% sales increase",
       revenueImpact: "$500K+ annual revenue",
       customMetrics: {
-        "cart_abandonment_reduction": "45%",
-        "page_load_time": "2s",
-        "payment_gateways": 5,
-        "inventory_automation": "95%"
-      }
+        cart_abandonment_reduction: "45%",
+        page_load_time: "2s",
+        payment_gateways: 5,
+        inventory_automation: "95%",
+      },
     },
     challenges: [
       "Complex inventory management across multiple warehouses",
       "Integration with legacy accounting systems",
       "Multi-currency and multi-language support",
-      "Real-time inventory synchronization"
     ],
     solutions: [
       "Built centralized inventory management system",
       "Created API bridges for legacy system integration",
       "Implemented i18n with dynamic currency conversion",
-      "Developed real-time WebSocket inventory updates"
     ],
     teamSize: 3,
     role: "Full-Stack Developer & Project Lead",
-    createdAt: Date.now() - 86400000 * 60,
-    updatedAt: Date.now() - 86400000 * 10,
-    version: 1
+    createdAt: 1704067200000,
+    updatedAt: 1706745600000,
+    version: 1,
   },
+
+  // ── 4. Odoo ERP Enterprise ──────────────────────────────────────────────────
   {
-    title: "MAB Modules — Magento / Adobe Commerce Extension Library",
-    description: "Open-source library of production-ready Magento 2 / Adobe Commerce modules. Covers checkout optimization, B2B workflows, custom payment integrations, and performance enhancements — published at mab-modules.github.io.",
-    longDescription: "MAB Modules is an open-source collection of professional-grade Magento 2 and Adobe Commerce extensions built for real-world enterprise deployments. Each module is built with clean architecture, fully tested, and designed to drop into any Adobe Commerce installation without conflicts. The library covers checkout UX improvements, B2B quote and approval workflows, custom payment provider integrations, multi-store catalog management, advanced SEO tooling, and performance optimization utilities. All modules follow Adobe Commerce coding standards and are distributed with full documentation at mab-modules.github.io.",
-    category: "E-commerce",
-    status: "maintenance",
+    title: "Odoo ERP Enterprise Implementation",
+    description:
+      "Full-scale Odoo ERP implementation for a manufacturing giant, integrating Inventory, Manufacturing, Accounting, and CRM modules.",
+    longDescription:
+      "Architected and deployed a comprehensive Odoo Enterprise solution for a multi-national manufacturing corporation. The system integrates complex manufacturing workflows (MRP II) with real-time inventory tracking, multi-currency accounting, and a custom CRM. Implemented automated quality control checkpoints and IoT integration for machine monitoring. The solution handles over 50,000 daily stock moves and synchronizes data across 12 global warehouses.",
+    category: "ERP Solutions",
+    status: "completed",
     achievements: [
-      "Published open-source Adobe Commerce module library at mab-modules.github.io",
-      "Built production-grade checkout optimization modules",
-      "Developed B2B quote & approval workflow extensions",
-      "Created custom payment gateway integration modules",
-      "Implemented advanced SEO & sitemap generation modules",
-      "All modules follow Adobe Commerce coding standards",
-      "Actively maintained with Magento 2.x / Adobe Commerce compatibility"
+      "Unified 12 global warehouses",
+      "Reduced inventory discrepancy by 98%",
+      "Automated 85% of accounting entries",
+      "Integrated IoT sensors for real-time monitoring",
+      "Customized 20+ Odoo modules",
+      "Migrated 5M+ historical records",
+      "Achieved ROI in 8 months",
     ],
-    technologies: ["Magento 2", "Adobe Commerce", "PHP", "XML", "JavaScript", "LESS", "Composer", "PHPUnit", "MySQL", "GraphQL"],
-    tags: ["magento", "adobe-commerce", "modules", "open-source", "ecommerce", "extensions", "php", "b2b"],
-    image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&h=600&fit=crop",
-    logo: "/magento-logo.svg",
-    icon: "🧩",
-    liveUrl: "https://mab-modules.github.io",
-    githubUrl: "https://github.com/mab-modules",
-    demoUrl: "https://mab-modules.github.io",
+    technologies: [
+      "Python", "Odoo 17", "PostgreSQL", "Docker",
+      "Redis", "Nginx", "Linux", "XML-RPC", "React", "AWS",
+    ],
+    tags: ["erp", "odoo", "python", "enterprise", "manufacturing", "iot"],
+    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=600&fit=crop",
+    logo: "",   // odoo-logo.svg not in /public — use icon fallback
+    icon: "🏭",
+    liveUrl: "",
+    githubUrl: "",
+    demoUrl: "",
     caseStudyUrl: "",
     featured: true,
     disabled: false,
-    priority: 92,
-    startDate: "2022-01-01",
-    endDate: "",
-    duration: "Ongoing",
+    priority: 88,
+    startDate: "2023-01-01",
+    endDate: "2023-12-30",
+    duration: "12 months",
     clientInfo: {
-      name: "Open Source Community",
-      industry: "E-commerce / Adobe Commerce Ecosystem",
+      name: "Global Manufacturing Corp",
+      industry: "Manufacturing",
       size: "enterprise",
       location: "International",
-      website: "https://mab-modules.github.io",
-      isPublic: true
+      isPublic: false,
     },
     metrics: {
-      performanceImprovement: "Checkout conversion improvements",
+      usersReached: 1200,
+      performanceImprovement: "40% efficiency gain",
+      revenueImpact: "$3M+ annual savings",
       customMetrics: {
-        "module_types": "Checkout, B2B, Payments, SEO, Performance",
-        "platform": "Adobe Commerce / Magento 2.x",
-        "distribution": "mab-modules.github.io",
-        "standard": "Adobe Commerce Coding Standards"
-      }
+        daily_stock_moves: 50000,
+        warehouses_connected: 12,
+        modules_customized: 20,
+        data_records_migrated: "5M+",
+      },
     },
     challenges: [
-      "Maintaining compatibility across multiple Adobe Commerce versions",
-      "Conflict-free integration with third-party extensions",
-      "Complex B2B workflow requirements across diverse client setups",
-      "Keeping documentation current for all module releases"
+      "Legacy system data fragmentation across 12 countries",
+      "Complex multi-currency consolidation",
+      "Real-time synchronization latency",
+      "User adoption across different cultures",
     ],
     solutions: [
-      "Built version-aware compatibility layer for Magento 2.3 through Adobe Commerce 2.4.x",
-      "Used dependency injection and event/plugin architecture for conflict-free modules",
-      "Modular design with separate packages per business domain",
-      "Auto-generated API docs and README per module at mab-modules.github.io"
+      "Custom ETL pipeline for data migration",
+      "Distributed architecture with read replicas",
+      "Progressive Web App for warehouse staff",
+      "Automated testing suite for custom modules",
     ],
-    teamSize: 2,
-    role: "Lead Developer & Maintainer",
-    createdAt: Date.now() - 86400000 * 180,
-    updatedAt: Date.now() - 86400000 * 2,
-    version: 1
+    teamSize: 12,
+    role: "Lead ERP Architect",
+    createdAt: 1704067200000,
+    updatedAt: 1706745600000,
+    version: 1,
   },
+
+  // ── 5. Cegid Retail & POS ──────────────────────────────────────────────────
   {
-    title: "ETL Data Processing Platform",
-    description: "High-performance ETL platform for processing large datasets with automated data validation and transformation pipelines.",
-    longDescription: "Built a robust ETL (Extract, Transform, Load) platform capable of processing terabytes of data daily. Features include automated data validation, transformation pipelines, error handling, and comprehensive monitoring with alerting systems. Implemented using Apache Airflow for workflow orchestration and Kubernetes for scalable processing.",
-    category: "DevOps & Infrastructure",
+    title: "Cegid Retail & POS Architecture",
+    description:
+      "Omnichannel retail management solution using Cegid Retail Y2, connecting 50+ physical stores with e-commerce platforms.",
+    longDescription:
+      "Designed and implemented a unified retail architecture for a luxury fashion retailer with 50+ stores. Leveraged Cegid Retail Y2 to synchronize POS data, inventory, and customer loyalty programs in real-time. Developed custom middleware to bridge Cegid with Shopify Plus, enabling Click & Collect, Ship from Store, and unified customer profiles. The system processes high-volume transactions with zero downtime during peak seasons.",
+    category: "Retail Solutions",
     status: "completed",
     achievements: [
-      "Processes 5TB+ data daily",
-      "Reduced processing time by 80%",
-      "Implemented automated error recovery",
-      "Built comprehensive monitoring system",
-      "Achieved 99.95% data accuracy",
-      "Automated 95% of data workflows",
-      "Reduced manual data processing by 90%"
+      "Connected 50+ physical stores",
+      "Enabled real-time omnichannel inventory",
+      "Reduced stockouts by 60%",
+      "Unified customer loyalty program",
+      "Zero downtime during Black Friday",
+      "Automated replenishment workflows",
+      "Integrated mobile POS for staff",
     ],
-    technologies: ["Python", "Apache Airflow", "PostgreSQL", "Redis", "Docker", "Kubernetes", "Grafana", "Prometheus", "Apache Spark", "Elasticsearch"],
-    tags: ["etl", "big-data", "automation", "monitoring", "scalable", "data-engineering"],
-    image: "https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=800&h=600&fit=crop",
-    logo: "/etl-platform-logo.svg",
-    icon: "⚡",
-    liveUrl: "https://etl.techno-dz.com",
+    technologies: [
+      "Cegid Retail Y2", ".NET", "SQL Server", "Azure",
+      "Shopify API", "Node.js", "React Native", "Redis",
+    ],
+    tags: ["retail", "cegid", "pos", "omnichannel", "ecommerce", "integration"],
+    image: "https://images.unsplash.com/photo-1556740738-b6a63e27c4df?w=800&h=600&fit=crop",
+    logo: "",   // cegid-logo.svg not in /public — use icon
+    icon: "🛍️",
+    liveUrl: "",
     githubUrl: "",
     demoUrl: "",
+    caseStudyUrl: "",
     featured: true,
     disabled: false,
     priority: 85,
-    startDate: "2023-09-01",
-    endDate: "2024-01-15",
-    duration: "4.5 months",
+    startDate: "2023-04-01",
+    endDate: "2023-11-30",
+    duration: "8 months",
     clientInfo: {
-      name: "Techno DZ",
-      industry: "Data Processing",
-      size: "medium",
-      location: "Algeria",
-      website: "https://etl.techno-dz.com",
-      isPublic: true
+      name: "Luxury Fashion Brand",
+      industry: "Retail",
+      size: "enterprise",
+      location: "Europe",
+      isPublic: false,
     },
     metrics: {
-      performanceImprovement: "80% faster processing",
-      uptime: "99.95%",
+      usersReached: 500,
+      performanceImprovement: "60% less stockouts",
+      revenueImpact: "25% sales increase",
       customMetrics: {
-        "daily_data_processed": "5TB",
-        "accuracy_rate": "99.95%",
-        "automation_level": "95%",
-        "processing_speed_improvement": "80%"
-      }
+        stores_connected: 50,
+        transactions_peak_hour: 5000,
+        inventory_accuracy: "99.8%",
+        omnichannel_orders: "30%",
+      },
     },
-    challenges: [
-      "Processing massive datasets efficiently",
-      "Ensuring data quality and accuracy",
-      "Handling various data formats and sources",
-      "Scaling processing power dynamically"
-    ],
-    solutions: [
-      "Implemented Apache Spark for distributed processing",
-      "Built comprehensive data validation pipelines",
-      "Created flexible data transformation modules",
-      "Used Kubernetes for auto-scaling processing nodes"
-    ],
-    teamSize: 4,
-    role: "Data Engineer & DevOps Specialist",
-    createdAt: Date.now() - 86400000 * 45,
-    updatedAt: Date.now() - 86400000 * 3,
-    version: 1
+    teamSize: 8,
+    role: "Technical Lead",
+    createdAt: 1701475200000,
+    updatedAt: 1706745600000,
+    version: 1,
   },
+
+  // ── 6. Adobe Commerce Enterprise ───────────────────────────────────────────
   {
-    title: "Adobe Commerce (Magento) — Enterprise E-commerce Solutions",
-    description: "Custom Adobe Commerce (Magento) development and optimization for enterprise e-commerce platforms. 15+ stores built, 25+ custom modules, 10+ payment gateways — powered by Adobe's leading commerce platform.",
-    longDescription: "Developed and optimized 15+ enterprise Adobe Commerce (Magento 2.x) e-commerce platforms for B2B and B2C clients, leveraging Adobe's industry-leading commerce infrastructure. Built custom extensions, payment integrations, inventory management systems, and performance optimization layers. Specialized in Magento 2.x to Adobe Commerce migrations, custom theme development, multi-store configurations, and advanced SEO strategies. Implemented Adobe-recommended caching with Varnish, Elasticsearch full-text search, and Redis session management for high-traffic stores.",
+    title: "Adobe Commerce — Enterprise E-commerce Solutions",
+    description:
+      "Custom Adobe Commerce (Magento) development and optimization for enterprise e-commerce platforms. 15+ stores built, 25+ custom modules, 10+ payment gateways.",
+    longDescription:
+      "Developed and optimized 15+ enterprise Adobe Commerce (Magento 2.x) e-commerce platforms for B2B and B2C clients. Built custom extensions, payment integrations, inventory management systems, and performance optimization layers. Specialized in Magento 2.x to Adobe Commerce migrations, custom theme development, multi-store configurations, and advanced SEO strategies.",
     category: "E-commerce",
     status: "completed",
     achievements: [
@@ -287,10 +377,12 @@ export const initialProjects: ProjectInput[] = [
       "Managed complex multi-store, multi-language configurations",
       "Implemented advanced SEO resulting in 200% organic traffic increase",
       "Reduced server response time by 70% through optimization",
-      "Completed Magento 1.x to Adobe Commerce 2.x migrations"
     ],
-    technologies: ["Adobe Commerce", "Magento 2.x", "PHP", "MySQL", "JavaScript", "LESS", "XML", "Composer", "Redis", "Elasticsearch", "Varnish", "GraphQL"],
-    tags: ["adobe-commerce", "magento", "ecommerce", "php", "enterprise", "optimization", "b2b", "b2c", "adobe"],
+    technologies: [
+      "Adobe Commerce", "Magento 2.x", "PHP", "MySQL",
+      "JavaScript", "LESS", "XML", "Composer", "Redis", "Elasticsearch", "Varnish", "GraphQL",
+    ],
+    tags: ["adobe-commerce", "magento", "ecommerce", "php", "enterprise", "optimization", "b2b", "b2c"],
     image: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&h=600&fit=crop",
     logo: "/magento-logo.svg",
     icon: "🛍️",
@@ -305,104 +397,187 @@ export const initialProjects: ProjectInput[] = [
     endDate: "2022-12-30",
     duration: "18 months",
     clientInfo: {
-      name: "Multiple Enterprise Clients (Adobe Commerce)",
+      name: "Multiple Enterprise Clients",
       industry: "E-commerce",
       size: "enterprise",
       location: "International",
-      isPublic: false
+      isPublic: false,
     },
     metrics: {
       usersReached: 50000,
       performanceImprovement: "65% faster loading",
       customMetrics: {
-        "stores_built": 15,
-        "custom_modules": 25,
-        "payment_gateways": 10,
-        "performance_improvement": "65%",
-        "seo_improvement": "200%",
-        "platform": "Adobe Commerce (Magento)"
-      }
+        stores_built: 15,
+        custom_modules: 25,
+        payment_gateways: 10,
+        seo_improvement: "200%",
+      },
     },
     challenges: [
       "Legacy Magento 1.x to Adobe Commerce 2.x migrations at scale",
       "Performance optimization for large product catalogs (100K+ SKUs)",
       "Complex B2B pricing, quoting, and approval workflow requirements",
-      "Multi-store and multi-language global deployments"
     ],
     solutions: [
       "Developed automated Magento 1.x to Adobe Commerce 2.x migration scripts",
       "Implemented full-page caching with Varnish + Redis for sub-200ms response",
       "Built custom B2B Adobe Commerce modules with approval workflows",
-      "Created scalable multi-store architecture with shared catalog management"
     ],
     teamSize: 6,
     role: "Senior Adobe Commerce Developer & Technical Lead",
-    createdAt: Date.now() - 86400000 * 200,
-    updatedAt: Date.now() - 86400000 * 30,
-    version: 2
+    createdAt: 1640995200000,
+    updatedAt: 1706745600000,
+    version: 2,
   },
+
+  // ── 7. ETL Data Processing Platform ────────────────────────────────────────
   {
-    title: "JSKit Development Toolkit",
-    description: "Comprehensive JavaScript development toolkit with code generators, testing utilities, and performance optimization tools.",
-    longDescription: "Created a complete JavaScript development toolkit that includes code generators, automated testing utilities, performance optimization tools, and debugging helpers. Used by 500+ developers worldwide for rapid application development. Features include React component generators, API client generators, testing boilerplates, and performance monitoring tools.",
-    category: "Web Application",
-    status: "maintenance",
+    title: "ETL Data Processing Platform",
+    description:
+      "High-performance ETL platform processing 5TB+ daily with automated data validation, transformation pipelines, and comprehensive monitoring.",
+    longDescription:
+      "Built a robust ETL (Extract, Transform, Load) platform capable of processing terabytes of data daily. Features include automated data validation, transformation pipelines, error handling, and comprehensive monitoring with alerting systems. Implemented using Apache Airflow for workflow orchestration and Kubernetes for scalable processing.",
+    category: "DevOps & Infrastructure",
+    status: "completed",
     achievements: [
-      "Used by 500+ developers globally",
-      "Reduced development time by 60%",
-      "Generated 10,000+ code snippets",
-      "Integrated with popular IDEs",
-      "Maintained 95% user satisfaction",
-      "Built CLI tools for automation",
-      "Created comprehensive documentation"
+      "Processes 5TB+ data daily",
+      "Reduced processing time by 80%",
+      "Implemented automated error recovery",
+      "Built comprehensive monitoring system",
+      "Achieved 99.95% data accuracy",
+      "Automated 95% of data workflows",
+      "Reduced manual data processing by 90%",
     ],
-    technologies: ["JavaScript", "TypeScript", "Node.js", "Webpack", "Babel", "Jest", "ESLint", "Prettier", "CLI", "NPM"],
-    tags: ["toolkit", "development", "automation", "testing", "productivity", "open-source"],
-    image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&h=600&fit=crop",
-    logo: "/jskit-logo.svg",
-    icon: "🔧",
-    liveUrl: "https://jskit-app.web.app",
-    githubUrl: "https://github.com/mounir1/jskit",
-    demoUrl: "https://jskit-app.web.app/demo",
-    featured: false,
+    technologies: [
+      "Python", "Apache Airflow", "PostgreSQL", "Redis",
+      "Docker", "Kubernetes", "Grafana", "Prometheus", "Apache Spark", "Elasticsearch",
+    ],
+    tags: ["etl", "big-data", "automation", "monitoring", "scalable", "data-engineering"],
+    image: "https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=800&h=600&fit=crop",
+    logo: "/etl-platform-logo.svg",
+    icon: "⚡",
+    liveUrl: "https://etl.techno-dz.com",
+    githubUrl: "",
+    demoUrl: "",
+    caseStudyUrl: "",
+    featured: true,
     disabled: false,
-    priority: 75,
-    startDate: "2022-11-01",
-    endDate: "2023-05-30",
-    duration: "7 months",
+    priority: 83,
+    startDate: "2023-09-01",
+    endDate: "2024-01-15",
+    duration: "4.5 months",
+    clientInfo: {
+      name: "Techno DZ",
+      industry: "Data Processing",
+      size: "medium",
+      location: "Algeria",
+      website: "https://etl.techno-dz.com",
+      isPublic: true,
+    },
     metrics: {
-      usersReached: 500,
-      performanceImprovement: "60% faster development",
+      performanceImprovement: "80% faster processing",
+      uptime: "99.95%",
       customMetrics: {
-        "code_snippets_generated": 10000,
-        "user_satisfaction": "95%",
-        "development_time_saved": "60%",
-        "ide_integrations": 5
-      }
+        daily_data_processed: "5TB",
+        accuracy_rate: "99.95%",
+        automation_level: "95%",
+      },
     },
     challenges: [
-      "Creating flexible code generation templates",
-      "Supporting multiple JavaScript frameworks",
-      "Maintaining compatibility across different environments",
-      "Building intuitive CLI interface"
+      "Processing massive datasets efficiently",
+      "Ensuring data quality and accuracy",
+      "Scaling processing power dynamically",
     ],
     solutions: [
-      "Developed modular template system with customization",
-      "Built framework-agnostic core with plugins",
-      "Implemented comprehensive testing across environments",
-      "Created interactive CLI with helpful prompts"
+      "Implemented Apache Spark for distributed processing",
+      "Built comprehensive data validation pipelines",
+      "Used Kubernetes for auto-scaling processing nodes",
     ],
-    teamSize: 2,
-    role: "Lead Developer & Product Owner",
-    createdAt: Date.now() - 86400000 * 90,
-    updatedAt: Date.now() - 86400000 * 15,
-    version: 1
+    teamSize: 4,
+    role: "Data Engineer & DevOps Specialist",
+    createdAt: 1704067200000,
+    updatedAt: 1706745600000,
+    version: 1,
   },
+
+  // ── 8. Moodle LMS ──────────────────────────────────────────────────────────
+  {
+    title: "Moodle LMS & E-Learning Ecosystem",
+    description:
+      "Enterprise-grade Learning Management System serving 50,000+ students with custom modules and high-availability infrastructure.",
+    longDescription:
+      "Architected a scalable Moodle LMS environment for a major university. The solution includes a high-availability server cluster (Ubuntu/Nginx/PHP-FPM), custom plugin development for advanced grading and attendance, and integration with Microsoft Teams for live classes. Implemented a video streaming server for on-demand content and a gamification module to boost student engagement.",
+    category: "Education Technology",
+    status: "completed",
+    achievements: [
+      "Supports 50,000+ concurrent users",
+      "Developed 5 custom Moodle plugins",
+      "99.99% uptime during exam periods",
+      "Integrated live video classrooms",
+      "Automated certificate generation",
+      "Optimized database for high load",
+      "Mobile-friendly responsive theme",
+    ],
+    technologies: [
+      "Moodle", "PHP", "MariaDB", "Redis",
+      "Linux (Ubuntu)", "Nginx", "JavaScript", "SCORM", "WebRTC",
+    ],
+    tags: ["edtech", "moodle", "lms", "php", "education", "server-admin"],
+    image: "https://images.unsplash.com/photo-1501504905252-473c47e087f8?w=800&h=600&fit=crop",
+    logo: "",   // no moodle logo in /public — use icon
+    icon: "🎓",
+    liveUrl: "",
+    githubUrl: "",
+    demoUrl: "",
+    caseStudyUrl: "",
+    featured: false,
+    disabled: false,
+    priority: 80,
+    startDate: "2022-09-01",
+    endDate: "2023-03-30",
+    duration: "7 months",
+    clientInfo: {
+      name: "National University",
+      industry: "Education",
+      size: "enterprise",
+      location: "North Africa",
+      isPublic: false,
+    },
+    metrics: {
+      usersReached: 50000,
+      performanceImprovement: "99.99% uptime",
+      customMetrics: {
+        concurrent_users: 5000,
+        courses_hosted: 1200,
+        daily_logins: 25000,
+        plugins_developed: 5,
+      },
+    },
+    challenges: [
+      "High concurrency during exams",
+      "Complex gradebook calculations",
+      "Video bandwidth optimization",
+    ],
+    solutions: [
+      "Redis caching layer implementation",
+      "Database sharding strategy",
+      "CDN integration for media",
+    ],
+    teamSize: 5,
+    role: "Lead LMS Developer",
+    createdAt: 1688169600000,
+    updatedAt: 1706745600000,
+    version: 1,
+  },
+
+  // ── 9. Noor Al Maarifa ─────────────────────────────────────────────────────
   {
     title: "Noor Al Maarifa Educational Platform",
-    description: "Interactive educational platform with course management, student tracking, and advanced learning analytics.",
-    longDescription: "Developed a comprehensive educational platform for Noor Al Maarifa featuring course management, student progress tracking, interactive learning modules, and advanced analytics. The platform serves 2000+ students with personalized learning paths, real-time collaboration tools, and automated assessment systems.",
-    category: "Web Application",
+    description:
+      "Interactive educational platform with course management, student tracking, and advanced learning analytics serving 2,000+ students.",
+    longDescription:
+      "Developed a comprehensive educational platform for Noor Al Maarifa featuring course management, student progress tracking, interactive learning modules, and advanced analytics. The platform serves 2000+ students with personalized learning paths, real-time collaboration tools, and automated assessment systems.",
+    category: "Education Technology",
     status: "completed",
     achievements: [
       "Serves 2000+ active students",
@@ -411,9 +586,12 @@ export const initialProjects: ProjectInput[] = [
       "Built interactive assessment system",
       "Achieved 98% student satisfaction",
       "Created mobile-responsive design",
-      "Integrated video conferencing"
+      "Integrated video conferencing",
     ],
-    technologies: ["React", "Firebase", "Node.js", "Express", "MongoDB", "Socket.io", "Chart.js", "Material-UI", "WebRTC", "PWA"],
+    technologies: [
+      "React", "Firebase", "Node.js", "Express",
+      "MongoDB", "Socket.io", "Chart.js", "Material-UI", "WebRTC", "PWA",
+    ],
     tags: ["education", "learning", "analytics", "interactive", "scalable", "mobile"],
     image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=600&fit=crop",
     logo: "/noor-almaarifa-logo.svg",
@@ -421,9 +599,10 @@ export const initialProjects: ProjectInput[] = [
     liveUrl: "https://www.nooralmaarifa.com",
     githubUrl: "",
     demoUrl: "",
+    caseStudyUrl: "",
     featured: false,
     disabled: false,
-    priority: 80,
+    priority: 78,
     startDate: "2023-01-15",
     endDate: "2023-07-30",
     duration: "6.5 months",
@@ -433,40 +612,101 @@ export const initialProjects: ProjectInput[] = [
       size: "medium",
       location: "Algeria",
       website: "https://www.nooralmaarifa.com",
-      isPublic: true
+      isPublic: true,
     },
     metrics: {
       usersReached: 2000,
       performanceImprovement: "40% better learning outcomes",
       customMetrics: {
-        "student_satisfaction": "98%",
-        "active_students": 2000,
-        "learning_improvement": "40%",
-        "course_completion_rate": "85%"
-      }
+        student_satisfaction: "98%",
+        active_students: 2000,
+        course_completion_rate: "85%",
+      },
     },
     challenges: [
       "Creating engaging interactive learning content",
       "Implementing real-time collaboration features",
-      "Building comprehensive analytics dashboard",
-      "Ensuring mobile accessibility"
+      "Ensuring mobile accessibility",
     ],
     solutions: [
       "Developed interactive multimedia content system",
       "Integrated WebRTC for real-time communication",
-      "Built advanced analytics with Chart.js and D3",
-      "Implemented PWA for mobile-first experience"
+      "Implemented PWA for mobile-first experience",
     ],
     teamSize: 4,
     role: "Full-Stack Developer & UX Designer",
-    createdAt: Date.now() - 86400000 * 75,
-    updatedAt: Date.now() - 86400000 * 8,
-    version: 1
+    createdAt: 1680912000000,
+    updatedAt: 1706745600000,
+    version: 1,
   },
+
+  // ── 10. Jira Service Management ────────────────────────────────────────────
+  {
+    title: "Jira Service Management Enterprise",
+    description:
+      "Enterprise-wide Jira Service Management implementation for IT service delivery, automating incidents, changes, and problems.",
+    longDescription:
+      "Rolled out Jira Service Management (JSM) for a financial institution's IT department. Configured complex workflows for Incident, Problem, and Change Management following ITIL best practices. Implemented automation rules to triage tickets, SLA monitoring, and a self-service portal with a knowledge base.",
+    category: "ITSM Solutions",
+    status: "completed",
+    achievements: [
+      "Reduced MTTR by 50%",
+      "Automated 60% of ticket routing",
+      "Implemented ITIL best practices",
+      "Created 500+ knowledge articles",
+      "Integrated monitoring alerts",
+      "95% SLA compliance achieved",
+      "Seamless Slack integration",
+    ],
+    technologies: [
+      "Jira Service Management", "Groovy (ScriptRunner)",
+      "Automation for Jira", "Slack API", "Rest API",
+    ],
+    tags: ["jira", "itsm", "automation", "itil", "workflow", "enterprise"],
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=600&fit=crop",
+    logo: "",   // no jira logo in /public — use icon
+    icon: "🎫",
+    liveUrl: "",
+    githubUrl: "",
+    demoUrl: "",
+    caseStudyUrl: "",
+    featured: false,
+    disabled: false,
+    priority: 75,
+    startDate: "2023-08-01",
+    endDate: "2024-02-01",
+    duration: "6 months",
+    clientInfo: {
+      name: "FinTech Solutions",
+      industry: "Finance",
+      size: "large",
+      location: "Remote",
+      isPublic: false,
+    },
+    metrics: {
+      usersReached: 2000,
+      performanceImprovement: "50% faster resolution",
+      customMetrics: {
+        tickets_monthly: 3000,
+        automation_rate: "60%",
+        sla_compliance: "95%",
+        kb_articles: 500,
+      },
+    },
+    teamSize: 3,
+    role: "Atlassian Consultant",
+    createdAt: 1704067200000,
+    updatedAt: 1706745600000,
+    version: 1,
+  },
+
+  // ── 11. IT Collaborator ────────────────────────────────────────────────────
   {
     title: "IT Collaborator Project Management",
-    description: "Advanced project management platform with team collaboration, time tracking, and automated reporting features.",
-    longDescription: "Built a sophisticated project management platform for IT teams featuring real-time collaboration, advanced time tracking, automated reporting, resource allocation, and integration with popular development tools. Used by 50+ companies with features like Gantt charts, Kanban boards, and automated notifications.",
+    description:
+      "Advanced project management platform with team collaboration, time tracking, and automated reporting features. Used by 50+ companies.",
+    longDescription:
+      "Built a sophisticated project management platform for IT teams featuring real-time collaboration, advanced time tracking, automated reporting, resource allocation, and integration with popular development tools. Used by 50+ companies with features like Gantt charts, Kanban boards, and automated notifications.",
     category: "Web Application",
     status: "completed",
     achievements: [
@@ -476,9 +716,11 @@ export const initialProjects: ProjectInput[] = [
       "Integrated with 20+ dev tools",
       "Reduced project delays by 35%",
       "Built real-time collaboration features",
-      "Implemented advanced analytics"
     ],
-    technologies: ["Vue.js", "Laravel", "MySQL", "Redis", "Docker", "GitLab CI", "Slack API", "Jira API", "WebSocket", "Chart.js"],
+    technologies: [
+      "Vue.js", "Laravel", "MySQL", "Redis",
+      "Docker", "GitLab CI", "Slack API", "Jira API", "WebSocket", "Chart.js",
+    ],
     tags: ["project-management", "collaboration", "automation", "integration", "productivity", "saas"],
     image: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=600&fit=crop",
     logo: "/it-collaborator-logo.svg",
@@ -486,9 +728,10 @@ export const initialProjects: ProjectInput[] = [
     liveUrl: "https://it-collaborator-techno.web.app",
     githubUrl: "",
     demoUrl: "https://it-collaborator-techno.web.app/demo",
+    caseStudyUrl: "",
     featured: false,
     disabled: false,
-    priority: 70,
+    priority: 72,
     startDate: "2022-08-01",
     endDate: "2023-02-28",
     duration: "7 months",
@@ -496,138 +739,124 @@ export const initialProjects: ProjectInput[] = [
       usersReached: 1000,
       performanceImprovement: "55% productivity increase",
       customMetrics: {
-        "companies_using": 50,
-        "productivity_increase": "55%",
-        "reporting_automation": "80%",
-        "project_delay_reduction": "35%"
-      }
+        companies_using: 50,
+        productivity_increase: "55%",
+        reporting_automation: "80%",
+      },
     },
-    challenges: [
-      "Integrating with multiple third-party tools",
-      "Building real-time collaboration features",
-      "Creating intuitive project visualization",
-      "Implementing complex permission systems"
-    ],
-    solutions: [
-      "Built unified API gateway for tool integrations",
-      "Implemented WebSocket-based real-time updates",
-      "Created interactive Gantt and Kanban components",
-      "Developed role-based access control system"
-    ],
     teamSize: 5,
     role: "Frontend Lead & Integration Specialist",
-    createdAt: Date.now() - 86400000 * 120,
-    updatedAt: Date.now() - 86400000 * 20,
-    version: 1
+    createdAt: 1659312000000,
+    updatedAt: 1706745600000,
+    version: 1,
   },
+
+  // ── 12. JSKit Development Toolkit ─────────────────────────────────────────
   {
-    title: "Real-time Analytics Dashboard",
-    description: "High-performance analytics dashboard with real-time data visualization and customizable reporting features.",
-    longDescription: "Developed a comprehensive analytics dashboard that processes real-time data streams and provides interactive visualizations. Features include customizable dashboards, automated alerts, data export capabilities, and multi-tenant architecture. Built with modern data visualization libraries and optimized for high-frequency data updates.",
+    title: "JSKit Development Toolkit",
+    description:
+      "Comprehensive JavaScript development toolkit with code generators, testing utilities, and performance optimization tools. Used by 500+ developers worldwide.",
+    longDescription:
+      "Created a complete JavaScript development toolkit that includes code generators, automated testing utilities, performance optimization tools, and debugging helpers. Used by 500+ developers worldwide for rapid application development. Features include React component generators, API client generators, testing boilerplates, and performance monitoring tools.",
     category: "Web Application",
-    status: "completed",
+    status: "maintenance",
     achievements: [
-      "Processes 1M+ events per minute",
-      "Sub-second data visualization",
-      "Built 50+ chart types",
-      "Implemented real-time alerts",
-      "Supports multi-tenant architecture",
-      "Created custom visualization library",
-      "Optimized for mobile devices"
+      "Used by 500+ developers globally",
+      "Reduced development time by 60%",
+      "Generated 10,000+ code snippets",
+      "Integrated with popular IDEs",
+      "Maintained 95% user satisfaction",
     ],
-    technologies: ["React", "D3.js", "WebSocket", "InfluxDB", "Grafana", "Node.js", "Kafka", "Docker", "TypeScript", "Material-UI"],
-    tags: ["analytics", "real-time", "visualization", "dashboard", "performance", "big-data"],
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=600&fit=crop",
-    icon: "📊",
-    liveUrl: "",
-    githubUrl: "https://github.com/mounir1/analytics-dashboard",
-    demoUrl: "",
+    technologies: [
+      "JavaScript", "TypeScript", "Node.js",
+      "Webpack", "Babel", "Jest", "ESLint", "Prettier", "CLI", "NPM",
+    ],
+    tags: ["toolkit", "development", "automation", "testing", "productivity", "open-source"],
+    image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&h=600&fit=crop",
+    logo: "/jskit-logo.svg",
+    icon: "🔧",
+    liveUrl: "https://jskit-app.web.app",
+    githubUrl: "https://github.com/mounir1/jskit",
+    demoUrl: "https://jskit-app.web.app/demo",
+    caseStudyUrl: "",
     featured: false,
     disabled: false,
-    priority: 65,
-    startDate: "2023-04-01",
-    endDate: "2023-09-15",
-    duration: "5.5 months",
+    priority: 70,
+    startDate: "2022-11-01",
+    endDate: "2023-05-30",
+    duration: "7 months",
     metrics: {
-      performanceImprovement: "Sub-second visualization",
+      usersReached: 500,
+      performanceImprovement: "60% faster development",
       customMetrics: {
-        "events_per_minute": 1000000,
-        "chart_types": 50,
-        "visualization_speed": "sub-second",
-        "data_retention": "1_year"
-      }
+        code_snippets_generated: 10000,
+        user_satisfaction: "95%",
+        ide_integrations: 5,
+      },
     },
-    challenges: [
-      "Handling high-frequency data streams",
-      "Creating responsive visualizations",
-      "Implementing real-time alerts",
-      "Optimizing for large datasets"
-    ],
-    solutions: [
-      "Implemented data streaming with Kafka",
-      "Built custom React visualization components",
-      "Created rule-based alerting system",
-      "Used data aggregation and sampling techniques"
-    ],
-    teamSize: 3,
-    role: "Frontend Developer & Data Visualization Specialist",
-    createdAt: Date.now() - 86400000 * 100,
-    updatedAt: Date.now() - 86400000 * 12,
-    version: 1
+    teamSize: 2,
+    role: "Lead Developer & Product Owner",
+    createdAt: 1667260800000,
+    updatedAt: 1706745600000,
+    version: 1,
   },
+
+  // ── 13. Server Infrastructure & DevOps ─────────────────────────────────────
   {
-    title: "Microservices Architecture Migration",
-    description: "Complete migration of monolithic application to microservices architecture with improved scalability and performance.",
-    longDescription: "Led the migration of a large monolithic application to microservices architecture, implementing containerization, service mesh, API gateway, and comprehensive monitoring. Resulted in 10x improved scalability and 50% cost reduction. Implemented using Docker, Kubernetes, and modern DevOps practices.",
+    title: "Server Infrastructure & Cloud DevOps",
+    description:
+      "High-performance server infrastructure setup and management using Linux, Docker, and Kubernetes for scalable applications with 99.999% availability.",
+    longDescription:
+      "Designed and managed the complete server infrastructure for a SaaS platform. Migrated legacy monolithic applications to a microservices architecture using Docker and Kubernetes. Implemented CI/CD pipelines with GitHub Actions, automated backups, and comprehensive monitoring with Prometheus and Grafana. Hardened security with firewalls, VPNs, and regular audits.",
     category: "DevOps & Infrastructure",
-    status: "completed",
+    status: "active",
     achievements: [
-      "Migrated 500K+ lines of code",
-      "Improved scalability by 10x",
-      "Reduced infrastructure costs by 50%",
-      "Implemented zero-downtime deployments",
-      "Built comprehensive monitoring",
+      "99.999% system availability",
       "Automated CI/CD pipelines",
-      "Reduced deployment time by 80%"
+      "Reduced server costs by 30%",
+      "Implemented zero-trust security",
+      "Scalable Kubernetes cluster",
+      "Real-time monitoring dashboard",
+      "Disaster recovery plan tested",
     ],
-    technologies: ["Docker", "Kubernetes", "Istio", "Kong", "Prometheus", "Grafana", "Jenkins", "Terraform", "AWS", "Microservices"],
-    tags: ["microservices", "migration", "scalability", "devops", "kubernetes", "cloud"],
-    image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&h=600&fit=crop",
-    icon: "🔄",
+    technologies: [
+      "Linux", "Docker", "Kubernetes", "AWS",
+      "Terraform", "Ansible", "Nginx", "Prometheus", "Grafana", "Bash",
+    ],
+    tags: ["devops", "infrastructure", "linux", "cloud", "security", "kubernetes"],
+    image: "https://images.unsplash.com/photo-1558494949-ef526b0042a0?w=800&h=600&fit=crop",
+    logo: "",
+    icon: "🖥️",
     liveUrl: "",
     githubUrl: "",
     demoUrl: "",
+    caseStudyUrl: "",
     featured: false,
     disabled: false,
-    priority: 60,
-    startDate: "2022-10-01",
-    endDate: "2023-06-30",
-    duration: "9 months",
-    metrics: {
-      performanceImprovement: "10x scalability improvement",
-      customMetrics: {
-        "code_lines_migrated": 500000,
-        "scalability_improvement": "10x",
-        "cost_reduction": "50%",
-        "deployment_time_reduction": "80%"
-      }
+    priority: 68,
+    startDate: "2022-01-01",
+    endDate: "",
+    duration: "Ongoing",
+    clientInfo: {
+      name: "SaaS Tech Corp",
+      industry: "Technology",
+      size: "medium",
+      location: "International",
+      isPublic: false,
     },
-    challenges: [
-      "Breaking down monolithic codebase",
-      "Maintaining data consistency",
-      "Implementing service communication",
-      "Ensuring zero-downtime migration"
-    ],
-    solutions: [
-      "Applied domain-driven design principles",
-      "Implemented event sourcing and CQRS patterns",
-      "Built service mesh with Istio",
-      "Used blue-green deployment strategy"
-    ],
-    teamSize: 8,
-    role: "DevOps Lead & Migration Architect",
-    createdAt: Date.now() - 86400000 * 150,
-    updatedAt: Date.now() - 86400000 * 25,
-    version: 1
-  }
+    metrics: {
+      performanceImprovement: "30% cost reduction",
+      uptime: "99.999%",
+      customMetrics: {
+        containers_managed: 200,
+        deployments_daily: 15,
+        security_incidents: 0,
+      },
+    },
+    teamSize: 4,
+    role: "Lead DevOps Engineer",
+    createdAt: 1640995200000,
+    updatedAt: 1706745600000,
+    version: 1,
+  },
 ];
