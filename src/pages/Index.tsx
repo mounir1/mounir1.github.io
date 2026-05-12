@@ -10,6 +10,7 @@ import { useLinks } from "@/hooks/useLinks";
 const Experience   = lazy(() => import("@/components/sections/experience").then(m => ({ default: m.Experience })));
 const Skills       = lazy(() => import("@/components/sections/skills").then(m => ({ default: m.Skills })));
 const Projects     = lazy(() => import("@/components/sections/projects").then(m => ({ default: m.Projects })));
+const Upcoming     = lazy(() => import("@/components/sections/upcoming").then(m => ({ default: m.Upcoming })));
 const Testimonials = lazy(() => import("@/components/sections/testimonials").then(m => ({ default: m.Testimonials })));
 const Contact      = lazy(() => import("@/components/sections/contact").then(m => ({ default: m.Contact })));
 
@@ -203,6 +204,12 @@ const Index = () => {
         <SectionErrorBoundary name="Projects">
           <Suspense fallback={<SectionSkeleton />}>
             <Projects />
+          </Suspense>
+        </SectionErrorBoundary>
+
+        <SectionErrorBoundary name="Upcoming">
+          <Suspense fallback={<SectionSkeleton />}>
+            <Upcoming />
           </Suspense>
         </SectionErrorBoundary>
 

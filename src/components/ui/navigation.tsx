@@ -1,32 +1,78 @@
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Menu, X } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Logo } from "@/components/ui/logo";
 
-export const Navigation = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+// ─── Section IDs tracked for active highlighting ──────────────────────────────
+const SECTION_IDS = ["home", "experience", "skills", "projects", "upcoming", "contact"];
 
+const NAV_ITEMS = [
+  { label: "Home",       href: "#home"       },
+  { label: "Experience", href: "#experience" },
+  { label: "Skills",     href: "#skills"     },
+  { label: "Projects",   href: "#projects"   },
+  { label: "Upcoming",   href: "#upcoming"   },
+  { label: "Contact",    href: "#contact"    },
+];
+
+export const Navigation = () => {
+  const [isOpen,   setIsOpen]   = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [activeId, setActiveId] = useState("home");
+  const observerRef = useRef<IntersectionObserver | null>(null);
+
+  // ── Scroll shadow ────────────────────────────────────────────────────────
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const navItems = [
-    { label: "Home", href: "#home" },
-    { label: "Experience", href: "#experience" },
-    { label: "Skills", href: "#skills" },
-    { label: "Projects", href: "#projects" },
-    { label: "Contact", href: "#contact" },
-  ];
+  // ── Active section via IntersectionObserver ──────────────────────────────
+  useEffect(() => {
+    // Track best-intersecting section
+    const ratios: Record<string, number> = {};
+
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          ratios[entry.target.id] = entry.intersectionRatio;
+        });
+        // Pick the section with the highest visible ratio
+        let best = "";
+        let bestRatio = 0;
+        SECTION_IDS.forEach((id) => {
+          if ((ratios[id] ?? 0) > bestRatio) {
+            bestRatio = ratios[id] ?? 0;
+            best = id;
+          }
+        });
+        if (best) setActiveId(best);
+      },
+      {
+        // Middle 20–40% of viewport → most prominent section
+        rootMargin: "-20% 0px -60% 0px",
+        threshold: [0, 0.1, 0.25, 0.5, 0.75, 1.0],
+      }
+    );
+
+    const io = observerRef.current;
+    SECTION_IDS.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) io.observe(el);
+    });
+
+    return () => io.disconnect();
+  }, []);
 
   const scrollToSection = (href: string) => {
     const element = document.querySelector(href);
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
       setIsOpen(false);
+      // Optimistically set active — observer will confirm shortly
+      setActiveId(href.slice(1));
     }
   };
 
@@ -40,6 +86,7 @@ export const Navigation = () => {
     >
       <div className="max-w-6xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
+
           {/* Logo */}
           <div
             className="flex items-center space-x-3 cursor-pointer group"
@@ -55,25 +102,40 @@ export const Navigation = () => {
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            {navItems.map((item) => (
-              <button
-                key={item.label}
-                onClick={() => scrollToSection(item.href)}
-                className="text-muted-foreground hover:text-primary transition-colors duration-200 font-medium text-sm relative group"
+          <div className="hidden md:flex items-center space-x-1">
+            {NAV_ITEMS.map((item) => {
+              const isActive = activeId === item.href.slice(1);
+              return (
+                <button
+                  key={item.label}
+                  onClick={() => scrollToSection(item.href)}
+                  className={`relative px-3 py-1.5 text-sm font-medium rounded-lg transition-all duration-200 group ${
+                    isActive
+                      ? "text-primary"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
+                  }`}
+                >
+                  {item.label}
+                  {/* Animated underline pill */}
+                  <span
+                    className={`absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] rounded-full bg-primary transition-all duration-300 ${
+                      isActive ? "w-4/5 opacity-100" : "w-0 opacity-0 group-hover:w-1/2 group-hover:opacity-50"
+                    }`}
+                  />
+                </button>
+              );
+            })}
+
+            <div className="ml-2 flex items-center gap-2">
+              <ThemeToggle />
+              <Button
+                size="sm"
+                className="shadow-glow hover:shadow-large transition-all duration-300 rounded-lg"
+                onClick={() => scrollToSection("#contact")}
               >
-                {item.label}
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary rounded-full transition-all duration-300 group-hover:w-full" />
-              </button>
-            ))}
-            <ThemeToggle />
-            <Button
-              size="sm"
-              className="shadow-glow hover:shadow-large transition-all duration-300 rounded-lg"
-              onClick={() => scrollToSection("#contact")}
-            >
-              Let's Talk
-            </Button>
+                Let's Talk
+              </Button>
+            </div>
           </div>
 
           {/* Mobile Controls */}
@@ -95,15 +157,28 @@ export const Navigation = () => {
         {isOpen && (
           <div className="md:hidden mt-4 pb-4 border-t border-border/50 animate-in slide-in-from-top-2 duration-200">
             <div className="flex flex-col space-y-1 pt-4">
-              {navItems.map((item) => (
-                <button
-                  key={item.label}
-                  onClick={() => scrollToSection(item.href)}
-                  className="text-left text-muted-foreground hover:text-primary hover:bg-muted/50 transition-all duration-200 font-medium py-2.5 px-3 rounded-lg"
-                >
-                  {item.label}
-                </button>
-              ))}
+              {NAV_ITEMS.map((item) => {
+                const isActive = activeId === item.href.slice(1);
+                return (
+                  <button
+                    key={item.label}
+                    onClick={() => scrollToSection(item.href)}
+                    className={`text-left font-medium py-2.5 px-3 rounded-lg transition-all duration-200 flex items-center gap-2 ${
+                      isActive
+                        ? "text-primary bg-primary/5"
+                        : "text-muted-foreground hover:text-primary hover:bg-muted/50"
+                    }`}
+                  >
+                    {/* Active dot indicator */}
+                    <span
+                      className={`w-1.5 h-1.5 rounded-full flex-shrink-0 transition-all duration-200 ${
+                        isActive ? "bg-primary scale-100" : "bg-transparent scale-0"
+                      }`}
+                    />
+                    {item.label}
+                  </button>
+                );
+              })}
               <Button
                 size="sm"
                 className="self-start mt-3 shadow-glow"
