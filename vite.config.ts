@@ -16,108 +16,106 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
     dedupe: ["react", "react-dom"],
-    mainFields: ["module", "browser", "exports", "main"],
-    conditions: ["module", "import", "browser", "default"],
   },
   build: {
     outDir: "dist",
     sourcemap: false,
     minify: "terser",
-    target: "esnext",
+    target: "es2020",
     reportCompressedSize: false,
-    // Firebase SDK alone is ~464KB minified (~180KB gzipped) — this is
-    // unavoidable and acceptable for a portfolio backed by Firebase.
-    chunkSizeWarningLimit: 900,
+    chunkSizeWarningLimit: 600,
     rollupOptions: {
       output: {
-        // Fine-grained manual chunks — each vendor group is a separate file
-        // that browsers can cache independently of app code changes.
+        // ─── Manual chunks ─────────────────────────────────────────────────
+        // Key rule: ALL Firebase packages go into ONE chunk to prevent
+        // circular chunk references that cause TDZ runtime crashes.
+        // (@firebase/* packages have deep internal cross-references that
+        // Rollup cannot safely split across separate async chunk boundaries.)
         manualChunks(id) {
-          // ── React core (tiny, always critical) ───────────────────────────
+          // ── React runtime (tiny, always first-loaded) ──────────────────
           if (
             id.includes("node_modules/react/") ||
             id.includes("node_modules/react-dom/") ||
             id.includes("node_modules/scheduler/")
           ) {
-            return "react-core";
+            return "react-vendor";
           }
-          // ── Router ────────────────────────────────────────────────────────
+
+          // ── React Router ───────────────────────────────────────────────
           if (
             id.includes("node_modules/react-router") ||
             id.includes("node_modules/@remix-run")
           ) {
-            return "react-router";
+            return "router-vendor";
           }
-          // ── Firebase — split into sub-packages ───────────────────────────
-          if (
-            id.includes("node_modules/@firebase/firestore") ||
-            id.includes("node_modules/@firebase/database")
-          ) {
-            return "firebase-firestore";
-          }
-          if (
-            id.includes("node_modules/@firebase/auth") ||
-            id.includes("node_modules/@firebase/storage")
-          ) {
-            return "firebase-auth-storage";
-          }
+
+          // ── ALL Firebase in one chunk — prevents circular TDZ bug ──────
+          // firebase/app, firebase/firestore, firebase/auth, firebase/storage,
+          // firebase/analytics, @firebase/*, @firebase/firestore, etc.
           if (
             id.includes("node_modules/firebase/") ||
             id.includes("node_modules/@firebase/")
           ) {
-            return "firebase-core";
+            return "firebase-vendor";
           }
-          // ── Radix UI ─────────────────────────────────────────────────────
+
+          // ── Radix UI + shadcn primitives ───────────────────────────────
           if (id.includes("node_modules/@radix-ui")) {
-            return "radix-ui";
+            return "radix-vendor";
           }
-          // ── Lucide icons ─────────────────────────────────────────────────
+
+          // ── Lucide icons ───────────────────────────────────────────────
           if (id.includes("node_modules/lucide-react")) {
-            return "icons";
+            return "icons-vendor";
           }
-          // ── Forms / validation ───────────────────────────────────────────
+
+          // ── TanStack Query ─────────────────────────────────────────────
+          if (id.includes("node_modules/@tanstack")) {
+            return "query-vendor";
+          }
+
+          // ── Forms & validation ─────────────────────────────────────────
           if (
             id.includes("node_modules/react-hook-form") ||
             id.includes("node_modules/@hookform") ||
             id.includes("node_modules/zod")
           ) {
-            return "forms";
+            return "forms-vendor";
           }
-          // ── TanStack Query ────────────────────────────────────────────────
-          if (id.includes("node_modules/@tanstack")) {
-            return "query";
-          }
-          // ── Utility / styling ─────────────────────────────────────────────
+
+          // ── Utility / styling ──────────────────────────────────────────
           if (
             id.includes("node_modules/clsx") ||
             id.includes("node_modules/class-variance-authority") ||
-            id.includes("node_modules/tailwind-merge") ||
-            id.includes("node_modules/date-fns")
+            id.includes("node_modules/tailwind-merge")
           ) {
-            return "utils";
+            return "utils-vendor";
           }
-          // ── Theming ───────────────────────────────────────────────────────
+
+          // ── Theming ────────────────────────────────────────────────────
           if (id.includes("node_modules/next-themes")) {
-            return "theming";
+            return "theming-vendor";
           }
-          // ── Toast / notifications ─────────────────────────────────────────
-          if (
-            id.includes("node_modules/sonner") ||
-            id.includes("node_modules/@radix-ui/react-toast")
-          ) {
-            return "notifications";
+
+          // ── Notifications ──────────────────────────────────────────────
+          if (id.includes("node_modules/sonner")) {
+            return "notifications-vendor";
           }
-          // ── Everything else from node_modules ─────────────────────────────
+
+          // ── Everything else from node_modules ─────────────────────────
           if (id.includes("node_modules/")) {
-            return "vendor";
+            return "misc-vendor";
           }
-          // App code gets its own natural chunk per route (via lazy())
+
+          // App code splits naturally per route via React.lazy()
         },
+
         chunkFileNames: "assets/js/[name]-[hash].js",
         entryFileNames: "assets/js/[name]-[hash].js",
         assetFileNames: (assetInfo) => {
-          const ext = (assetInfo.name ?? "").split(".").pop() ?? "";
-          if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(ext)) {
+          const name = assetInfo.name ?? "";
+          const ext = name.split(".").pop() ?? "";
+          if (/png|jpe?g|svg|gif|tiff|bmp|ico|webp/i.test(ext)) {
             return "assets/images/[name]-[hash][extname]";
           }
           if (/css/i.test(ext)) {
@@ -131,19 +129,31 @@ export default defineConfig(({ mode }) => ({
       compress: {
         drop_console: true,
         drop_debugger: true,
-        pure_funcs: ["console.log", "console.warn", "console.info"],
+        pure_funcs: [
+          "console.log",
+          "console.warn",
+          "console.info",
+          "console.debug",
+        ],
         passes: 2,
         dead_code: true,
         unused: true,
+        // Prevent Terser from reordering declarations in ways that
+        // interact badly with Rollup chunk ordering
+        sequences: false,
       },
       mangle: { safari10: true },
       format: { comments: false },
     },
-    commonjsOptions: { transformMixedEsModules: true },
+    commonjsOptions: {
+      transformMixedEsModules: true,
+      // Ensure CommonJS modules inside Firebase are handled correctly
+      include: [/node_modules/],
+    },
     cssCodeSplit: true,
     assetsInlineLimit: 4096,
   },
-  base: "/",
+  // Ensure Vite pre-bundles firebase properly in dev
   optimizeDeps: {
     include: [
       "react",
@@ -161,15 +171,16 @@ export default defineConfig(({ mode }) => ({
       "class-variance-authority",
       "tailwind-merge",
       "next-themes",
+      "@tanstack/react-query",
     ],
     exclude: ["@firebase/app-check"],
-    force: false,
   },
+  base: "/",
   esbuild: {
     legalComments: "none",
+    target: "es2020",
   },
   css: {
-    modules: { localsConvention: "camelCaseOnly" },
     devSourcemap: mode !== "production",
   },
 }));
