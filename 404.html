@@ -1,122 +1,35 @@
 <!DOCTYPE html>
-<html lang="en" itemscope itemtype="https://schema.org/Person">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mounir Abderrahmani</title>
+  <!--
+    GitHub Pages SPA redirect — single-page app routing fix.
+    When GitHub Pages returns 404 for /admin, /projects, etc.,
+    this page captures the path and redirects to / with the path
+    stored in sessionStorage so the React Router can restore it.
 
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-96R4Z44Y80"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-96R4Z44Y80');
-    </script>
-
-    <!-- Primary Meta Tags -->
-    <title>Mounir Abderrahmani | Senior Full-Stack Developer & Software Engineer</title>
-    <meta name="title" content="Mounir Abderrahmani | Senior Full-Stack Developer & Software Engineer">
-    <meta name="description" content="Senior Full-Stack Developer with 10+ years of experience in React, Node.js, TypeScript, and Cloud Technologies. Specializing in enterprise solutions, Magento e-commerce, and modern web applications.">
-    <meta name="author" content="Mounir Abderrahmani">
-    <meta name="keywords" content="Mounir Abderrahmani, Senior Full Stack Developer, React Expert, Node.js Developer, TypeScript Developer, Magento Developer, Firebase Expert, ERP Integration, Web Developer Algeria">
-
-    <!-- SEO -->
-    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
-    <meta name="language" content="English">
-    <meta name="revisit-after" content="7 days">
-
-    <!-- Canonical -->
-    <link rel="canonical" href="https://mounir1.github.io/">
-
-    <!-- Open Graph -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://mounir1.github.io/">
-    <meta property="og:title" content="Mounir Abderrahmani | Senior Full-Stack Developer">
-    <meta property="og:description" content="Senior Full-Stack Developer with 10+ years of experience. Expertise in React, Node.js, TypeScript, Magento, and enterprise solutions.">
-    <meta property="og:image" content="https://mounir1.github.io/profile.webp">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta property="og:site_name" content="Mounir Abderrahmani Portfolio">
-    <meta property="og:locale" content="en_US">
-
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://mounir1.github.io/">
-    <meta property="twitter:title" content="Mounir Abderrahmani | Senior Full-Stack Developer">
-    <meta property="twitter:description" content="Senior Full-Stack Developer specializing in modern web technologies and enterprise solutions. 10+ years experience.">
-    <meta property="twitter:image" content="https://mounir1.github.io/profile.webp">
-    <meta name="twitter:creator" content="@mounir1badi">
-    <meta name="twitter:site" content="@mounir1badi">
-
-    <!-- Schema.org Structured Data -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Person",
-      "@id": "https://mounir1.github.io/#person",
-      "name": "Mounir Abderrahmani",
-      "alternateName": ["mounir1", "mounir webdev"],
-      "jobTitle": "Senior Full-Stack Developer & Software Engineer",
-      "description": "Senior Full-Stack Developer with 10+ years of experience in React, Node.js, TypeScript, and Cloud Technologies.",
-      "url": "https://mounir1.github.io",
-      "image": "https://mounir1.github.io/profile.webp",
-      "email": "mounir.webdev@gmail.com",
-      "address": {
-        "@type": "PostalAddress",
-        "addressLocality": "Algiers",
-        "addressCountry": "Algeria"
-      },
-      "sameAs": [
-        "https://linkedin.com/in/mounir1badi",
-        "https://github.com/mounir1",
-        "https://twitter.com/mounir1badi"
-      ]
+    Technique: https://github.com/rafgraph/spa-github-pages
+  -->
+  <script>
+    // Encode the full path + query + hash into sessionStorage, then
+    // redirect to the root so index.html (and React Router) loads.
+    var l = window.location;
+    // Only redirect if we're NOT already at the root
+    if (l.pathname !== '/') {
+      sessionStorage.setItem(
+        'spa_redirect',
+        JSON.stringify({
+          path: l.pathname,
+          query: l.search,
+          hash: l.hash,
+        })
+      );
+      l.replace(l.protocol + '//' + l.host + '/');
     }
-    </script>
-
-    <!-- Mobile -->
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Mounir Abderrahmani">
-    <meta name="theme-color" content="#0ea5e9">
-
-    <!-- Preconnect -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://www.googletagmanager.com">
-    <link rel="dns-prefetch" href="https://firebase.googleapis.com">
-
-    <!-- Favicons -->
-    <link rel="icon" type="image/svg+xml" href="/mounir-icon.svg">
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="apple-touch-icon" href="/mounir-icon.svg">
-    <link rel="manifest" href="/site.webmanifest">
-
-    <!-- hreflang -->
-    <link rel="alternate" hreflang="en" href="https://mounir1.github.io/">
-    <link rel="alternate" hreflang="x-default" href="https://mounir1.github.io/">
-
-    <!-- Social -->
-    <link rel="me" href="https://github.com/mounir1">
-    <link rel="me" href="https://linkedin.com/in/mounir1badi">
-    <script type="module" crossorigin src="/assets/js/index-vwC2w24e.js"></script>
-    <link rel="modulepreload" crossorigin href="/assets/js/react-vendor-BmCUiXzP.js">
-    <link rel="modulepreload" crossorigin href="/assets/js/misc-vendor-QwiooBm6.js">
-    <link rel="modulepreload" crossorigin href="/assets/js/radix-vendor-WRuR99NX.js">
-    <link rel="modulepreload" crossorigin href="/assets/js/utils-vendor-iXzCrkLu.js">
-    <link rel="modulepreload" crossorigin href="/assets/js/icons-vendor-B8DRUVYK.js">
-    <link rel="modulepreload" crossorigin href="/assets/js/theming-vendor-ihGQH3C5.js">
-    <link rel="modulepreload" crossorigin href="/assets/js/notifications-vendor-DxdMjCBN.js">
-    <link rel="modulepreload" crossorigin href="/assets/js/query-vendor-CyBViqjl.js">
-    <link rel="modulepreload" crossorigin href="/assets/js/router-vendor-Czqw9aUf.js">
-    <link rel="modulepreload" crossorigin href="/assets/js/firebase-vendor-3unqi7cg.js">
-    <link rel="stylesheet" crossorigin href="/assets/css/index-Dr0NBEIW.css">
-  </head>
-
-  <body>
-    <div id="root"></div>
-    <!-- Vite injects the correct hashed asset paths at build time -->
-  </body>
+  </script>
+</head>
+<body>
+  <!-- Redirecting… -->
+</body>
 </html>
