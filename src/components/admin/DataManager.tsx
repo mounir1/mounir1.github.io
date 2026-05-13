@@ -24,17 +24,19 @@ import {
   seedProjects,
   seedExperience,
   seedSkills,
+  seedTestimonials,
   seedUpcoming,
   seedLinks,
   COLLECTIONS,
   type UploadProgress,
   type UploadResult,
 } from "@/utils/database-uploader";
-import { initialProjects }   from "@/data/initial-projects";
-import { initialExperience } from "@/data/initial-experience";
-import { initialSkills }     from "@/data/initial-skills";
-import { DEFAULT_UPCOMING }  from "@/hooks/useUpcoming";
-import { DEFAULT_LINKS }     from "@/hooks/useLinks";
+import { initialProjects }      from "@/data/initial-projects";
+import { initialExperience }    from "@/data/initial-experience";
+import { initialSkills }        from "@/data/initial-skills";
+import { initialTestimonials }  from "@/data/initial-testimonials";
+import { DEFAULT_UPCOMING }     from "@/hooks/useUpcoming";
+import { DEFAULT_LINKS }        from "@/hooks/useLinks";
 import { isFirebaseEnabled, db } from "@/lib/firebase";
 
 // ─── Collection metadata ──────────────────────────────────────────────────────
@@ -49,17 +51,19 @@ interface ColMeta {
 }
 
 const COLS: ColMeta[] = [
-  { key: "projects",    label: "Projects",    collectionName: COLLECTIONS.projects,    seedCount: initialProjects.length,   color: "blue",   seedFn: seedProjects   },
-  { key: "experiences", label: "Experience",  collectionName: COLLECTIONS.experiences, seedCount: initialExperience.length, color: "green",  seedFn: seedExperience },
-  { key: "skills",      label: "Skills",      collectionName: COLLECTIONS.skills,      seedCount: initialSkills.length,     color: "purple", seedFn: seedSkills     },
-  { key: "upcoming",    label: "Upcoming",    collectionName: COLLECTIONS.upcoming,    seedCount: DEFAULT_UPCOMING.length,  color: "orange", seedFn: seedUpcoming   },
-  { key: "links",       label: "Links",       collectionName: COLLECTIONS.links,       seedCount: DEFAULT_LINKS.length,     color: "cyan",   seedFn: seedLinks      },
+  { key: "projects",     label: "Projects",      collectionName: COLLECTIONS.projects,     seedCount: initialProjects.length,     color: "blue",   seedFn: seedProjects     },
+  { key: "experiences", label: "Experience",    collectionName: COLLECTIONS.experiences,  seedCount: initialExperience.length,   color: "green",  seedFn: seedExperience   },
+  { key: "skills",      label: "Skills",        collectionName: COLLECTIONS.skills,       seedCount: initialSkills.length,       color: "purple", seedFn: seedSkills       },
+  { key: "testimonials",label: "Testimonials",  collectionName: COLLECTIONS.testimonials, seedCount: initialTestimonials.length, color: "yellow", seedFn: seedTestimonials },
+  { key: "upcoming",    label: "Upcoming",      collectionName: COLLECTIONS.upcoming,     seedCount: DEFAULT_UPCOMING.length,    color: "orange", seedFn: seedUpcoming     },
+  { key: "links",       label: "Links",         collectionName: COLLECTIONS.links,        seedCount: DEFAULT_LINKS.length,       color: "cyan",   seedFn: seedLinks        },
 ];
 
 const COLOR_MAP: Record<string, string> = {
   blue:   "bg-blue-50 dark:bg-blue-950/20 text-blue-700 dark:text-blue-400",
   green:  "bg-green-50 dark:bg-green-950/20 text-green-700 dark:text-green-400",
   purple: "bg-purple-50 dark:bg-purple-950/20 text-purple-700 dark:text-purple-400",
+  yellow: "bg-yellow-50 dark:bg-yellow-950/20 text-yellow-700 dark:text-yellow-400",
   orange: "bg-orange-50 dark:bg-orange-950/20 text-orange-700 dark:text-orange-400",
   cyan:   "bg-cyan-50 dark:bg-cyan-950/20 text-cyan-700 dark:text-cyan-400",
 };
@@ -190,7 +194,7 @@ export function DataManager() {
         <CardContent className="space-y-6">
 
           {/* Collection count grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
             {COLS.map(col => {
               const live = counts[col.collectionName] ?? "…";
               const full = typeof live === "number" && live >= col.seedCount;
@@ -411,6 +415,7 @@ export function DataManager() {
             <div><span className="text-green-500">seedSkills()</span>           <span className="text-muted-foreground">// skills only</span></div>
             <div><span className="text-green-500">seedExperience()</span>       <span className="text-muted-foreground">// experience only</span></div>
             <div><span className="text-green-500">seedUpcoming()</span>         <span className="text-muted-foreground">// upcoming projects only</span></div>
+            <div><span className="text-green-500">seedTestimonials()</span>    <span className="text-muted-foreground">// testimonials only</span></div>
             <div><span className="text-green-500">seedLinks()</span>            <span className="text-muted-foreground">// links only</span></div>
           </div>
         </CardContent>

@@ -4,9 +4,11 @@ import { Badge } from "@/components/ui/badge";
 import {
   BarChart3, Plus, Database, Upload, Link, Clock,
   ExternalLink, TrendingUp, Settings, Star, Eye, Mail,
+  MessageSquare,
 } from "lucide-react";
 import { useProjects } from "@/hooks/useProjects";
 import { useContactMessages } from "@/hooks/useContactMessages";
+import { useTestimonials } from "@/hooks/useTestimonials";
 import { useMemo } from "react";
 
 interface OverviewTabProps {
@@ -14,55 +16,101 @@ interface OverviewTabProps {
 }
 
 export function OverviewTab({ onNavigate }: OverviewTabProps) {
-  const { projects } = useProjects();
-  const { messages, unreadCount } = useContactMessages();
+  const { projects }                     = useProjects();
+  const { messages, unreadCount }        = useContactMessages();
+  const { testimonials, featured: featuredTestimonials } = useTestimonials(true);
 
   const stats = useMemo(() => ({
-    total: projects.length,
-    featured: projects.filter((p) => p.featured).length,
-    active: projects.filter((p) => !p.disabled).length,
-    categories: [...new Set(projects.map((p) => p.category))].length,
-  }), [projects]);
+    total:         projects.length,
+    featured:      projects.filter((p) => p.featured).length,
+    active:        projects.filter((p) => !p.disabled).length,
+    categories:    [...new Set(projects.map((p) => p.category))].length,
+    testimonials:  testimonials.length,
+    featuredTests: featuredTestimonials.length,
+  }), [projects, testimonials, featuredTestimonials]);
 
   const statCards = [
-    { label: "Total Projects", value: stats.total, icon: Database, color: "bg-primary/10 text-primary" },
-    { label: "Featured", value: stats.featured, icon: Star, color: "bg-yellow-500/10 text-yellow-500" },
-    { label: "Active", value: stats.active, icon: Eye, color: "bg-green-500/10 text-green-500" },
-    { label: "Categories", value: stats.categories, icon: BarChart3, color: "bg-blue-500/10 text-blue-500" },
-    { label: "Messages", value: messages.length, icon: Mail, color: "bg-purple-500/10 text-purple-500", badge: unreadCount > 0 ? unreadCount : undefined },
+    {
+      label: "Total Projects",
+      value: stats.total,
+      icon: Database,
+      color: "bg-primary/10 text-primary",
+    },
+    {
+      label: "Featured",
+      value: stats.featured,
+      icon: Star,
+      color: "bg-yellow-500/10 text-yellow-500",
+    },
+    {
+      label: "Active",
+      value: stats.active,
+      icon: Eye,
+      color: "bg-green-500/10 text-green-500",
+    },
+    {
+      label: "Categories",
+      value: stats.categories,
+      icon: BarChart3,
+      color: "bg-blue-500/10 text-blue-500",
+    },
+    {
+      label: "Testimonials",
+      value: stats.testimonials,
+      sub: `${stats.featuredTests} featured`,
+      icon: MessageSquare,
+      color: "bg-purple-500/10 text-purple-500",
+    },
+    {
+      label: "Messages",
+      value: messages.length,
+      icon: Mail,
+      color: "bg-rose-500/10 text-rose-500",
+      badge: unreadCount > 0 ? unreadCount : undefined,
+    },
   ];
 
   const quickActions = [
-    { label: "Upload Portfolio Data", icon: Upload, tab: "upload" },
-    { label: "Add New Project", icon: Plus, tab: "add-project" },
-    { label: "Manage Projects", icon: Database, tab: "projects" },
-    { label: "Manage Experience", icon: TrendingUp, tab: "experience" },
-    { label: "Manage Skills", icon: BarChart3, tab: "skills" },
-    { label: "Manage Links", icon: Link, tab: "links" },
-    { label: "Upcoming Projects", icon: Clock, tab: "upcoming" },
-    { label: "Site Settings", icon: Settings, tab: "settings" },
-    ...(unreadCount > 0 ? [{ label: `Messages (${unreadCount} unread)`, icon: Mail, tab: "messages" }] : []),
+    { label: "Upload Portfolio Data", icon: Upload,      tab: "upload"       },
+    { label: "Add New Project",        icon: Plus,        tab: "add-project"  },
+    { label: "Manage Projects",        icon: Database,    tab: "projects"     },
+    { label: "Manage Experience",      icon: TrendingUp,  tab: "experience"   },
+    { label: "Manage Skills",          icon: BarChart3,   tab: "skills"       },
+    { label: "Testimonials",           icon: MessageSquare,tab: "testimonials"},
+    { label: "Manage Links",           icon: Link,        tab: "links"        },
+    { label: "Upcoming Projects",      icon: Clock,       tab: "upcoming"     },
+    { label: "Site Settings",          icon: Settings,    tab: "settings"     },
+    ...(unreadCount > 0
+      ? [{ label: `Messages (${unreadCount} unread)`, icon: Mail, tab: "messages" }]
+      : []
+    ),
   ];
 
   return (
     <div className="space-y-6">
-      {/* Stat Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        {statCards.map(({ label, value, icon: Icon, color, badge }) => (
+
+      {/* ── Stat Cards ── */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4">
+        {statCards.map(({ label, value, sub, icon: Icon, color, badge }) => (
           <Card key={label} className="border-0 shadow-medium">
             <CardContent className="p-5">
               <div className="flex items-center gap-3">
-                <div className={`p-2.5 rounded-xl ${color}`}>
+                <div className={`p-2.5 rounded-xl shrink-0 ${color}`}>
                   <Icon className="h-5 w-5" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <div className="flex items-center gap-1.5">
                     <div className="text-2xl font-bold">{value}</div>
                     {badge !== undefined && (
-                      <Badge className="bg-red-500 text-white text-[10px] h-4 px-1.5">{badge}</Badge>
+                      <Badge className="bg-red-500 text-white text-[10px] h-4 px-1.5">
+                        {badge}
+                      </Badge>
                     )}
                   </div>
-                  <div className="text-xs text-muted-foreground">{label}</div>
+                  <div className="text-xs text-muted-foreground truncate">{label}</div>
+                  {sub && (
+                    <div className="text-[10px] text-muted-foreground/70 truncate">{sub}</div>
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -71,7 +119,8 @@ export function OverviewTab({ onNavigate }: OverviewTabProps) {
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
-        {/* Recent Projects */}
+
+        {/* ── Recent Projects ── */}
         <Card className="border-0 shadow-medium">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
@@ -91,7 +140,10 @@ export function OverviewTab({ onNavigate }: OverviewTabProps) {
                     <div className="font-medium text-sm truncate">{project.title}</div>
                     <div className="text-xs text-muted-foreground">{project.category}</div>
                   </div>
-                  <Badge variant={project.featured ? "default" : "outline"} className="text-xs shrink-0">
+                  <Badge
+                    variant={project.featured ? "default" : "outline"}
+                    className="text-xs shrink-0"
+                  >
                     {project.featured ? "Featured" : "Standard"}
                   </Badge>
                 </div>
@@ -105,7 +157,7 @@ export function OverviewTab({ onNavigate }: OverviewTabProps) {
           </CardContent>
         </Card>
 
-        {/* Quick Actions */}
+        {/* ── Quick Actions ── */}
         <Card className="border-0 shadow-medium">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">

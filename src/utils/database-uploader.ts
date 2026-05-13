@@ -281,6 +281,10 @@ export async function seedSkills(clearFirst = false) {
   const u = new DatabaseUploader();
   return u.uploadCollection(COLLECTIONS.skills, initialSkills as any, { clearFirst, skipDuplicates: !clearFirst });
 }
+export async function seedTestimonials(clearFirst = false) {
+  const u = new DatabaseUploader();
+  return u.uploadCollection(COLLECTIONS.testimonials, initialTestimonials as any, { clearFirst, skipDuplicates: !clearFirst });
+}
 export async function seedUpcoming(clearFirst = false) {
   const u = new DatabaseUploader();
   return u.uploadCollection(COLLECTIONS.upcoming, DEFAULT_UPCOMING as any, { clearFirst, skipDuplicates: !clearFirst });
@@ -292,13 +296,14 @@ export async function seedLinks(clearFirst = false) {
 
 // Expose to browser console
 if (typeof window !== 'undefined') {
-  (window as any).seedPortfolio    = seedPortfolio;
-  (window as any).clearAndSeed     = clearAndSeed;
-  (window as any).seedProjects     = seedProjects;
-  (window as any).seedExperience   = seedExperience;
-  (window as any).seedSkills       = seedSkills;
-  (window as any).seedUpcoming     = seedUpcoming;
-  (window as any).seedLinks        = seedLinks;
+  (window as any).seedPortfolio      = seedPortfolio;
+  (window as any).clearAndSeed       = clearAndSeed;
+  (window as any).seedProjects       = seedProjects;
+  (window as any).seedExperience     = seedExperience;
+  (window as any).seedSkills         = seedSkills;
+  (window as any).seedTestimonials   = seedTestimonials;
+  (window as any).seedUpcoming       = seedUpcoming;
+  (window as any).seedLinks          = seedLinks;
   // Legacy aliases
   (window as any).uploadAllPortfolioData = seedPortfolio;
   (window as any).clearAndUploadAll      = clearAndSeed;

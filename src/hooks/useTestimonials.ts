@@ -4,6 +4,7 @@ import {
   collection, onSnapshot, addDoc, deleteDoc,
   updateDoc, doc, orderBy, query, where,
 } from "firebase/firestore";
+import { initialTestimonials } from "@/data/initial-testimonials";
 
 export interface Testimonial {
   id: string;
@@ -66,7 +67,18 @@ export function useTestimonials(adminMode = false) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Fallback to local data when Firebase is unavailable (same pattern as useProjects)
     if (!isFirebaseEnabled || !db) {
+      const localTestimonials: Testimonial[] = initialTestimonials.map((t, i) => ({
+        id: `local-testimonial-${i}`,
+        ...t,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      }));
+      // In public mode, only show non-disabled featured items
+      setTestimonials(
+        adminMode ? localTestimonials : localTestimonials.filter(t => !t.disabled)
+      );
       setLoading(false);
       return;
     }

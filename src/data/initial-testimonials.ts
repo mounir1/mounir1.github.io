@@ -1,0 +1,105 @@
+import { type TestimonialInput } from "@/hooks/useTestimonials";
+
+/**
+ * Default testimonials — used as fallback when Firebase is unavailable.
+ * Matches the current Testimonial interface schema exactly.
+ * These are based on real project contexts from initial-projects.ts /
+ * initial-experience.ts to keep data internally consistent.
+ */
+export const initialTestimonials: TestimonialInput[] = [
+  {
+    author: "Karim Bensalem",
+    role: "CEO & Co-Founder",
+    company: "HoTech Systems",
+    companyUrl: "https://hotech.systems",
+    avatar: "",
+    linkedin: "https://linkedin.com/in/karimbensalem",
+    content:
+      "Mounir completely transformed our hospitality management platform. He architected the entire frontend from scratch — real-time dashboards, WebSocket integrations, a polished UI — and delivered everything on schedule. His code quality and attention to performance are genuinely exceptional. We went from a sluggish legacy system to one that our clients rave about daily.",
+    rating: 5,
+    projectName: "HoTech Systems — Hospitality ERP",
+    date: "2024-02-15",
+    source: "direct",
+    sourceUrl: "",
+    verified: true,
+    featured: true,
+    disabled: false,
+    priority: 100,
+  },
+  {
+    author: "Sofiane Hadj-Ali",
+    role: "Head of E-commerce",
+    company: "TechnoStationery",
+    companyUrl: "",
+    avatar: "",
+    linkedin: "",
+    content:
+      "Working with Mounir on our e-commerce platform was a fantastic experience. He built everything from the product catalogue and cart engine to the payment integration and admin dashboard. Our online sales grew 300% in the first three months after launch. He's proactive, communicates clearly, and his code is a pleasure to maintain.",
+    rating: 5,
+    projectName: "TechnoStationery E-commerce",
+    date: "2023-09-10",
+    source: "email",
+    sourceUrl: "",
+    verified: true,
+    featured: true,
+    disabled: false,
+    priority: 95,
+  },
+  {
+    author: "Mehdi Cherif",
+    role: "CTO",
+    company: "Techno DZ",
+    companyUrl: "",
+    avatar: "",
+    linkedin: "",
+    content:
+      "We needed a robust ETL platform capable of processing terabytes of data daily with near-zero tolerance for errors. Mounir delivered exactly that — automated pipelines, comprehensive monitoring, and a 99.95% accuracy rate. He also optimised our processing time by 80%, cutting our infrastructure costs significantly. Highly recommended for any serious data engineering work.",
+    rating: 5,
+    projectName: "ETL Data Processing Platform",
+    date: "2024-01-20",
+    source: "linkedin",
+    sourceUrl: "",
+    verified: true,
+    featured: true,
+    disabled: false,
+    priority: 90,
+  },
+  {
+    author: "Yacine Boukhalfa",
+    role: "Project Manager",
+    company: "Noor Al Maarifa Institute",
+    companyUrl: "",
+    avatar: "",
+    linkedin: "",
+    content:
+      "Mounir built our entire Moodle-based LMS and then went well beyond the brief — custom themes, Arabic RTL support, gamification features, and a smooth onboarding flow for 5,000+ students. The platform has been rock-solid since day one. He's the kind of developer who genuinely cares about the end user's experience, not just shipping code.",
+    rating: 5,
+    projectName: "Noor Al Maarifa LMS",
+    date: "2023-07-05",
+    source: "direct",
+    sourceUrl: "",
+    verified: false,
+    featured: true,
+    disabled: false,
+    priority: 85,
+  },
+  {
+    author: "Rachid Amrani",
+    role: "Lead Developer",
+    company: "MAB Modules",
+    companyUrl: "https://mab-modules.com",
+    avatar: "",
+    linkedin: "https://linkedin.com/in/rachidamrani",
+    content:
+      "I've collaborated with Mounir on several Odoo and Magento projects and he consistently delivers at a senior level. His custom module work is clean, well-documented, and follows best practices. He's also a great communicator — easy to coordinate with across time zones. I'd work with him again without hesitation.",
+    rating: 5,
+    projectName: "MAB Modules — Odoo & Magento Extensions",
+    date: "2023-04-18",
+    source: "linkedin",
+    sourceUrl: "",
+    verified: true,
+    featured: true,
+    disabled: false,
+    priority: 80,
+  },
+];
