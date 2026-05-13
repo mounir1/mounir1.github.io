@@ -10,11 +10,9 @@ import {
 // – firebase/auth    → loaded only when Admin page mounts
 // – firebase/storage → loaded only when image-upload is triggered
 // – firebase/analytics → loaded only in production after page is interactive
-// (no static re-exports of firebase/auth|storage|analytics — even type-only
-//  re-exports can cause Rollup to trace those modules into the entry chunk)
 
-// ─── Production Firebase configuration (from env vars only) ──────────────────
-const productionConfig = {
+// ─── Firebase configuration (from Vite env vars, baked in at build time) ─────
+const firebaseConfig = {
   apiKey:            import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain:        import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
   projectId:         import.meta.env.VITE_FIREBASE_PROJECT_ID,
@@ -24,35 +22,41 @@ const productionConfig = {
   measurementId:     import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
-// ─── Validate config ──────────────────────────────────────────────────────────
-const hasRequiredConfig = Boolean(
-  productionConfig.apiKey &&
-  productionConfig.authDomain &&
-  productionConfig.projectId &&
-  !productionConfig.apiKey.startsWith('demo') &&
-  !productionConfig.apiKey.startsWith('mock') &&
-  productionConfig.apiKey !== 'undefined'
+// ─── Validate: all three required keys must be non-empty, non-placeholder ─────
+const PLACEHOLDER = ['', 'undefined', 'null', 'demo', 'mock', 'test', 'placeholder'];
+function isRealValue(v: string | undefined): boolean {
+  if (!v) return false;
+  const lower = v.toLowerCase().trim();
+  return !PLACEHOLDER.some(p => lower === p || lower.startsWith(p + '-'));
+}
+
+export const hasRequiredConfig: boolean = (
+  isRealValue(firebaseConfig.apiKey) &&
+  isRealValue(firebaseConfig.authDomain) &&
+  isRealValue(firebaseConfig.projectId)
 );
 
 // ─── isFirebaseEnabled ────────────────────────────────────────────────────────
-// - Production: always attempt (will surface real errors if misconfigured)
-// - Development: only enable when real env vars are present OR emulator flag set
+// Enabled ONLY when the three required config values are genuinely present.
+// In development: also enabled when VITE_FIREBASE_ENABLE_DEV=true and real keys exist.
+// This is the single source of truth — no "PROD always true" bypass.
 export const isFirebaseEnabled: boolean = (() => {
-  if (import.meta.env.PROD) return true;
-  if (import.meta.env.VITE_FIREBASE_ENABLE_DEV === 'true') return true;
-  return hasRequiredConfig;
+  if (!hasRequiredConfig) return false;                           // always gate on real keys
+  if (import.meta.env.PROD) return true;                         // production: enable
+  if (import.meta.env.VITE_FIREBASE_ENABLE_DEV === 'true') return true; // dev opt-in
+  return false;                                                   // dev default: local data
 })();
 
 // ─── Core Firebase instances (synchronous — needed on every page load) ────────
 let app: FirebaseApp | undefined;
 let db:  Firestore   | undefined;
 
-if (isFirebaseEnabled && hasRequiredConfig) {
+if (hasRequiredConfig) {
   try {
-    app = getApps().length ? getApps()[0] : initializeApp(productionConfig);
+    app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
     db  = getFirestore(app);
 
-    // Firestore emulator: dev only, when explicitly enabled
+    // Firestore emulator: dev only, when explicitly requested
     if (
       import.meta.env.DEV &&
       typeof window !== 'undefined' &&
@@ -65,22 +69,26 @@ if (isFirebaseEnabled && hasRequiredConfig) {
       }
     }
   } catch (error) {
-    console.error('❌ Firebase initialisation failed:', error);
+    // Surface config errors clearly in production
+    if (import.meta.env.PROD) {
+      console.error('❌ Firebase init failed — check VITE_FIREBASE_* env vars:', error);
+    }
     app = db = undefined;
   }
-} else if (isFirebaseEnabled && !hasRequiredConfig) {
-  console.warn(
-    '⚠️  Firebase is enabled but environment variables are missing or contain placeholder values.\n' +
-    '   Copy .env.example → .env.development and fill in your Firebase project credentials.\n' +
-    '   Required vars: VITE_FIREBASE_API_KEY, VITE_FIREBASE_AUTH_DOMAIN, VITE_FIREBASE_PROJECT_ID'
+} else if (import.meta.env.PROD) {
+  // In production with bad/missing keys, log a clear actionable error
+  console.error(
+    '❌ Firebase not initialised — missing or invalid environment variables.\n' +
+    `   VITE_FIREBASE_API_KEY     = "${firebaseConfig.apiKey ?? '(empty)'}"\n` +
+    `   VITE_FIREBASE_AUTH_DOMAIN = "${firebaseConfig.authDomain ?? '(empty)'}"\n` +
+    `   VITE_FIREBASE_PROJECT_ID  = "${firebaseConfig.projectId ?? '(empty)'}"\n` +
+    '   Fix: ensure these are set in .env.production before building.'
   );
 }
 
 export { app, db };
 
 // ─── Lazy auth loader ─────────────────────────────────────────────────────────
-// Call this inside the Admin page / auth hook — not at module load time.
-// Returns { auth, GithubAuthProvider } after dynamic import resolves.
 export async function getFirebaseAuth() {
   if (!app) return { auth: undefined, GithubAuthProvider: undefined };
   const {
@@ -101,7 +109,6 @@ export async function getFirebaseAuth() {
 }
 
 // ─── Lazy storage loader ──────────────────────────────────────────────────────
-// Call this in image-upload.ts — not at module load time.
 export async function getFirebaseStorage() {
   if (!app) return undefined;
   const { getStorage } = await import('firebase/storage');
@@ -109,10 +116,9 @@ export async function getFirebaseStorage() {
 }
 
 // ─── Lazy analytics loader ────────────────────────────────────────────────────
-// Called once after the page is interactive, production only.
 export async function initFirebaseAnalytics() {
   if (!app || !import.meta.env.PROD || typeof window === 'undefined') return;
-  if (!productionConfig.measurementId) return;
+  if (!firebaseConfig.measurementId) return;
   try {
     const { getAnalytics } = await import('firebase/analytics');
     getAnalytics(app);
