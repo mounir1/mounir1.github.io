@@ -104,6 +104,21 @@
   </head>
 
   <body>
+    <!-- GitHub Pages SPA routing: restore path after 404.html redirect -->
+    <script>
+      (function () {
+        var r = sessionStorage.getItem('spa_redirect');
+        if (r) {
+          sessionStorage.removeItem('spa_redirect');
+          try {
+            var d = JSON.parse(r);
+            if (d.path && d.path !== '/') {
+              window.history.replaceState(null, '', d.path + (d.query || '') + (d.hash || ''));
+            }
+          } catch (e) {}
+        }
+      })();
+    </script>
     <div id="root"></div>
     <!-- Vite injects the correct hashed asset paths at build time -->
     <script type="module" src="/src/main.tsx"></script>

@@ -44,6 +44,11 @@ bun.lockb
 # Misc junk
 deploy.ps1
 image.jpeg
+public/image.jpeg
+public/node-v24.6.0-x64.msi
+public/*.msi
+public/*.exe
+public/*.dmg
 
 # Firebase
 .firebase/

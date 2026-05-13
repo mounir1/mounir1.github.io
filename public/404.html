@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mounir Abderrahmani</title>
+  <!--
+    GitHub Pages SPA redirect — single-page app routing fix.
+    When GitHub Pages returns 404 for /admin, /projects, etc.,
+    this page captures the path and redirects to / with the path
+    stored in sessionStorage so the React Router can restore it.
+
+    Technique: https://github.com/rafgraph/spa-github-pages
+  -->
+  <script>
+    // Encode the full path + query + hash into sessionStorage, then
+    // redirect to the root so index.html (and React Router) loads.
+    var l = window.location;
+    // Only redirect if we're NOT already at the root
+    if (l.pathname !== '/') {
+      sessionStorage.setItem(
+        'spa_redirect',
+        JSON.stringify({
+          path: l.pathname,
+          query: l.search,
+          hash: l.hash,
+        })
+      );
+      l.replace(l.protocol + '//' + l.host + '/');
+    }
+  </script>
+</head>
+<body>
+  <!-- Redirecting… -->
+</body>
+</html>
