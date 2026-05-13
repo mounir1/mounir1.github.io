@@ -35,6 +35,16 @@ dist-ssr
 *.exe
 *.dmg
 
+# Root-level compiled assets (built by Vite into dist/)
+/assets/
+
+# Lockfiles from other package managers
+bun.lockb
+
+# Misc junk
+deploy.ps1
+image.jpeg
+
 # Firebase
 .firebase/
 .firebaserc.local
