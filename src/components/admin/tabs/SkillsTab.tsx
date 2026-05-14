@@ -17,7 +17,17 @@ import { db, isFirebaseEnabled } from "@/lib/firebase";
 import { addDoc, collection, updateDoc, deleteDoc, doc } from "firebase/firestore";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { SKILL_ICONS, getSkillColor } from "@/lib/skill-icons";
-import { Plus, Edit, Trash2, Eye, EyeOff, Star, Zap, Palette, Search } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, EyeOff, Star, Zap, Palette, Search, Download } from "lucide-react";
+
+function downloadJSON(data: any, filename: string) {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 const SKILL_CATEGORIES: SkillCategory[] = [
   "Frontend Development", "Backend Development", "Database",
@@ -41,7 +51,7 @@ const DEFAULT_SKILL: SkillInput = {
 };
 
 export function SkillsTab() {
-  const { skills, skillsByCategory, loading } = useSkills();
+  const { skills, skillsByCategory, loading } = useSkills(true);
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState<SkillInput>(DEFAULT_SKILL);
@@ -123,9 +133,14 @@ export function SkillsTab() {
             {skills.length} skills across {Object.keys(skillsByCategory).length} categories
           </p>
         </div>
-        <Button onClick={openAdd} className="shadow-glow">
-          <Plus className="h-4 w-4 mr-2" />Add Skill
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => { const ts = new Date().toISOString().slice(0,10); downloadJSON(skills, `skills-${ts}.json`); }} disabled={skills.length === 0}>
+            <Download className="h-4 w-4 mr-2" />Export JSON
+          </Button>
+          <Button onClick={openAdd} className="shadow-glow">
+            <Plus className="h-4 w-4 mr-2" />Add Skill
+          </Button>
+        </div>
       </div>
 
       {/* Category Filter pills */}

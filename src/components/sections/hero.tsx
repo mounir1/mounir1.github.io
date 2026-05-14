@@ -84,10 +84,7 @@ export const Hero = () => {
 
   const typingWords = [
     personalInfo.title,
-    "Full-Stack Developer",
-    "Magento Expert",
-    "ERP Integrator",
-    "AI Solutions Builder",
+    ...(personalInfo.typingWords ?? ["Full-Stack Developer", "Magento Expert", "ERP Integrator", "AI Solutions Builder"]),
   ].filter(Boolean) as string[];
 
   const typed = useTyping(typingWords, 75, 40, 2000);
@@ -353,32 +350,36 @@ export const Hero = () => {
               </div>
 
               {/* Floating card: Currently Building */}
-              <div
-                className="absolute -bottom-4 -left-4 z-20 hidden md:flex items-center gap-3 px-4 py-3 rounded-2xl bg-card/90 backdrop-blur-md border border-border/60 shadow-large"
-                style={{ animation: "badge-bounce 3s ease-in-out infinite" }}
-              >
-                <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-lg shrink-0">
-                  💻
+              {personalInfo.currentlyBuilding && (
+                <div
+                  className="absolute -bottom-4 -left-4 z-20 hidden md:flex items-center gap-3 px-4 py-3 rounded-2xl bg-card/90 backdrop-blur-md border border-border/60 shadow-large"
+                  style={{ animation: "badge-bounce 3s ease-in-out infinite" }}
+                >
+                  <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center text-lg shrink-0">
+                    💻
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-foreground leading-tight">Currently Building</p>
+                    <p className="text-xs text-muted-foreground">{personalInfo.currentlyBuilding}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-xs font-semibold text-foreground leading-tight">Currently Building</p>
-                  <p className="text-xs text-muted-foreground">AI Ops Dashboard</p>
-                </div>
-              </div>
+              )}
 
               {/* Floating card: Open Source */}
-              <div
-                className="absolute -top-4 -right-4 z-20 hidden md:flex items-center gap-2 px-3 py-2 rounded-xl bg-card/90 backdrop-blur-md border border-border/60 shadow-medium"
-                style={{ animation: "badge-bounce 3.6s ease-in-out 0.8s infinite" }}
-              >
-                <div className="w-7 h-7 rounded-lg bg-green-500/10 flex items-center justify-center text-sm shrink-0">
-                  🌍
+              {personalInfo.openSourceModules && (
+                <div
+                  className="absolute -top-4 -right-4 z-20 hidden md:flex items-center gap-2 px-3 py-2 rounded-xl bg-card/90 backdrop-blur-md border border-border/60 shadow-medium"
+                  style={{ animation: "badge-bounce 3.6s ease-in-out 0.8s infinite" }}
+                >
+                  <div className="w-7 h-7 rounded-lg bg-green-500/10 flex items-center justify-center text-sm shrink-0">
+                    🌍
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-foreground leading-tight">Open Source</p>
+                    <p className="text-xs text-muted-foreground">{personalInfo.openSourceModules} Modules</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-xs font-semibold text-foreground leading-tight">Open Source</p>
-                  <p className="text-xs text-muted-foreground">15+ Modules</p>
-                </div>
-              </div>
+              )}
             </div>
 
           </div>

@@ -9,7 +9,17 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useTestimonials, DEFAULT_TESTIMONIAL, type TestimonialInput } from "@/hooks/useTestimonials";
-import { Plus, Edit, Trash2, Eye, EyeOff, Star, MessageSquare, ExternalLink, Loader2 } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, EyeOff, Star, MessageSquare, ExternalLink, Loader2, Download } from "lucide-react";
+
+function downloadJSON(data: any, filename: string) {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 function StarRating({ rating, onChange }: { rating: number; onChange?: (r: number) => void }) {
   return (
@@ -101,10 +111,15 @@ export function TestimonialsTab() {
             {testimonials.length} total · {testimonials.filter((t) => t.featured && !t.disabled).length} featured
           </p>
         </div>
-        <Button onClick={openAdd} className="shadow-glow">
-          <Plus className="h-4 w-4 mr-2" />
-          Add Testimonial
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => { const ts = new Date().toISOString().slice(0,10); downloadJSON(testimonials, `testimonials-${ts}.json`); }} disabled={!testimonials.length}>
+            <Download className="h-4 w-4 mr-2" />Export JSON
+          </Button>
+          <Button onClick={openAdd} className="shadow-glow">
+            <Plus className="h-4 w-4 mr-2" />
+            Add Testimonial
+          </Button>
+        </div>
       </div>
 
       {/* Loading */}

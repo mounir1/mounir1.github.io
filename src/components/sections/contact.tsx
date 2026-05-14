@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSettings } from "@/hooks/useSettings";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -51,6 +52,9 @@ const EMPTY_FORM: FormState = {
 
 export function Contact() {
   const { submitMessage } = useContactMessages();
+  const { settings } = useSettings();
+  const info = settings?.personalInfo;
+  const social = settings?.social;
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
@@ -148,19 +152,19 @@ export function Contact() {
                 {
                   icon: Mail,
                   label: "Email",
-                  value: "mounir.webdev@gmail.com",
-                  href: "mailto:mounir.webdev@gmail.com",
+                  value: info?.email ?? "mounir.webdev@gmail.com",
+                  href: `mailto:${info?.email ?? "mounir.webdev@gmail.com"}`,
                 },
                 {
                   icon: Phone,
                   label: "Phone",
-                  value: "+213 674 09 48 55",
-                  href: "tel:+213674094855",
+                  value: info?.phone ?? "+213 674 09 48 55",
+                  href: `tel:${(info?.phone ?? "+213674094855").replace(/\s/g, "")}`,
                 },
                 {
                   icon: MapPin,
                   label: "Location",
-                  value: "Algeria • Remote worldwide",
+                  value: info?.location ?? "Algeria • Remote worldwide",
                   href: undefined,
                 },
               ].map(({ icon: Icon, label, value, href }) => (
@@ -185,7 +189,7 @@ export function Contact() {
             {/* Social links */}
             <div className="flex gap-3">
               <a
-                href="https://linkedin.com/in/mounir1badi"
+                href={social?.linkedin ?? "https://linkedin.com/in/mounir1badi"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-card/60 border border-border/60 text-sm font-medium hover:bg-primary/5 hover:border-primary/30 transition-all duration-200"
@@ -194,7 +198,7 @@ export function Contact() {
                 LinkedIn
               </a>
               <a
-                href="https://github.com/mounir1"
+                href={social?.github ?? "https://github.com/mounir1"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-card/60 border border-border/60 text-sm font-medium hover:bg-primary/5 hover:border-primary/30 transition-all duration-200"

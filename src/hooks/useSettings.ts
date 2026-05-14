@@ -26,6 +26,12 @@ export interface SiteSettings {
     availabilityNote?: string;
     openToWork: boolean;
     remoteOnly: boolean;
+    /** Extra typing-animation words shown in hero (title is always first) */
+    typingWords?: string[];
+    /** Text for the "Currently Building" floating card on the hero avatar */
+    currentlyBuilding?: string;
+    /** Number shown in the "Open Source" floating card (e.g. "15+") */
+    openSourceModules?: string;
   };
   social: {
     linkedin?: string;
@@ -73,6 +79,9 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     availabilityNote: "Open to remote contracts and full-time opportunities",
     openToWork: true,
     remoteOnly: false,
+    typingWords: ["Full-Stack Developer", "Magento Expert", "ERP Integrator", "AI Solutions Builder"],
+    currentlyBuilding: "AI Ops Dashboard",
+    openSourceModules: "15+",
   },
   social: {
     linkedin: "https://linkedin.com/in/mounir1badi",

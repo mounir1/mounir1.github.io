@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Code, Server, Cloud, Database, Globe, Cpu, Layers, Wrench, Smartphone, Brain } from "lucide-react";
+import { Code, Server, Cloud, Database, Globe, Cpu, Layers, Wrench, Smartphone, Brain, BookOpen, Hotel, Package, ShoppingCart, Store, ClipboardList } from "lucide-react";
 import { useSkills } from "@/hooks/useSkills";
 
 const CATEGORY_ICONS: Record<string, React.ElementType> = {
@@ -16,6 +16,13 @@ const CATEGORY_ICONS: Record<string, React.ElementType> = {
   "Tools": Wrench,
   "Frameworks": Cpu,
   "Languages": Globe,
+  "Project Management": ClipboardList,
+  "LMS & Education": BookOpen,
+  "Hospitality Solutions": Hotel,
+  "ERP Solutions": Package,
+  "Retail Solutions": ShoppingCart,
+  "E-commerce": Store,
+  "Testing": Wrench,
   "Other": Cpu,
 };
 
@@ -90,6 +97,9 @@ export const Skills = () => {
       <div className="max-w-6xl mx-auto space-y-20">
         {/* Header */}
         <div className="text-center mb-4">
+          <Badge className="bg-primary/10 text-primary border-primary/20 text-sm px-4 py-1.5 mb-4">
+            Skills &amp; Tools
+          </Badge>
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
             Technical <span className="text-primary">Expertise</span>
           </h2>

@@ -20,8 +20,18 @@ import { BrandAssetPicker } from "@/components/admin/BrandAssetPicker";
 import {
   Database, Plus, Edit, Trash2, Eye, EyeOff, Star,
   Globe, Github, Search, Loader2, ChevronDown, Image as ImageIcon,
-  Palette, ExternalLink,
+  Palette, ExternalLink, Download,
 } from "lucide-react";
+
+function downloadJSON(data: any, filename: string) {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 const CATEGORIES = [
   "Web Application", "Mobile Application", "Enterprise Integration",
@@ -411,6 +421,9 @@ export function ProjectsTab() {
             {categories.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
           </SelectContent>
         </Select>
+        <Button variant="outline" size="sm" onClick={() => { const ts = new Date().toISOString().slice(0,10); downloadJSON(projects, `projects-${ts}.json`); }} disabled={!projects.length}>
+          <Download className="h-4 w-4 mr-2" />Export JSON
+        </Button>
         <Dialog open={addOpen} onOpenChange={setAddOpen}>
           <DialogTrigger asChild>
             <Button className="shadow-glow"><Plus className="h-4 w-4 mr-2" />Add Project</Button>

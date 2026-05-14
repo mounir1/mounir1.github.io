@@ -18,14 +18,25 @@ import { ImageUpload } from "@/components/admin/ImageUpload";
 import { BrandAssetPicker } from "@/components/admin/BrandAssetPicker";
 import {
   Plus, Edit, Trash2, Eye, EyeOff, Star, MapPin, Calendar,
-  TrendingUp, Briefcase, ChevronDown, ChevronUp, Building2, Palette,
+  TrendingUp, Briefcase, ChevronDown, ChevronUp, Building2, Palette, Download,
 } from "lucide-react";
 
+function downloadJSON(data: any, filename: string) {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 const DEFAULT_EXP: ExperienceInput = {
-  title: "", company: "", location: "", type: "freelance",
+  title: "", company: "", companyUrl: "", companyLogo: "",
+  location: "", type: "freelance",
   startDate: "", endDate: "", current: false,
   description: "", achievements: [], technologies: [],
-  skills: [], responsibilities: [], featured: false,
+  projects: [], skills: [], responsibilities: [], featured: false,
   disabled: false, priority: 50, icon: "💼",
   createdAt: Date.now(), updatedAt: Date.now(),
 };
@@ -34,6 +45,11 @@ const EXP_TYPES = ["full-time", "part-time", "freelance", "contract", "internshi
 
 export function ExperienceTab() {
   const { experiences, loading } = useExperience(true);
+  // export all experience records as JSON
+  const handleExport = () => {
+    const ts = new Date().toISOString().slice(0, 10);
+    downloadJSON(experiences, `experience-${ts}.json`);
+  };
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState<ExperienceInput>(DEFAULT_EXP);
@@ -105,9 +121,14 @@ export function ExperienceTab() {
           <h2 className="text-xl font-bold">Experience Management</h2>
           <p className="text-sm text-muted-foreground">{experiences.length} entries</p>
         </div>
-        <Button onClick={openAdd} className="shadow-glow">
-          <Plus className="h-4 w-4 mr-2" />Add Experience
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={handleExport} disabled={experiences.length === 0}>
+            <Download className="h-4 w-4 mr-2" />Export JSON
+          </Button>
+          <Button onClick={openAdd} className="shadow-glow">
+            <Plus className="h-4 w-4 mr-2" />Add Experience
+          </Button>
+        </div>
       </div>
 
       {loading && <div className="text-center py-8 text-muted-foreground">Loading…</div>}

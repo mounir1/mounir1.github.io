@@ -9,7 +9,17 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useUpcoming, type UpcomingProjectInput, type UpcomingStatus } from "@/hooks/useUpcoming";
-import { Plus, Trash2, Calendar, Loader2, Clock, Edit, Eye, EyeOff, ExternalLink } from "lucide-react";
+import { Plus, Trash2, Calendar, Loader2, Clock, Edit, Eye, EyeOff, ExternalLink, Download } from "lucide-react";
+
+function downloadJSON(data: any, filename: string) {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 const STATUS_COLORS: Record<UpcomingStatus, string> = {
   idea:             "bg-gray-500/10 text-gray-600 border-gray-400/20",
@@ -114,10 +124,15 @@ export function UpcomingTab() {
             {upcoming.length} planned · Stored in Firebase
           </p>
         </div>
-        <Button onClick={openAdd} className="shadow-glow">
-          <Plus className="h-4 w-4 mr-2" />
-          Add Upcoming
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => { const ts = new Date().toISOString().slice(0,10); downloadJSON(upcoming, `upcoming-${ts}.json`); }} disabled={!upcoming.length}>
+            <Download className="h-4 w-4 mr-2" />Export JSON
+          </Button>
+          <Button onClick={openAdd} className="shadow-glow">
+            <Plus className="h-4 w-4 mr-2" />
+            Add Upcoming
+          </Button>
+        </div>
       </div>
 
       {loading && (
