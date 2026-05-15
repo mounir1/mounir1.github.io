@@ -3,6 +3,7 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Menu, X } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { Logo } from "@/components/ui/logo";
+import { useSettings } from "@/hooks/useSettings";
 
 // ─── Section IDs tracked for active highlighting ──────────────────────────────
 const SECTION_IDS = ["home", "experience", "skills", "projects", "upcoming", "contact"];
@@ -17,6 +18,9 @@ const NAV_ITEMS = [
 ];
 
 export const Navigation = () => {
+  const { settings } = useSettings();
+  const firstName = settings.personalInfo.name.split(" ")[0] ?? "Mounir";
+  const navSubtitle = settings.personalInfo.title.split(" ").slice(0, 3).join(" ") || "Full-Stack Developer";
   const [isOpen,   setIsOpen]   = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeId, setActiveId] = useState("home");
@@ -95,9 +99,9 @@ export const Navigation = () => {
             <Logo size="md" className="text-primary" />
             <div className="hidden sm:block">
               <div className="font-bold text-lg text-foreground group-hover:text-primary transition-colors">
-                Mounir
+                {firstName}
               </div>
-              <div className="text-xs text-muted-foreground -mt-1">Full-Stack Developer</div>
+              <div className="text-xs text-muted-foreground -mt-1">{navSubtitle}</div>
             </div>
           </div>
 

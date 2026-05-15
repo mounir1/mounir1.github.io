@@ -1,9 +1,10 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Calendar, MapPin, TrendingUp, Users, Award, Code, Wifi, WifiOff } from "lucide-react";
+import { Calendar, MapPin, TrendingUp, Users, Award, Code } from "lucide-react";
 import { Signature } from "@/components/ui/signature";
 import { useExperience } from "@/hooks/useExperience";
+import { useSettings } from "@/hooks/useSettings";
 
 function ExperienceSkeleton() {
   return (
@@ -35,11 +36,16 @@ function ExperienceSkeleton() {
 
 export const Experience = () => {
   const { experiences, loading } = useExperience();
+  const { settings } = useSettings();
+  const { heroStats } = settings;
 
   return (
     <section id="experience" className="py-20 px-6 bg-gradient-to-br from-card/20 via-background to-card/20">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
+          <Badge className="bg-primary/10 text-primary border-primary/20 text-sm px-4 py-1.5 mb-4">
+            Career Journey
+          </Badge>
           <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-primary bg-clip-text text-transparent">
             Professional Experience
           </h2>
@@ -205,10 +211,10 @@ export const Experience = () => {
         {/* Summary Stats */}
         <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6">
           {[
-            { value: "10+", label: "Years Experience" },
-            { value: "150+", label: "Projects Completed" },
+            { value: `${heroStats.yearsExperience}+`, label: "Years Experience" },
+            { value: `${heroStats.projectsCompleted}+`, label: "Projects Completed" },
             { value: "20+", label: "Technologies Mastered" },
-            { value: "10K+", label: "Users Served" },
+            { value: heroStats.usersServed, label: "Users Served" },
           ].map((stat) => (
             <div
               key={stat.label}

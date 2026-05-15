@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { db, isFirebaseEnabled } from "@/lib/firebase";
 import {
-  collection, onSnapshot, addDoc, updateDoc,
+  collection, onSnapshot, addDoc, updateDoc, deleteDoc,
   doc, orderBy, query,
 } from "firebase/firestore";
 
@@ -51,23 +51,31 @@ export function useContactMessages() {
   }, []);
 
   const submitMessage = async (data: ContactMessageInput) => {
-    await addDoc(collection(db!, CONTACT_COLLECTION), {
-      ...data,
-      status: "unread",
-      createdAt: Date.now(),
-    });
+    if (!isFirebaseEnabled || !db) return;
+    await addDoc(collection(db, CONTACT_COLLECTION), { ...data, status: "unread", createdAt: Date.now() });
   };
 
-  const markRead = (id: string) =>
-    updateDoc(doc(db!, CONTACT_COLLECTION, id), { status: "read", readAt: Date.now() });
+  const markRead = (id: string) => {
+    if (!isFirebaseEnabled || !db) return;
+    return updateDoc(doc(db, CONTACT_COLLECTION, id), { status: "read", readAt: Date.now() });
+  };
 
-  const markReplied = (id: string) =>
-    updateDoc(doc(db!, CONTACT_COLLECTION, id), { status: "replied", repliedAt: Date.now() });
+  const markReplied = (id: string) => {
+    if (!isFirebaseEnabled || !db) return;
+    return updateDoc(doc(db, CONTACT_COLLECTION, id), { status: "replied", repliedAt: Date.now() });
+  };
 
-  const markStatus = (id: string, status: MessageStatus) =>
-    updateDoc(doc(db!, CONTACT_COLLECTION, id), { status });
+  const markStatus = (id: string, status: MessageStatus) => {
+    if (!isFirebaseEnabled || !db) return;
+    return updateDoc(doc(db, CONTACT_COLLECTION, id), { status });
+  };
+
+  const deleteMessage = async (id: string) => {
+    if (!isFirebaseEnabled || !db) return;
+    return deleteDoc(doc(db, CONTACT_COLLECTION, id));
+  };
 
   const unreadCount = messages.filter((m) => m.status === "unread").length;
 
-  return { messages, loading, submitMessage, markRead, markReplied, markStatus, unreadCount };
+  return { messages, loading, submitMessage, markRead, markReplied, markStatus, deleteMessage, unreadCount };
 }

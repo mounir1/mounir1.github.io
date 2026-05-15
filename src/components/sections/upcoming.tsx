@@ -278,7 +278,7 @@ export function Upcoming() {
         {/* Footer note */}
         {!loading && (
           <p className="text-center text-xs text-muted-foreground/60 pt-2">
-            Roadmap updated May 2025 · Subject to change based on priorities
+            Roadmap updated {new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })} · Subject to change based on priorities
           </p>
         )}
       </div>

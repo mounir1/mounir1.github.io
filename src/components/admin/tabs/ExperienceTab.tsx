@@ -18,8 +18,20 @@ import { ImageUpload } from "@/components/admin/ImageUpload";
 import { BrandAssetPicker } from "@/components/admin/BrandAssetPicker";
 import {
   Plus, Edit, Trash2, Eye, EyeOff, Star, MapPin, Calendar,
-  TrendingUp, Briefcase, ChevronDown, ChevronUp, Building2, Palette,
+  TrendingUp, Briefcase, ChevronDown, ChevronUp, Building2, Palette, Download,
 } from "lucide-react";
+
+function downloadJSON(data: any[], filename: string) {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${filename}-${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
 
 const DEFAULT_EXP: ExperienceInput = {
   title: "", company: "", location: "", type: "freelance",
@@ -27,8 +39,9 @@ const DEFAULT_EXP: ExperienceInput = {
   description: "", achievements: [], technologies: [],
   skills: [], responsibilities: [], featured: false,
   disabled: false, priority: 50, icon: "💼",
+  companyUrl: "", companyLogo: "", projects: [],
   createdAt: Date.now(), updatedAt: Date.now(),
-};
+} as any;
 
 const EXP_TYPES = ["full-time", "part-time", "freelance", "contract", "internship", "consulting"];
 
@@ -103,6 +116,9 @@ export function ExperienceTab() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-bold">Experience Management</h2>
+          <Button variant="outline" size="sm" onClick={() => downloadJSON(experiences, "experiences")}>
+            <Download className="h-4 w-4 mr-2" />Export JSON
+          </Button>
           <p className="text-sm text-muted-foreground">{experiences.length} entries</p>
         </div>
         <Button onClick={openAdd} className="shadow-glow">

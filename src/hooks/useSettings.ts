@@ -26,6 +26,9 @@ export interface SiteSettings {
     availabilityNote?: string;
     openToWork: boolean;
     remoteOnly: boolean;
+    typingWords?: string[];
+    currentlyBuilding?: string;
+    openSourceModules?: string;
   };
   social: {
     linkedin?: string;
@@ -73,6 +76,9 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     availabilityNote: "Open to remote contracts and full-time opportunities",
     openToWork: true,
     remoteOnly: false,
+    typingWords: ["Full-Stack Developer", "Magento Expert", "ERP Integrator", "AI Solutions Builder"],
+    currentlyBuilding: "AI Ops Dashboard",
+    openSourceModules: "15+",
   },
   social: {
     linkedin: "https://linkedin.com/in/mounir1badi",

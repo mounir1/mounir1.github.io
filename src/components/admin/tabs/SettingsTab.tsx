@@ -231,6 +231,39 @@ export function SettingsTab() {
               </div>
             </div>
 
+            <div className="space-y-2">
+              <Label>Hero Typing Words</Label>
+              <Textarea
+                value={(s.personalInfo.typingWords ?? []).join(", ")}
+                onChange={(e) => patchNested("personalInfo", "typingWords",
+                  e.target.value.split(",").map((w) => w.trim()).filter(Boolean))}
+                rows={2}
+                placeholder="Full-Stack Developer, Magento Expert, ERP Integrator..."
+              />
+              <p className="text-xs text-muted-foreground">Comma-separated. These rotate in the typing animation after your title.</p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Currently Building</Label>
+                <Input
+                  value={s.personalInfo.currentlyBuilding ?? ""}
+                  onChange={(e) => patchNested("personalInfo", "currentlyBuilding", e.target.value)}
+                  placeholder="AI Ops Dashboard"
+                />
+                <p className="text-xs text-muted-foreground">Floating card on hero avatar. Leave empty to hide.</p>
+              </div>
+              <div className="space-y-2">
+                <Label>Open Source Modules</Label>
+                <Input
+                  value={s.personalInfo.openSourceModules ?? ""}
+                  onChange={(e) => patchNested("personalInfo", "openSourceModules", e.target.value)}
+                  placeholder="15+"
+                />
+                <p className="text-xs text-muted-foreground">Shown as "{'{value}'} Modules". Leave empty to hide.</p>
+              </div>
+            </div>
+
             <div className="flex gap-6 pt-2">
               <div className="flex items-center gap-2">
                 <Switch

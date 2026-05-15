@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Skeleton } from "@/components/ui/skeleton";
 import { ExternalLink, Github, Star, Search, Filter, X } from "lucide-react";
 import { useProjects } from "@/hooks/useProjects";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 
 const CATEGORIES = [
   "All",
@@ -45,6 +45,8 @@ export const Projects = () => {
   const [activeCategory, setActiveCategory] = useState("All");
   const [showAll, setShowAll] = useState(false);
 
+  useEffect(() => { setShowAll(false); }, [activeCategory, search]);
+
   // Filtered lists
   const filteredFeatured = useMemo(() => {
     return featured.filter((p) => {
@@ -83,6 +85,9 @@ export const Projects = () => {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
+          <Badge className="bg-primary/10 text-primary border-primary/20 text-sm px-4 py-1.5 mb-4">
+            Portfolio
+          </Badge>
           <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-primary bg-clip-text text-transparent">
             Featured Projects
           </h2>

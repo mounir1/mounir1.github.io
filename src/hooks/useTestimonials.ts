@@ -119,21 +119,20 @@ export function useTestimonials(adminMode = false) {
     [testimonials]
   );
 
-  const addTestimonial = (data: TestimonialInput) =>
-    addDoc(collection(db!, TESTIMONIALS_COLLECTION), {
-      ...data,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    });
+  const addTestimonial = async (data: TestimonialInput) => {
+    if (!isFirebaseEnabled || !db) { console.warn("Firebase not available"); return; }
+    return addDoc(collection(db, TESTIMONIALS_COLLECTION), { ...data, createdAt: Date.now(), updatedAt: Date.now() });
+  };
 
-  const updateTestimonial = (id: string, data: Partial<TestimonialInput>) =>
-    updateDoc(doc(db!, TESTIMONIALS_COLLECTION, id), {
-      ...data,
-      updatedAt: Date.now(),
-    });
+  const updateTestimonial = async (id: string, data: Partial<TestimonialInput>) => {
+    if (!isFirebaseEnabled || !db) { console.warn("Firebase not available"); return; }
+    return updateDoc(doc(db, TESTIMONIALS_COLLECTION, id), { ...data, updatedAt: Date.now() });
+  };
 
-  const deleteTestimonial = (id: string) =>
-    deleteDoc(doc(db!, TESTIMONIALS_COLLECTION, id));
+  const deleteTestimonial = async (id: string) => {
+    if (!isFirebaseEnabled || !db) { console.warn("Firebase not available"); return; }
+    return deleteDoc(doc(db, TESTIMONIALS_COLLECTION, id));
+  };
 
   return {
     testimonials,

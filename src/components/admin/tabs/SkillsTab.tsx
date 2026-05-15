@@ -17,7 +17,19 @@ import { db, isFirebaseEnabled } from "@/lib/firebase";
 import { addDoc, collection, updateDoc, deleteDoc, doc } from "firebase/firestore";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { SKILL_ICONS, getSkillColor } from "@/lib/skill-icons";
-import { Plus, Edit, Trash2, Eye, EyeOff, Star, Zap, Palette, Search } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, EyeOff, Star, Zap, Palette, Search, Download } from "lucide-react";
+
+function downloadJSON(data: any[], filename: string) {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${filename}-${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
 
 const SKILL_CATEGORIES: SkillCategory[] = [
   "Frontend Development", "Backend Development", "Database",
@@ -41,7 +53,7 @@ const DEFAULT_SKILL: SkillInput = {
 };
 
 export function SkillsTab() {
-  const { skills, skillsByCategory, loading } = useSkills();
+  const { skills, skillsByCategory, loading } = useSkills(true);
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState<SkillInput>(DEFAULT_SKILL);
@@ -119,6 +131,9 @@ export function SkillsTab() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-bold">Skills Management</h2>
+          <Button variant="outline" size="sm" onClick={() => downloadJSON(skills, "skills")}>
+            <Download className="h-4 w-4 mr-2" />Export JSON
+          </Button>
           <p className="text-sm text-muted-foreground">
             {skills.length} skills across {Object.keys(skillsByCategory).length} categories
           </p>

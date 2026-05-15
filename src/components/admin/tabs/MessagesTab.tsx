@@ -7,8 +7,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useContactMessages, type ContactMessage, type MessageStatus } from "@/hooks/useContactMessages";
 import {
   Mail, MailOpen, Reply, Archive, Trash2, Search,
-  Clock, Building, Phone, Loader2, Inbox, RefreshCw,
+  Clock, Building, Phone, Loader2, Inbox, RefreshCw, Download,
 } from "lucide-react";
+
+function downloadJSON(data: any[], filename: string) {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${filename}-${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
 
 const STATUS_CONFIG: Record<MessageStatus, { label: string; color: string; icon: any }> = {
   unread:   { label: "Unread",   color: "bg-blue-500/15 text-blue-700 border-blue-500/30",     icon: Mail },
@@ -88,7 +100,7 @@ function MessageRow({
 }
 
 export function MessagesTab() {
-  const { messages, loading, markRead, markReplied, markStatus, unreadCount } =
+  const { messages, loading, markRead, markReplied, markStatus, deleteMessage, unreadCount } =
     useContactMessages();
 
   const [selected, setSelected] = useState<ContactMessage | null>(null);
@@ -137,10 +149,15 @@ export function MessagesTab() {
             <Badge className="bg-blue-500 text-white">{unreadCount} unread</Badge>
           )}
         </div>
-        <Button variant="outline" size="sm" onClick={() => window.location.reload()}>
-          <RefreshCw className="h-4 w-4 mr-2" />
-          Refresh
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button variant="outline" size="sm" onClick={() => downloadJSON(messages, "messages")}>
+            <Download className="h-4 w-4 mr-2" />Export JSON
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => window.location.reload()}>
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Refresh
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -303,6 +320,22 @@ export function MessagesTab() {
                     Spam
                   </Button>
                 </div>
+                {deleteMessage && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="w-full text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 mt-2"
+                    onClick={async () => {
+                      if (confirm(`Permanently delete this message from ${selected.name}? This cannot be undone.`)) {
+                        await deleteMessage(selected.id);
+                        setSelected(null);
+                      }
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Permanently Delete Message
+                  </Button>
+                )}
               </CardContent>
             </Card>
           ) : (

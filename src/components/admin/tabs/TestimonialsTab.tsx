@@ -9,7 +9,19 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useTestimonials, DEFAULT_TESTIMONIAL, type TestimonialInput } from "@/hooks/useTestimonials";
-import { Plus, Edit, Trash2, Eye, EyeOff, Star, MessageSquare, ExternalLink, Loader2 } from "lucide-react";
+import { Plus, Edit, Trash2, Eye, EyeOff, Star, MessageSquare, ExternalLink, Loader2, Download } from "lucide-react";
+
+function downloadJSON(data: any[], filename: string) {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${filename}-${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
 
 function StarRating({ rating, onChange }: { rating: number; onChange?: (r: number) => void }) {
   return (
@@ -97,6 +109,9 @@ export function TestimonialsTab() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-bold">Testimonials</h2>
+          <Button variant="outline" size="sm" onClick={() => downloadJSON(testimonials, "testimonials")}>
+            <Download className="h-4 w-4 mr-2" />Export JSON
+          </Button>
           <p className="text-sm text-muted-foreground">
             {testimonials.length} total · {testimonials.filter((t) => t.featured && !t.disabled).length} featured
           </p>
