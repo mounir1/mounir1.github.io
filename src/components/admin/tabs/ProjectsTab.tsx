@@ -13,7 +13,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
 import { useProjects, PROJECTS_COLLECTION, type ProjectInput, DEFAULT_PROJECT } from "@/hooks/useProjects";
-import { db } from "@/lib/firebase";
+import { db, isFirebaseEnabled } from "@/lib/firebase";
 import { addDoc, collection, doc, updateDoc, deleteDoc } from "firebase/firestore";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { BrandAssetPicker } from "@/components/admin/BrandAssetPicker";
@@ -375,7 +375,7 @@ export function ProjectsTab() {
   const categories = [...new Set(projects.map((p) => p.category))];
 
   async function handleAdd(data: ProjectInput) {
-    if (!db) return;
+    if (!isFirebaseEnabled || !db) return;
     setSubmitting(true);
     try {
       await addDoc(collection(db, PROJECTS_COLLECTION), {
@@ -387,7 +387,7 @@ export function ProjectsTab() {
   }
 
   async function handleEdit(data: ProjectInput) {
-    if (!db || !editProject) return;
+    if (!isFirebaseEnabled || !db || !editProject) return;
     setSubmitting(true);
     try {
       await updateDoc(doc(db, PROJECTS_COLLECTION, editProject.id), { ...data, updatedAt: Date.now() });
@@ -397,12 +397,12 @@ export function ProjectsTab() {
   }
 
   async function handleToggle(id: string, key: "featured" | "disabled", current: boolean) {
-    if (!db) return;
+    if (!isFirebaseEnabled || !db) return;
     await updateDoc(doc(db, PROJECTS_COLLECTION, id), { [key]: !current, updatedAt: Date.now() });
   }
 
   async function handleDelete(id: string, title: string) {
-    if (!db || !confirm(`Delete "${title}"? This cannot be undone.`)) return;
+    if (!isFirebaseEnabled || !db || !confirm(`Delete "${title}"? This cannot be undone.`)) return;
     await deleteDoc(doc(db, PROJECTS_COLLECTION, id));
   }
 
@@ -427,16 +427,14 @@ export function ProjectsTab() {
           <DialogTrigger asChild>
             <Button className="shadow-glow"><Plus className="h-4 w-4 mr-2" />Add Project</Button>
           </DialogTrigger>
-        </Dialog>
-        <Button variant="outline" size="sm" onClick={() => downloadJSON(projects, "projects")}>
-          <Download className="h-4 w-4 mr-2" />Export JSON
-        </Button>
-        <Dialog open={addOpen} onOpenChange={setAddOpen}>
           <DialogContent className="max-w-3xl">
             <DialogHeader><DialogTitle>Add New Project</DialogTitle></DialogHeader>
             <ProjectForm onSubmit={handleAdd} onCancel={() => setAddOpen(false)} submitting={submitting} />
           </DialogContent>
         </Dialog>
+        <Button variant="outline" size="sm" onClick={() => downloadJSON(projects, "projects")}>
+          <Download className="h-4 w-4 mr-2" />Export JSON
+        </Button>
       </div>
 
       {/* Stats */}

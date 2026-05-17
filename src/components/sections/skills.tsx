@@ -99,7 +99,7 @@ export const Skills = () => {
         {/* Header */}
         <div className="text-center mb-4">
           <Badge className="bg-primary/10 text-primary border-primary/20 text-sm px-4 py-1.5 mb-4">
-            Skills &amp; Tools
+            Skills & Tools
           </Badge>
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
             Technical <span className="text-primary">Expertise</span>
@@ -146,7 +146,7 @@ export const Skills = () => {
                           <div className="flex items-center gap-2 font-medium">
                             {skill.icon && <span className="text-base">{skill.icon}</span>}
                             <span>{skill.name}</span>
-                            {skill.trending && (
+                            {(skill as any).trending && (
                               <Badge className="text-[10px] h-4 px-1.5 bg-orange-500/10 text-orange-600 border-orange-400/20">
                                 Trending
                               </Badge>

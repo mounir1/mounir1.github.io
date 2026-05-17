@@ -37,6 +37,8 @@ export interface Skill {
   featured: boolean;
   disabled: boolean;
   priority: number;
+  trending?: boolean;
+  languageLevel?: string;
   createdAt: number;
   updatedAt: number;
 }

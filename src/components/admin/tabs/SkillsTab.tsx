@@ -116,12 +116,12 @@ export function SkillsTab() {
   }
 
   async function handleDelete(id: string, name: string) {
-    if (!db || !confirm(`Delete "${name}"? This cannot be undone.`)) return;
+    if (!isFirebaseEnabled || !db || !confirm(`Delete "${name}"? This cannot be undone.`)) return;
     await deleteDoc(doc(db, SKILLS_COLLECTION, id));
   }
 
   async function toggleField(id: string, field: "disabled" | "featured", value: boolean) {
-    if (!db) return;
+    if (!isFirebaseEnabled || !db) return;
     await updateDoc(doc(db, SKILLS_COLLECTION, id), { [field]: value, updatedAt: Date.now() });
   }
 

@@ -120,7 +120,31 @@ export function useSettings() {
     const ref = doc(db, "settings", "site");
     const unsub = onSnapshot(ref, (snap) => {
       if (snap.exists()) {
-        setSettings({ ...DEFAULT_SETTINGS, ...(snap.data() as SiteSettings) });
+        const firestoreData = snap.data() as Partial<SiteSettings>;
+        setSettings({
+          ...DEFAULT_SETTINGS,
+          ...firestoreData,
+          personalInfo: {
+            ...DEFAULT_SETTINGS.personalInfo,
+            ...(firestoreData.personalInfo ?? {}),
+          },
+          heroStats: {
+            ...DEFAULT_SETTINGS.heroStats,
+            ...(firestoreData.heroStats ?? {}),
+          },
+          social: {
+            ...DEFAULT_SETTINGS.social,
+            ...(firestoreData.social ?? {}),
+          },
+          features: {
+            ...DEFAULT_SETTINGS.features,
+            ...(firestoreData.features ?? {}),
+          },
+          seo: {
+            ...DEFAULT_SETTINGS.seo,
+            ...(firestoreData.seo ?? {}),
+          },
+        });
       }
       setLoading(false);
     }, () => setLoading(false));

@@ -101,12 +101,12 @@ export function ExperienceTab() {
   }
 
   async function handleDelete(id: string, title: string) {
-    if (!db || !confirm(`Delete "${title}"?`)) return;
+    if (!isFirebaseEnabled || !db || !confirm(`Delete "${title}"?`)) return;
     await deleteDoc(doc(db, EXPERIENCE_COLLECTION, id));
   }
 
   async function toggleField(id: string, field: "disabled" | "featured", value: boolean) {
-    if (!db) return;
+    if (!isFirebaseEnabled || !db) return;
     await updateDoc(doc(db, EXPERIENCE_COLLECTION, id), { [field]: value, updatedAt: Date.now() });
   }
 
