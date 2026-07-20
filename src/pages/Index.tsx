@@ -21,7 +21,7 @@ class SectionErrorBoundary extends React.Component<
   { name: string; children: React.ReactNode },
   { error: Error | null }
 > {
-  constructor(props: any) {
+  constructor(props: { name: string; children: React.ReactNode }) {
     super(props);
     this.state = { error: null };
   }
