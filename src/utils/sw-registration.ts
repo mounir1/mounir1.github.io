@@ -5,7 +5,7 @@ const isDevelopment = import.meta.env.DEV;
 
 interface ServiceWorkerMessage {
   type: string;
-  payload?: any;
+  payload?: unknown;
 }
 
 export class ServiceWorkerManager {

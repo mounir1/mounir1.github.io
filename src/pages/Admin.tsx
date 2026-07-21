@@ -86,8 +86,9 @@ function AdminLogin({ auth }: { auth: Auth }) {
     try {
       const { signInWithEmailAndPassword } = await import("firebase/auth");
       await signInWithEmailAndPassword(auth, email, password);
-    } catch (err: any) {
-      setError(err.message ?? "Login failed.");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Login failed.";
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -99,9 +100,11 @@ function AdminLogin({ auth }: { auth: Auth }) {
     try {
       const { signInWithPopup, GoogleAuthProvider } = await import("firebase/auth");
       await signInWithPopup(auth, new GoogleAuthProvider());
-    } catch (err: any) {
-      if (err.code !== "auth/popup-closed-by-user") {
-        setError(err.message ?? "Google login failed.");
+    } catch (err: unknown) {
+      const code = (err as { code?: string }).code;
+      if (code !== "auth/popup-closed-by-user") {
+        const message = err instanceof Error ? err.message : "Google login failed.";
+        setError(message);
       }
     } finally {
       setLoading(false);
