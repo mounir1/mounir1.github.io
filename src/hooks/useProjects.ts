@@ -11,9 +11,13 @@ export type ProjectCategory =
   | "Machine Learning"
   | "API Development"
   | "DevOps & Infrastructure"
+  | "Hospitality Solutions"
+  | "Education Technology"
+  | "Training / Education"
+  | "Data Platform"
   | "Other";
 
-export type ProjectStatus = "completed" | "in-progress" | "maintenance" | "archived";
+export type ProjectStatus = "completed" | "in-progress" | "in-development" | "active" | "maintenance" | "archived";
 
 export interface ClientInfo {
   name: string;

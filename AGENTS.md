@@ -91,6 +91,18 @@ src/
 4. **Admin auth** — Firebase Auth (Google OAuth + Email/Password). Admin route
    is protected; access via `/admin`, signature triple-click, or footer button.
 
+5. **Project data infrastructure** — Two-layer data model:
+   - **`src/data/projects-index.ts`** — Registry mapping `C:\projects`/directories
+     to canonical portfolio slugs (the single source of truth).
+   - **`src/data/initial-projects.ts`** — Seed data with full project details
+     (titles, descriptions, achievements, tech stack). Both layers must be kept
+     in sync.
+   - **`src/data/verify-project-data.ts`** — CLI fact-checker to validate that
+     every portfolio entry matches a real directory on disk.
+     Run with: `npx tsx src/data/verify-project-data.ts`
+   - When adding a new project: (1) add entry to `projects-index.ts`, (2) add
+     seed data to `initial-projects.ts`, (3) run verify script.
+
 ## Code Conventions
 
 - **Path alias:** `@/` maps to `src/`

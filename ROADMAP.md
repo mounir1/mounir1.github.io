@@ -1,7 +1,7 @@
 # ROADMAP
 
 > Issue-handling plan, priorities, and technical-debt tracker.
-> Last updated: 2026-07-20.
+> Last updated: 2026-07-28.
 
 ## Status Legend
 
@@ -67,6 +67,31 @@ match `main` as a backup mirror.
 **Fix applied:** Added weekly Dependabot config for npm + github-actions,
 grouping Radix/ESLint/types, blocking major bumps of react/firebase/vite.
 
+### [x] Project data restructure — projects-index.ts registry + 7 new projects
+
+**Problem:** Portfolio seed data had only 9 projects, missing many real projects
+on disk at `C:\projects`. No canonical mapping between disk directories and
+portfolio entries.
+
+**Fix applied:**
+- Created `src/data/projects-index.ts` — registry mapping `C:\projects`/paths to
+  canonical portfolio slugs, with type/importance/status metadata + reverse
+  lookup helpers
+- Extended `ProjectCategory` type in `useProjects.ts` with: `"Hospitality Solutions"`,
+  `"Education Technology"`, `"Training / Education"`, `"Data Platform"`
+- Extended `ProjectStatus` type with: `"in-development"`, `"active"`
+- Added 7 new projects to `src/data/initial-projects.ts`:
+  - **IT Collaborator** — Networking & Security Training Platform (#10)
+  - **Techno-ETL** — Media & Data Management Platform (#11)
+  - **Ogent** — Otello AI Agent (MCP Server, #12)
+  - **CloudWeb** — Hotel Multi-Service Platform (#13)
+  - **MDM Application** — Master Data Management (#14)
+  - **WebEX** — HoTech Web Extension Platform (#15)
+  - **WebCMS** — Hotel Content Management System (#16)
+- Created `src/data/verify-project-data.ts` — CLI fact-checker that validates
+  every portfolio entry against the real disk directories
+- Updated `AGENTS.md` to reference projects-index.ts and verify script
+
 ---
 
 ## P1 — High Priority
@@ -87,6 +112,18 @@ hooks, and `database-uploader.ts`. Firestore `DocumentData` is untyped.
 
 **Files affected:** `src/hooks/*`, `src/components/admin/tabs/*`,
 `src/utils/database-uploader.ts`, `src/lib/firebase.ts` (create if missing)
+
+### [ ] Project data verification — run `verify-project-data.ts` before seeding
+
+**Current:** Seed data is manually maintained; no automated check that every
+project on disk has a matching portfolio entry.
+
+**Plan:**
+- Run `npx tsx src/data/verify-project-data.ts` before seeding to Firestore
+- Add verification step to CI pipeline (optional gate)
+- Keep `projects-index.ts` as the single source of truth for disk ↔ portfolio
+  mapping
+- Goal: every `C:\projects` directory used in daily work has a portfolio entry
 
 ### [ ] Branch protection rules for `main`
 
