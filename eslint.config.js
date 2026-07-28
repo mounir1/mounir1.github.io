@@ -29,6 +29,11 @@ export default tseslint.config(
       // Keep the rule visible (warn) so the debt is tracked, but non-blocking
       // so CI stays green. Targeted files use `unknown` where safe.
       "@typescript-eslint/no-explicit-any": "warn",
+      // react-hooks v7 introduced these compiler-backed rules as errors.
+      // 14 pre-existing occurrences (setState-in-effect patterns, Date.now()
+      // in render defaults) are tracked in ROADMAP — warn until refactored.
+      "react-hooks/set-state-in-effect": "warn",
+      "react-hooks/purity": "warn",
     },
   }
 );

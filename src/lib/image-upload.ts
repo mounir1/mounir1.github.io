@@ -32,7 +32,7 @@ export async function uploadImage(
     };
   } catch (error) {
     console.error('Image upload failed:', error);
-    throw new Error('Failed to upload image. Please try again.');
+    throw new Error('Failed to upload image. Please try again.', { cause: error });
   }
 }
 
@@ -51,7 +51,7 @@ export async function deleteImage(path: string): Promise<void> {
     await deleteObject(storageRef);
   } catch (error) {
     console.error('Image deletion failed:', error);
-    throw new Error('Failed to delete image. Please try again.');
+    throw new Error('Failed to delete image. Please try again.', { cause: error });
   }
 }
 
