@@ -2,8 +2,8 @@
 
 > **A modern, data-driven portfolio built for production with Firebase integration and comprehensive admin dashboard**
 
-[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge&logo=vercel)](https://mounir.bio)
-[![Admin Panel](https://img.shields.io/badge/Admin-Panel-blue?style=for-the-badge&logo=firebase)](https://mounir.bio/admin)
+[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge&logo=vercel)](https://mounir1.github.io)
+[![Admin Panel](https://img.shields.io/badge/Admin-Panel-blue?style=for-the-badge&logo=firebase)](https://mounir1.github.io/admin)
 [![Build Status](https://img.shields.io/badge/Build-Passing-success?style=for-the-badge&logo=github-actions)](https://github.com/mounir1/portfolio)
 
 ## ✨ **Production-Ready Features**
@@ -222,7 +222,7 @@ npm run deploy
 - 💼 **LinkedIn**: [linkedin.com/in/mounir1badi](https://linkedin.com/in/mounir1badi)
 - 🐙 **GitHub**: [github.com/mounir1](https://github.com/mounir1)
 - 📱 **Phone**: +213 674 09 48 55
-- 🌐 **Portfolio**: [mounir.bio](https://mounir.bio)
+- 🌐 **Portfolio**: [mounir1.github.io](https://mounir1.github.io)
 
 ---
 

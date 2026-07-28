@@ -5,7 +5,7 @@ Disallow: /admin
 Disallow: /admin/*
 
 # Sitemap
-Sitemap: https://mounir.bio/sitemap.xml
+Sitemap: https://mounir1.github.io/sitemap.xml
 
 # Crawl-delay for respectful crawling
 Crawl-delay: 1

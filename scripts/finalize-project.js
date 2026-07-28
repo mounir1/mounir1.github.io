@@ -188,7 +188,7 @@ console.log('   📧 Email: mounir.webdev@gmail.com');
 console.log('   💼 LinkedIn: linkedin.com/in/mounir1badi');
 console.log('   🐙 GitHub: github.com/mounir1');
 console.log('   📱 Phone: +213 674 09 48 55');
-console.log('   🌐 Portfolio: mounir.bio');
+console.log('   🌐 Portfolio: mounir1.github.io');
 console.log('');
 
 console.log('🎊 CONGRATULATIONS!');

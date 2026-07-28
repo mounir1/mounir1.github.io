@@ -7,7 +7,7 @@
 Personal portfolio website for Mounir Abderrahmani — a production SPA built with
 React 18 + TypeScript + Vite, backed by Firebase (Auth + Firestore) with an
 admin dashboard for dynamic content management. Deployed to GitHub Pages via
-GitHub Actions at [mounir.bio](https://mounir.bio).
+GitHub Actions at [mounir1.github.io](https://mounir1.github.io).
 
 ## Essential Commands
 

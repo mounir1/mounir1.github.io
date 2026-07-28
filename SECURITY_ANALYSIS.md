@@ -328,7 +328,7 @@ untested.
    Tracks performance scores over time and alerts on regressions.
 
 3. **Uptime monitoring** — UptimeRobot (free) or GitHub Action pinging
-   `https://mounir.bio` every 5 minutes.
+   `https://mounir1.github.io` every 5 minutes.
 
 ---
 
