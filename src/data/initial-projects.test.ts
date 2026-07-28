@@ -17,6 +17,8 @@ const VALID_CATEGORIES: ProjectCategory[] = [
 const VALID_STATUSES: ProjectStatus[] = [
   "completed",
   "in-progress",
+  "in-development",
+  "active",
   "maintenance",
   "archived",
 ];
