@@ -1,7 +1,7 @@
 # ROADMAP
 
 > Issue-handling plan, priorities, and technical-debt tracker.
-> Last updated: 2026-07-28.
+> Last updated: 2026-07-28 (session 2).
 
 ## Status Legend
 
@@ -94,7 +94,64 @@ portfolio entries.
 
 ---
 
+## P0 — Completed (2026-07-28, session 2)
+
+### [x] Test infrastructure wired up (53/53 passing)
+
+**Problem:** `vitest.config.ts` + 6 test files existed but vitest and
+testing-library dependencies were missing — `npm test` could not run.
+
+**Fix applied:** Added vitest, @vitest/coverage-v8, jsdom, @testing-library/*
+devDeps plus `test` / `test:watch` / `test:coverage` scripts. Fixed
+`VALID_STATUSES` in `initial-projects.test.ts` to match the extended
+`ProjectStatus` union. Result: 6 files, 53/53 tests green.
+
+### [x] Security: react-router upgraded 6.30.1 → 7.18.1
+
+**Problem:** Dependabot flagged react-router 6.x (open-redirect CVE-2025-68470
+bypass, deserializeErrors constructor injection, 6.30.2–6.30.4 XSS).
+
+**Fix applied:** Upgraded to `react-router-dom@7.18.1` (ships v6-compatible
+exports — zero source changes). Verified: tsc clean, 53/53 tests, build OK.
+Note: npm audit still lists GHSA-qwww-vcr4-c8h2 (RSC Mode CSRF) against
+7.12–8.2; it affects RSC/SSR action handling only — this SPA uses
+`BrowserRouter` client-side routing, so the vulnerable code path is unused.
+Track upstream for a 7.x patch; react-router 8.x requires React 19.
+
+### [x] Security: eslint stack upgraded to v10 (brace-expansion DoS chain)
+
+**Problem:** `brace-expansion <=5.0.7` DoS advisories via
+minimatch → @eslint/config-array → eslint 9.
+
+**Fix applied:** eslint 10.8.0, @eslint/js 10.0.1, typescript-eslint 8.65.0,
+eslint-plugin-react-hooks 7.1.1. New v7 compiler rules
+(`set-state-in-effect`, `purity`) downgraded to warn — see P1 task below.
+`image-upload.ts` now attaches `{ cause }` to re-thrown errors.
+Lint: 0 errors.
+
+### [x] Data accuracy: internal HoTech URLs removed from public entries
+
+**Problem:** Ogent/CloudWeb entries linked auth-protected or internal-only
+hosts (ogent.hotech.dev → 401, dev.hotech.dev → Apache default page,
+gitlab.hotech.dev → no public DNS).
+
+**Fix applied:** Cleared those `liveUrl`/`demoUrl`/`caseStudyUrl` values with
+explanatory comments; public visitors no longer hit dead/forbidden links.
+
+---
+
 ## P1 — High Priority
+
+### [ ] Refactor 14 react-hooks v7 violations (set-state-in-effect, purity)
+
+**Current:** eslint-plugin-react-hooks 7.x flags 11 setState-in-effect and
+3 impure-render (`Date.now()` in render defaults) occurrences, temporarily
+downgraded to `warn` in `eslint.config.js`.
+
+**Plan:** Refactor each to derive state during render or use lazy init /
+`useSyncExternalStore`; then re-raise both rules to `error`.
+**Files:** `DataManager.tsx`, `hero.tsx`, `projects.tsx`, `carousel.tsx`,
+admin tabs, `initial-*.ts` (Date.now() seed defaults).
 
 ### [ ] Type the Firestore data layer (eliminate `any` warnings)
 
@@ -191,7 +248,7 @@ isn't in the repo. Update flow relies on `controllerchange` reload.
 
 ## P3 — Low Priority / Future
 
-### [ ] Migrate to React Router v7 (when stable)
+### [x] Migrate to React Router v7 — done 2026-07-28 (7.18.1, security-driven)
 
 ### [ ] Consider TanStack Router for type-safe routing
 
