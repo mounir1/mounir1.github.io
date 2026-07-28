@@ -229,13 +229,17 @@ export const Hero = () => {
               </div>
               <div className="text-sm text-muted-foreground">Projects</div>
             </div>
-            <div className="w-px h-12 bg-border" />
-            <div className="text-center group cursor-default">
-              <div className="text-2xl font-bold text-primary group-hover:scale-110 transition-transform">
-                {heroStats.usersServed}
-              </div>
-              <div className="text-sm text-muted-foreground">Users Served</div>
-            </div>
+            {heroStats.usersServed && (
+              <>
+                <div className="w-px h-12 bg-border" />
+                <div className="text-center group cursor-default">
+                  <div className="text-2xl font-bold text-primary group-hover:scale-110 transition-transform">
+                    {heroStats.usersServed}
+                  </div>
+                  <div className="text-sm text-muted-foreground">Users Served</div>
+                </div>
+              </>
+            )}
             {heroStats.clientSatisfaction && (
               <>
                 <div className="w-px h-12 bg-border" />

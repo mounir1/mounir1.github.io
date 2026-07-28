@@ -80,8 +80,8 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     openToWork: true,
     remoteOnly: false,
     typingWords: ["Full-Stack Developer", "Magento Expert", "ERP Integrator", "AI Solutions Builder"],
-    currentlyBuilding: "AI Ops Dashboard",
-    openSourceModules: "15+",
+    currentlyBuilding: "Nava PMS",
+    openSourceModules: "28+",
   },
   social: {
     linkedin: "https://linkedin.com/in/mounir1badi",
@@ -89,9 +89,9 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   },
   heroStats: {
     yearsExperience: 10,
-    projectsCompleted: 150,
-    usersServed: "10K+",
-    clientSatisfaction: "98%",
+    projectsCompleted: 30,
+    usersServed: "",
+    clientSatisfaction: "",
   },
   seo: {
     siteTitle: "Mounir Abderrahmani — Senior Full-Stack Developer",
