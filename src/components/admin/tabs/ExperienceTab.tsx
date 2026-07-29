@@ -21,6 +21,13 @@ import {
   TrendingUp, Briefcase, ChevronDown, ChevronUp, Building2, Palette, Download,
 } from "lucide-react";
 
+// Module-scope handler: uses Date.now(), so it must stay out of the
+// render path (react-hooks/purity). db is a module import.
+async function toggleField(id: string, field: "disabled" | "featured", value: boolean) {
+  if (!db) return;
+  await updateDoc(doc(db, EXPERIENCE_COLLECTION, id), { [field]: value, updatedAt: Date.now() });
+}
+
 function downloadJSON(data: any, filename: string) {
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
@@ -106,11 +113,6 @@ export function ExperienceTab() {
   async function handleDelete(id: string, title: string) {
     if (!db || !confirm(`Delete "${title}"?`)) return;
     await deleteDoc(doc(db, EXPERIENCE_COLLECTION, id));
-  }
-
-  async function toggleField(id: string, field: "disabled" | "featured", value: boolean) {
-    if (!db) return;
-    await updateDoc(doc(db, EXPERIENCE_COLLECTION, id), { [field]: value, updatedAt: Date.now() });
   }
 
   return (

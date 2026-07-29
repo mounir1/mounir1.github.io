@@ -19,6 +19,13 @@ import { ImageUpload } from "@/components/admin/ImageUpload";
 import { SKILL_ICONS, getSkillColor } from "@/lib/skill-icons";
 import { Plus, Edit, Trash2, Eye, EyeOff, Star, Zap, Palette, Search, Download } from "lucide-react";
 
+// Module-scope handler: uses Date.now(), so it must stay out of the
+// render path (react-hooks/purity). db is a module import.
+async function toggleField(id: string, field: "disabled" | "featured", value: boolean) {
+  if (!db) return;
+  await updateDoc(doc(db, SKILLS_COLLECTION, id), { [field]: value, updatedAt: Date.now() });
+}
+
 function downloadJSON(data: any, filename: string) {
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
@@ -116,11 +123,6 @@ export function SkillsTab() {
   async function handleDelete(id: string, name: string) {
     if (!db || !confirm(`Delete "${name}"? This cannot be undone.`)) return;
     await deleteDoc(doc(db, SKILLS_COLLECTION, id));
-  }
-
-  async function toggleField(id: string, field: "disabled" | "featured", value: boolean) {
-    if (!db) return;
-    await updateDoc(doc(db, SKILLS_COLLECTION, id), { [field]: value, updatedAt: Date.now() });
   }
 
   return (
