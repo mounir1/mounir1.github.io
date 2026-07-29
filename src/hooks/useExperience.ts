@@ -61,21 +61,21 @@ export const DEFAULT_EXPERIENCE: ExperienceInput = {
  *                    Use in admin panels. Default: false (public view).
  */
 export function useExperience(adminMode = false) {
-  const [experiences, setExperiences] = useState<Experience[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Local fallback is resolved during lazy state init — no synchronous
+  // setState inside the effect (react-hooks/set-state-in-effect) and no
+  // empty-state flash when Firebase is disabled.
+  const [experiences, setExperiences] = useState<Experience[]>(() =>
+    !isFirebaseEnabled || !db
+      ? initialExperience.map((exp, index) => ({ id: `local-exp-${index}`, ...exp }))
+      : []
+  );
+  const [loading, setLoading] = useState(isFirebaseEnabled && !!db);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Use local data when Firebase is not enabled (development mode)
+    // Local data already seeded via lazy init when Firebase is disabled
     if (!isFirebaseEnabled || !db) {
       console.log("Using local experience data — Firebase disabled in development");
-      const localExperience: Experience[] = initialExperience.map((exp, index) => ({
-        id: `local-exp-${index}`,
-        ...exp,
-      }));
-      setExperiences(localExperience);
-      setLoading(false);
-      setError(null);
       return;
     }
 
