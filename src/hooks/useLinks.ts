@@ -5,10 +5,11 @@ import {
   onSnapshot,
   addDoc,
   deleteDoc,
-  updateDoc,
+  setDoc,
   doc,
   orderBy,
   query,
+  getDocs,
 } from "firebase/firestore";
 
 export interface PortfolioLink {
@@ -94,6 +95,26 @@ export function useLinks() {
     return () => unsub();
   }, []);
 
+  /**
+   * When the Firestore collection is empty the UI displays DEFAULT_LINKS as a
+   * fallback — but those docs (ids d1…d12) don't exist in Firestore, so a
+   * plain updateDoc/deleteDoc would throw "No document to update". Before the
+   * first mutation we materialise ALL defaults into Firestore (keeping their
+   * ids) so every displayed row is backed by a real doc and later snapshots
+   * stay complete. No-op once the collection has any docs.
+   */
+  const ensureSeeded = async () => {
+    if (!isFirebaseEnabled || !db) return;
+    const snap = await getDocs(collection(db, LINKS_COLLECTION));
+    if (!snap.empty) return;
+    const now = Date.now();
+    await Promise.all(
+      DEFAULT_LINKS.map(({ id, ...data }) =>
+        setDoc(doc(db!, LINKS_COLLECTION, id), { ...data, createdAt: now, updatedAt: now })
+      )
+    );
+  };
+
   const addLink = async (data: PortfolioLinkInput) => {
     if (!isFirebaseEnabled || !db) {
       const newLink: PortfolioLink = { ...data, id: Date.now().toString(), createdAt: Date.now(), updatedAt: Date.now() };
@@ -102,6 +123,7 @@ export function useLinks() {
       localStorage.setItem("portfolio_links", JSON.stringify(updated));
       return;
     }
+    await ensureSeeded();
     await addDoc(collection(db, LINKS_COLLECTION), {
       ...data,
       createdAt: Date.now(),
@@ -116,7 +138,9 @@ export function useLinks() {
       localStorage.setItem("portfolio_links", JSON.stringify(updated));
       return;
     }
-    await updateDoc(doc(db, LINKS_COLLECTION, id), { ...data, updatedAt: Date.now() });
+    await ensureSeeded();
+    // setDoc+merge is an upsert — never throws "No document to update".
+    await setDoc(doc(db, LINKS_COLLECTION, id), { ...data, updatedAt: Date.now() }, { merge: true });
   };
 
   const deleteLink = async (id: string) => {
@@ -126,14 +150,18 @@ export function useLinks() {
       localStorage.setItem("portfolio_links", JSON.stringify(updated));
       return;
     }
+    await ensureSeeded();
     await deleteDoc(doc(db, LINKS_COLLECTION, id));
   };
 
   const seedDefaults = async () => {
-    for (const link of DEFAULT_LINKS) {
-      const { id: _id, ...data } = link;
-      await addLink({ ...data });
+    if (!isFirebaseEnabled || !db) {
+      setLinks(DEFAULT_LINKS);
+      localStorage.setItem("portfolio_links", JSON.stringify(DEFAULT_LINKS));
+      return;
     }
+    // Materialise defaults with stable ids (no-op if collection already has docs).
+    await ensureSeeded();
   };
 
   return { links, loading, addLink, updateLink, deleteLink, seedDefaults };

@@ -5,10 +5,11 @@ import {
   onSnapshot,
   addDoc,
   deleteDoc,
-  updateDoc,
+  setDoc,
   doc,
   orderBy,
   query,
+  getDocs,
 } from "firebase/firestore";
 
 export type UpcomingStatus = "idea" | "planned" | "in-development" | "beta" | "soon";
@@ -159,6 +160,24 @@ export function useUpcoming() {
     return () => unsub();
   }, []);
 
+  /**
+   * The UI falls back to DEFAULT_UPCOMING (ids u1…u4) while the Firestore
+   * collection is empty — those docs don't exist, so mutating them directly
+   * would throw "No document to update". Materialise all defaults (stable ids)
+   * before the first mutation; no-op once the collection has docs.
+   */
+  const ensureSeeded = async () => {
+    if (!isFirebaseEnabled || !db) return;
+    const snap = await getDocs(collection(db, UPCOMING_COLLECTION));
+    if (!snap.empty) return;
+    const now = Date.now();
+    await Promise.all(
+      DEFAULT_UPCOMING.map(({ id, ...data }) =>
+        setDoc(doc(db!, UPCOMING_COLLECTION, id), { ...data, createdAt: now, updatedAt: now })
+      )
+    );
+  };
+
   const addUpcoming = async (data: UpcomingProjectInput) => {
     if (!isFirebaseEnabled || !db) {
       const item: UpcomingProject = { ...data, id: Date.now().toString(), createdAt: Date.now(), updatedAt: Date.now() };
@@ -167,6 +186,7 @@ export function useUpcoming() {
       localStorage.setItem("portfolio_upcoming", JSON.stringify(updated));
       return;
     }
+    await ensureSeeded();
     await addDoc(collection(db, UPCOMING_COLLECTION), {
       ...data,
       createdAt: Date.now(),
@@ -181,7 +201,9 @@ export function useUpcoming() {
       localStorage.setItem("portfolio_upcoming", JSON.stringify(updated));
       return;
     }
-    await updateDoc(doc(db, UPCOMING_COLLECTION, id), { ...data, updatedAt: Date.now() });
+    await ensureSeeded();
+    // setDoc+merge is an upsert — never throws "No document to update".
+    await setDoc(doc(db, UPCOMING_COLLECTION, id), { ...data, updatedAt: Date.now() }, { merge: true });
   };
 
   const deleteUpcoming = async (id: string) => {
@@ -191,6 +213,7 @@ export function useUpcoming() {
       localStorage.setItem("portfolio_upcoming", JSON.stringify(updated));
       return;
     }
+    await ensureSeeded();
     await deleteDoc(doc(db, UPCOMING_COLLECTION, id));
   };
 
