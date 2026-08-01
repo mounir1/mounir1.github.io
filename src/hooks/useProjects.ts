@@ -120,21 +120,20 @@ export const DEFAULT_PROJECT: Omit<ProjectInput, 'title' | 'description' | 'cate
 };
 
 export function useProjects() {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Local fallback resolved during lazy state init — no synchronous setState
+  // in the effect (react-hooks/set-state-in-effect) and no empty-state flash.
+  const [projects, setProjects] = useState<Project[]>(() =>
+    !isFirebaseEnabled || !db
+      ? initialProjects.map((project, index) => ({ id: `local-${index}`, ...project }))
+      : []
+  );
+  const [loading, setLoading] = useState(isFirebaseEnabled && !!db);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Use local data when Firebase is not enabled (development mode)
+    // Local data already seeded via lazy init when Firebase is disabled
     if (!isFirebaseEnabled || !db) {
       console.log('Using local project data - Firebase disabled in development');
-      const localProjects: Project[] = initialProjects.map((project, index) => ({
-        id: `local-${index}`,
-        ...project
-      }));
-      setProjects(localProjects);
-      setLoading(false);
-      setError(null);
       return;
     }
 
