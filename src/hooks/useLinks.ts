@@ -48,19 +48,22 @@ export const DEFAULT_LINKS: PortfolioLink[] = [
 ];
 
 export function useLinks() {
-  const [links, setLinks] = useState<PortfolioLink[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Local fallback resolved during lazy state init — no synchronous setState
+  // in the effect (react-hooks/set-state-in-effect) and no empty-state flash.
+  const [links, setLinks] = useState<PortfolioLink[]>(() => {
+    if (isFirebaseEnabled && db) return [];
+    try {
+      const stored = JSON.parse(localStorage.getItem("portfolio_links") || "[]");
+      return stored.length > 0 ? stored : DEFAULT_LINKS;
+    } catch {
+      return DEFAULT_LINKS;
+    }
+  });
+  const [loading, setLoading] = useState(isFirebaseEnabled && !!db);
 
   useEffect(() => {
+    // Local data already seeded via lazy init when Firebase is disabled
     if (!isFirebaseEnabled || !db) {
-      // Fallback: try localStorage, else use defaults
-      try {
-        const stored = JSON.parse(localStorage.getItem("portfolio_links") || "[]");
-        setLinks(stored.length > 0 ? stored : DEFAULT_LINKS);
-      } catch {
-        setLinks(DEFAULT_LINKS);
-      }
-      setLoading(false);
       return;
     }
 

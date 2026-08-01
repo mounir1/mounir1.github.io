@@ -63,23 +63,25 @@ export const TESTIMONIALS_COLLECTION = "testimonials";
  * @param adminMode — When true, fetches all testimonials including disabled ones.
  */
 export function useTestimonials(adminMode = false) {
-  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Local fallback resolved during lazy state init — no synchronous setState
+  // in the effect (react-hooks/set-state-in-effect) and no empty-state flash.
+  const [testimonials, setTestimonials] = useState<Testimonial[]>(() => {
+    if (isFirebaseEnabled && db) return [];
+    const seededAt = Date.now();
+    const localTestimonials: Testimonial[] = initialTestimonials.map((t, i) => ({
+      id: `local-testimonial-${i}`,
+      ...t,
+      createdAt: seededAt,
+      updatedAt: seededAt,
+    }));
+    // In public mode, only show non-disabled items
+    return adminMode ? localTestimonials : localTestimonials.filter((t) => !t.disabled);
+  });
+  const [loading, setLoading] = useState(isFirebaseEnabled && !!db);
 
   useEffect(() => {
-    // Fallback to local data when Firebase is unavailable (same pattern as useProjects)
+    // Local data already seeded via lazy init when Firebase is disabled
     if (!isFirebaseEnabled || !db) {
-      const localTestimonials: Testimonial[] = initialTestimonials.map((t, i) => ({
-        id: `local-testimonial-${i}`,
-        ...t,
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-      }));
-      // In public mode, only show non-disabled featured items
-      setTestimonials(
-        adminMode ? localTestimonials : localTestimonials.filter(t => !t.disabled)
-      );
-      setLoading(false);
       return;
     }
 
