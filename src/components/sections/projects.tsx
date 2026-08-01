@@ -45,10 +45,13 @@ export const Projects = () => {
   const [activeCategory, setActiveCategory] = useState("All");
   const [showAll, setShowAll] = useState(false);
 
-  // Reset showAll when filter/search changes
-  useEffect(() => {
+  // Reset showAll when filter/search changes — adjust state during render
+  // (React's recommended pattern) instead of a setState-only effect.
+  const [prevFilter, setPrevFilter] = useState({ activeCategory, search });
+  if (prevFilter.activeCategory !== activeCategory || prevFilter.search !== search) {
+    setPrevFilter({ activeCategory, search });
     setShowAll(false);
-  }, [activeCategory, search]);
+  }
 
   // Filtered lists
   const filteredFeatured = useMemo(() => {

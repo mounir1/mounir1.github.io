@@ -53,8 +53,13 @@ function useTyping(
         );
         return () => clearTimeout(t);
       } else {
-        setIsPaused(true);
-        setIsDeleting(true);
+        // Transition to pause+delete on a timer — keeps the state machine
+        // out of the synchronous effect body (react-hooks/set-state-in-effect)
+        const t = setTimeout(() => {
+          setIsPaused(true);
+          setIsDeleting(true);
+        }, typingSpeed);
+        return () => clearTimeout(t);
       }
     } else {
       if (displayed.length > 0) {
@@ -64,8 +69,11 @@ function useTyping(
         );
         return () => clearTimeout(t);
       } else {
-        setIsDeleting(false);
-        setWordIndex((i) => i + 1);
+        const t = setTimeout(() => {
+          setIsDeleting(false);
+          setWordIndex((i) => i + 1);
+        }, deletingSpeed);
+        return () => clearTimeout(t);
       }
     }
   }, [displayed, isDeleting, isPaused, wordIndex, words, typingSpeed, deletingSpeed, pauseMs]);
