@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useTestimonials, DEFAULT_TESTIMONIAL, type TestimonialInput } from "@/hooks/useTestimonials";
+import { useToast } from "@/hooks/use-toast";
 import { Plus, Edit, Trash2, Eye, EyeOff, Star, MessageSquare, ExternalLink, Loader2, Download } from "lucide-react";
 
 function downloadJSON(data: any, filename: string) {
@@ -43,6 +44,7 @@ function StarRating({ rating, onChange }: { rating: number; onChange?: (r: numbe
 export function TestimonialsTab() {
   const { testimonials, loading, addTestimonial, updateTestimonial, deleteTestimonial } =
     useTestimonials(true);
+  const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState<TestimonialInput>({ ...DEFAULT_TESTIMONIAL });
@@ -89,8 +91,10 @@ export function TestimonialsTab() {
       if (editId) await updateTestimonial(editId, form);
       else await addTestimonial(form);
       setOpen(false);
+      toast({ title: editId ? "Testimonial updated" : "Testimonial added", description: form.author });
     } catch (e) {
       console.error("Failed to save testimonial:", e);
+      toast({ title: "Failed to save testimonial", description: String(e), variant: "destructive" });
     } finally {
       setSaving(false);
     }
@@ -98,7 +102,21 @@ export function TestimonialsTab() {
 
   async function handleDelete(id: string) {
     if (!confirm("Delete this testimonial? This cannot be undone.")) return;
-    await deleteTestimonial(id);
+    try {
+      await deleteTestimonial(id);
+      toast({ title: "Testimonial deleted" });
+    } catch (e) {
+      toast({ title: "Failed to delete testimonial", description: String(e), variant: "destructive" });
+    }
+  }
+
+  async function handleQuickToggle(id: string, patch: { featured?: boolean; disabled?: boolean }, label: string) {
+    try {
+      await updateTestimonial(id, patch);
+      toast({ title: label });
+    } catch (e) {
+      toast({ title: "Update failed", description: String(e), variant: "destructive" });
+    }
   }
 
   return (
@@ -210,7 +228,7 @@ export function TestimonialsTab() {
                     size="icon"
                     variant="ghost"
                     className="h-8 w-8"
-                    onClick={() => updateTestimonial(t.id, { featured: !t.featured })}
+                    onClick={() => handleQuickToggle(t.id, { featured: !t.featured }, t.featured ? "Removed from featured" : "Marked as featured")}
                     title={t.featured ? "Unfeature" : "Feature"}
                   >
                     <Star className={`h-4 w-4 ${t.featured ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground"}`} />
@@ -219,7 +237,7 @@ export function TestimonialsTab() {
                     size="icon"
                     variant="ghost"
                     className="h-8 w-8"
-                    onClick={() => updateTestimonial(t.id, { disabled: !t.disabled })}
+                    onClick={() => handleQuickToggle(t.id, { disabled: !t.disabled }, t.disabled ? "Testimonial visible" : "Testimonial hidden")}
                     title={t.disabled ? "Show" : "Hide"}
                   >
                     {t.disabled
