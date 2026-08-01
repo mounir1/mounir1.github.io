@@ -15,6 +15,7 @@ import {
 import { useProjects, PROJECTS_COLLECTION, type ProjectInput, DEFAULT_PROJECT } from "@/hooks/useProjects";
 import { db } from "@/lib/firebase";
 import { addDoc, collection, doc, updateDoc, deleteDoc } from "firebase/firestore";
+import { useToast } from "@/hooks/use-toast";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { BrandAssetPicker } from "@/components/admin/BrandAssetPicker";
 import {
@@ -352,7 +353,9 @@ function ProjectForm({
 
 // ─── ProjectsTab ─────────────────────────────────────────────────────────────
 export function ProjectsTab() {
-  const { projects, loading } = useProjects();
+  // adminMode — include disabled projects so they can be re-enabled
+  const { projects, loading } = useProjects(true);
+  const { toast } = useToast();
   const [search, setSearch] = useState("");
   const [filterCat, setFilterCat] = useState("all");
   const [addOpen, setAddOpen] = useState(false);
@@ -380,7 +383,11 @@ export function ProjectsTab() {
         ...data, createdAt: Date.now(), updatedAt: Date.now(), version: 1,
       });
       setAddOpen(false);
-    } catch (e) { console.error("Failed to add project:", e); }
+      toast({ title: "Project added", description: data.title });
+    } catch (e) {
+      console.error("Failed to add project:", e);
+      toast({ title: "Failed to add project", description: String(e), variant: "destructive" });
+    }
     finally { setSubmitting(false); }
   }
 
@@ -390,18 +397,36 @@ export function ProjectsTab() {
     try {
       await updateDoc(doc(db, PROJECTS_COLLECTION, editProject.id), { ...data, updatedAt: Date.now() });
       setEditProject(null);
-    } catch (e) { console.error("Failed to update project:", e); }
+      toast({ title: "Project updated", description: data.title });
+    } catch (e) {
+      console.error("Failed to update project:", e);
+      toast({ title: "Failed to update project", description: String(e), variant: "destructive" });
+    }
     finally { setSubmitting(false); }
   }
 
   async function handleToggle(id: string, key: "featured" | "disabled", current: boolean) {
     if (!db) return;
-    await updateDoc(doc(db, PROJECTS_COLLECTION, id), { [key]: !current, updatedAt: Date.now() });
+    try {
+      await updateDoc(doc(db, PROJECTS_COLLECTION, id), { [key]: !current, updatedAt: Date.now() });
+      toast({
+        title: key === "featured"
+          ? (!current ? "Marked as featured" : "Removed from featured")
+          : (!current ? "Project hidden from site" : "Project visible on site"),
+      });
+    } catch (e) {
+      toast({ title: "Failed to toggle project", description: String(e), variant: "destructive" });
+    }
   }
 
   async function handleDelete(id: string, title: string) {
     if (!db || !confirm(`Delete "${title}"? This cannot be undone.`)) return;
-    await deleteDoc(doc(db, PROJECTS_COLLECTION, id));
+    try {
+      await deleteDoc(doc(db, PROJECTS_COLLECTION, id));
+      toast({ title: "Project deleted", description: title });
+    } catch (e) {
+      toast({ title: "Failed to delete project", description: String(e), variant: "destructive" });
+    }
   }
 
   return (

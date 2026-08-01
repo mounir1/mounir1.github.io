@@ -119,14 +119,19 @@ export const DEFAULT_PROJECT: Omit<ProjectInput, 'title' | 'description' | 'cate
   version: 1
 };
 
-export function useProjects() {
+/**
+ * @param adminMode — When true, includes disabled projects so the admin list
+ * can show hidden entries and re-enable them. Public views (default) only
+ * ever see non-disabled projects.
+ */
+export function useProjects(adminMode = false) {
   // Local fallback resolved during lazy state init — no synchronous setState
   // in the effect (react-hooks/set-state-in-effect) and no empty-state flash.
-  const [projects, setProjects] = useState<Project[]>(() =>
-    !isFirebaseEnabled || !db
-      ? initialProjects.map((project, index) => ({ id: `local-${index}`, ...project }))
-      : []
-  );
+  const [projects, setProjects] = useState<Project[]>(() => {
+    if (isFirebaseEnabled && db) return [];
+    const local = initialProjects.map((project, index) => ({ id: `local-${index}`, ...project }));
+    return adminMode ? local : local.filter(p => !p.disabled);
+  });
   const [loading, setLoading] = useState(isFirebaseEnabled && !!db);
   const [error, setError] = useState<string | null>(null);
 
@@ -137,13 +142,20 @@ export function useProjects() {
       return;
     }
 
-    // Use Firebase in production
-    const q = query(
-      collection(db, PROJECTS_COLLECTION),
-      where("disabled", "==", false),
-      orderBy("priority", "desc"),
-      orderBy("createdAt", "desc")
-    );
+    // Use Firebase in production. Admin mode must see disabled projects too —
+    // otherwise hiding a project removes it from the admin list permanently.
+    const q = adminMode
+      ? query(
+          collection(db, PROJECTS_COLLECTION),
+          orderBy("priority", "desc"),
+          orderBy("createdAt", "desc")
+        )
+      : query(
+          collection(db, PROJECTS_COLLECTION),
+          where("disabled", "==", false),
+          orderBy("priority", "desc"),
+          orderBy("createdAt", "desc")
+        );
 
     const unsubscribe = onSnapshot(
       q,
@@ -165,14 +177,14 @@ export function useProjects() {
           id: `fallback-${index}`,
           ...project
         }));
-        setProjects(localProjects);
+        setProjects(adminMode ? localProjects : localProjects.filter(p => !p.disabled));
         setLoading(false);
         setError(null);
       }
     );
 
     return () => unsubscribe();
-  }, []);
+  }, [adminMode]);
 
   const featured = useMemo(() => 
     projects.filter(project => project.featured && !project.disabled)
