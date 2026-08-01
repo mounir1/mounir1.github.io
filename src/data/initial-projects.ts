@@ -596,7 +596,7 @@ export const initialProjects: ProjectInput[] = [
     liveUrl: "",
     githubUrl: "",
     demoUrl: "",
-    caseStudyUrl: "https://techno-dz.com",
+    caseStudyUrl: "https://technostationery.com",
     featured: true,
     disabled: false,
     priority: 93,
@@ -608,7 +608,7 @@ export const initialProjects: ProjectInput[] = [
       industry: "Education Technology",
       size: "medium",
       location: "Algeria",
-      website: "https://techno-dz.com",
+      website: "https://technostationery.com",
       isPublic: true,
     },
     metrics: {
