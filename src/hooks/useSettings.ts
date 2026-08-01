@@ -74,7 +74,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     phone: "+213 674 09 48 55",
     location: "Algeria • Remote",
     profilePhoto: "/profile.webp",
-    resumeUrl: "/Mounir_CV_2025.pdf",
+    resumeUrl: "/Mounir_Abderrahmani_Resume.pdf",
     availability: "available",
     availabilityNote: "Open to remote contracts and full-time opportunities",
     openToWork: true,

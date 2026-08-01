@@ -132,8 +132,8 @@ export const Hero = () => {
 
   const handleDownloadCV = () => {
     const link = document.createElement("a");
-    link.href = personalInfo.resumeUrl ?? "/Mounir_CV_2025.pdf";
-    link.download = "Mounir_Abderrahmani_CV_2025.pdf";
+    link.href = personalInfo.resumeUrl ?? "/Mounir_Abderrahmani_Resume.pdf";
+    link.download = "Mounir_Abderrahmani_Resume.pdf";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

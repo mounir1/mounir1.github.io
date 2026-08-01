@@ -226,7 +226,7 @@ export function SettingsTab() {
                 <Input
                   value={s.personalInfo.resumeUrl ?? ""}
                   onChange={(e) => patchNested("personalInfo", "resumeUrl", e.target.value)}
-                  placeholder="/Mounir_CV_2025.pdf"
+                  placeholder="/Mounir_Abderrahmani_Resume.pdf"
                 />
               </div>
             </div>
