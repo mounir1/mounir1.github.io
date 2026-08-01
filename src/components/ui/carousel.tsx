@@ -101,6 +101,10 @@ const Carousel = React.forwardRef<
         return
       }
 
+      // Stock shadcn/embla pattern: expose the embla API instance to the parent.
+      // setApi is an external callback (often a parent setState) — this is an
+      // intentional external-store sync, safe to suppress.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setApi(api)
     }, [api, setApi])
 
@@ -109,6 +113,9 @@ const Carousel = React.forwardRef<
         return
       }
 
+      // Sync initial scroll state from the embla external store before subscribing.
+      // Stock shadcn code; embla is an external store, so this is intentional.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       onSelect(api)
       api.on("reInit", onSelect)
       api.on("select", onSelect)

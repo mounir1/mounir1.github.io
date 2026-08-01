@@ -323,15 +323,13 @@ function AdminShell({ user, auth }: { user: User; auth: Auth }) {
 export default function Admin() {
   const [user, setUser] = useState<User | null>(null);
   const [auth, setAuth] = useState<Auth | null>(null);
-  const [authChecked, setAuthChecked] = useState(false);
+  // When Firebase is off there is nothing to check — start as "checked" (no setState in effect).
+  const [authChecked, setAuthChecked] = useState(!isFirebaseEnabled || !db);
   const unsubRef = useRef<(() => void) | null>(null);
 
   // Lazy-load firebase/auth only when Admin page mounts
   useEffect(() => {
-    if (!isFirebaseEnabled || !db) {
-      setAuthChecked(true);
-      return;
-    }
+    if (!isFirebaseEnabled || !db) return;
 
     let cancelled = false;
 

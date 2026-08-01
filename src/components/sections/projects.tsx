@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Skeleton } from "@/components/ui/skeleton";
 import { ExternalLink, Github, Star, Search, Filter, X } from "lucide-react";
 import { useProjects } from "@/hooks/useProjects";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 
 const CATEGORIES = [
   "All",
