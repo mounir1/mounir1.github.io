@@ -4,7 +4,7 @@ import { Navigation } from "@/components/ui/navigation";
 import { Hero } from "@/components/sections/hero";
 import { Signature } from "@/components/ui/signature";
 import { useSettings } from "@/hooks/useSettings";
-import { useLinks } from "@/hooks/useLinks";
+import { useLinks, DEFAULT_LINKS } from "@/hooks/useLinks";
 
 // ── Below-fold: lazy-loaded into separate async chunks ────────────────────────
 const Experience   = lazy(() => import("@/components/sections/experience").then(m => ({ default: m.Experience })));
@@ -113,35 +113,17 @@ function FooterLinks() {
 }
 
 // ─── Static footer links fallback (always shown if Firebase links empty) ─────
-const STATIC_FOOTER_LINKS = [
-  {
-    category: "Enterprise Solutions",
-    links: [
-      { href: "https://hotech.systems",                  label: "hotech.systems" },
-      { href: "https://en.hotech.systems",               label: "HoTech EN" },
-      { href: "https://technostationery.com",            label: "technostationery.com" },
-      { href: "https://dashboard.technostationery.com",  label: "Dashboard · AI · Monitoring" },
-      { href: "https://etl.techno-dz.com",               label: "ETL Platform" },
-    ],
-  },
-  {
-    category: "Magento & Adobe Commerce",
-    links: [
-      { href: "https://mab-modules.github.io",   label: "mab-modules.github.io" },
-      { href: "https://mounirtms.github.io",     label: "mounirtms.github.io" },
-      { href: "https://github.com/mab-modules",  label: "GitHub: mab-modules" },
-      { href: "https://github.com/mounirtms",    label: "GitHub: mounirtms" },
-    ],
-  },
-  {
-    category: "Web Applications",
-    links: [
-      { href: "https://jskit-app.web.app",                  label: "JSKit App" },
-      { href: "https://www.nooralmaarifa.com",               label: "Noor Al Maarifa" },
-      { href: "https://it-collaborator-techno.web.app",      label: "IT Collaborator" },
-    ],
-  },
-];
+// Derived from DEFAULT_LINKS (single source of truth — see useLinks.ts) so the
+// footer can never drift from the verified link list.
+const STATIC_FOOTER_LINKS = Object.entries(
+  DEFAULT_LINKS.filter((l) => l.active).reduce<Record<string, { href: string; label: string }[]>>(
+    (acc, l) => {
+      (acc[l.category] ??= []).push({ href: l.url, label: l.label });
+      return acc;
+    },
+    {},
+  ),
+).map(([category, links]) => ({ category, links }));
 
 function StaticFooterLinks() {
   return (
