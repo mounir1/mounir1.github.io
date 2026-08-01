@@ -140,18 +140,46 @@ explanatory comments; public visitors no longer hit dead/forbidden links.
 
 ---
 
+## P0 — Completed (2026-08-01, session 3)
+
+### [x] Refactor all react-hooks v7 violations — rules now `error`
+
+All 14 setState-in-effect / purity occurrences refactored across three
+commit batches (b09e9be, 219272a, 288eb17, c3b606e, 430f9b1):
+lazy state init for local-fallback data hooks, `useSyncExternalStore`
+for `use-mobile`, render-phase adjustment for `projects.tsx` filter reset,
+timer-based typewriter transitions in `hero.tsx`, async-yield + justified
+suppressions for `DataManager` mount fetch and embla external-store sync
+in `carousel.tsx`. `react-hooks/set-state-in-effect` and
+`react-hooks/purity` re-raised to **error** — regressions now block CI.
+
+### [x] Resume: uploaded Canada-targeted PDF wired in (8eaecbb)
+
+`public/Mounir_Abderrahmani_Resume.pdf` is the default `resumeUrl`
+(hero download + admin Settings placeholder updated); the generated
+`/Mounir_CV_2025.pdf` remains as an alternate. Verified live (200).
+
+### [x] Links audit — every URL curl-verified, footer single-sourced (c46bbbd)
+
+Dead links removed/replaced in `DEFAULT_LINKS`: `etl.techno-dz.com`
+(no DNS) → `github.com/mounirtms/ETL-scripts`; `mab-modules.github.io`
++ `github.com/mab-modules` (404) removed; `it-collaborator-techno.web.app`
+(404) removed; added `github.com/mounir1`. Footer `STATIC_FOOTER_LINKS`
+now derived from `DEFAULT_LINKS` — no duplicate list to drift.
+Admin → Links tab confirmed to support add/edit/delete/toggle.
+
+### [x] Projects audit — 14 project URLs verified 200, dead refs fixed (7af3789)
+
+All `liveUrl`/`githubUrl`/`demoUrl` values return 200; `techno-dz.com`
+(404) replaced with `technostationery.com` in IT Collaborator entry;
+all 9 logo SVGs confirmed present in `public/`.
+
+### [x] GitHub Pages SPA routing verified live
+
+`/admin` deep route serves `404.html` with the `spa_redirect`
+sessionStorage restore script; root and resume PDF return 200.
+
 ## P1 — High Priority
-
-### [ ] Refactor 14 react-hooks v7 violations (set-state-in-effect, purity)
-
-**Current:** eslint-plugin-react-hooks 7.x flags 11 setState-in-effect and
-3 impure-render (`Date.now()` in render defaults) occurrences, temporarily
-downgraded to `warn` in `eslint.config.js`.
-
-**Plan:** Refactor each to derive state during render or use lazy init /
-`useSyncExternalStore`; then re-raise both rules to `error`.
-**Files:** `DataManager.tsx`, `hero.tsx`, `projects.tsx`, `carousel.tsx`,
-admin tabs, `initial-*.ts` (Date.now() seed defaults).
 
 ### [ ] Type the Firestore data layer (eliminate `any` warnings)
 
