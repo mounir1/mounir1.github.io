@@ -8,6 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useSettings, type SiteSettings, type AvailabilityStatus } from "@/hooks/useSettings";
+import { useToast } from "@/hooks/use-toast";
 import {
   Settings, User, Globe, BarChart3, Zap, Save, Loader2,
   Linkedin, Github, Twitter, Youtube, Link, CheckCircle,
@@ -36,6 +37,7 @@ function SectionHeader({ icon: Icon, title, description }: { icon: any; title: s
 
 export function SettingsTab() {
   const { settings, loading, saveSettings } = useSettings();
+  const { toast } = useToast();
   const [draft, setDraft] = useState<SiteSettings | null>(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -69,11 +71,31 @@ export function SettingsTab() {
     try {
       await saveSettings(draft);
       setSaved(true);
+      toast({ title: "Settings saved", description: "Changes are live on the site." });
       setTimeout(() => setSaved(false), 3000);
     } catch (e) {
       console.error("Failed to save settings:", e);
+      toast({ title: "Failed to save settings", description: String(e), variant: "destructive" });
     } finally {
       setSaving(false);
+    }
+  }
+
+  /**
+   * Feature flags auto-save instantly — flipping a switch takes effect on the
+   * live site immediately (no separate "Save Settings" click needed).
+   * Other draft edits remain unsaved until Save is pressed.
+   */
+  async function handleFeatureToggle(key: keyof SiteSettings["features"], label: string, v: boolean) {
+    const current = draft ?? settings;
+    const features = { ...current.features, [key]: v };
+    patchNested("features", key, v); // keep UI/draft in sync
+    try {
+      await saveSettings({ features });
+      toast({ title: `${label} ${v ? "enabled" : "disabled"}`, description: "Live on the site now." });
+    } catch (e) {
+      patchNested("features", key, !v); // roll back on failure
+      toast({ title: `Failed to toggle ${label}`, description: String(e), variant: "destructive" });
     }
   }
 
@@ -480,7 +502,7 @@ export function SettingsTab() {
                   <Label className="cursor-pointer font-medium text-sm">{label}</Label>
                   <Switch
                     checked={(s.features as any)[key]}
-                    onCheckedChange={(v) => patchNested("features", key as any, v)}
+                    onCheckedChange={(v) => handleFeatureToggle(key as keyof SiteSettings["features"], label, v)}
                   />
                 </div>
               ))}
