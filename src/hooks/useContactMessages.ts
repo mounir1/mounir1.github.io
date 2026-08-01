@@ -35,11 +35,11 @@ export const CONTACT_COLLECTION = "contact_messages";
 
 export function useContactMessages() {
   const [messages, setMessages] = useState<ContactMessage[]>([]);
-  const [loading, setLoading] = useState(true);
+  // No remote source without Firebase — skip the loading state entirely.
+  const [loading, setLoading] = useState(isFirebaseEnabled && !!db);
 
   useEffect(() => {
     if (!isFirebaseEnabled || !db) {
-      setLoading(false);
       return;
     }
     const q = query(collection(db, CONTACT_COLLECTION), orderBy("createdAt", "desc"));

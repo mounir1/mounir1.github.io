@@ -114,18 +114,22 @@ export const DEFAULT_UPCOMING: UpcomingProject[] = [
 ];
 
 export function useUpcoming() {
-  const [upcoming, setUpcoming] = useState<UpcomingProject[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Local fallback resolved during lazy state init — no synchronous setState
+  // in the effect (react-hooks/set-state-in-effect) and no empty-state flash.
+  const [upcoming, setUpcoming] = useState<UpcomingProject[]>(() => {
+    if (isFirebaseEnabled && db) return [];
+    try {
+      const stored = JSON.parse(localStorage.getItem("portfolio_upcoming") || "[]");
+      return stored.length > 0 ? stored : DEFAULT_UPCOMING;
+    } catch {
+      return DEFAULT_UPCOMING;
+    }
+  });
+  const [loading, setLoading] = useState(isFirebaseEnabled && !!db);
 
   useEffect(() => {
+    // Local data already seeded via lazy init when Firebase is disabled
     if (!isFirebaseEnabled || !db) {
-      try {
-        const stored = JSON.parse(localStorage.getItem("portfolio_upcoming") || "[]");
-        setUpcoming(stored.length > 0 ? stored : DEFAULT_UPCOMING);
-      } catch {
-        setUpcoming(DEFAULT_UPCOMING);
-      }
-      setLoading(false);
       return;
     }
 

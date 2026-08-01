@@ -113,11 +113,11 @@ export const DEFAULT_SETTINGS: SiteSettings = {
 
 export function useSettings() {
   const [settings, setSettings] = useState<SiteSettings>(DEFAULT_SETTINGS);
-  const [loading, setLoading] = useState(true);
+  // Defaults already available synchronously — only load when Firebase is on.
+  const [loading, setLoading] = useState(isFirebaseEnabled && !!db);
 
   useEffect(() => {
     if (!isFirebaseEnabled || !db) {
-      setLoading(false);
       return;
     }
     const ref = doc(db, "settings", "site");
