@@ -29,9 +29,17 @@ function StarRating({ rating }: { rating: number }) {
 }
 
 export function Testimonials() {
-  const { featured, loading } = useTestimonials();
+  const { testimonials, featured, loading } = useTestimonials();
   const [current, setCurrent] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Show ALL visible testimonials, featured ones first — a testimonial added
+  // via Admin should appear even if the "featured" flag wasn't ticked.
+  // (The section still auto-hides while there are zero testimonials.)
+  const visible = [
+    ...featured,
+    ...testimonials.filter((t) => !t.disabled && !featured.includes(t)),
+  ];
 
   if (loading) {
     return (
@@ -43,15 +51,15 @@ export function Testimonials() {
     );
   }
 
-  if (featured.length === 0) return null;
+  if (visible.length === 0) return null;
 
-  const total = featured.length;
+  const total = visible.length;
 
   function goTo(index: number) {
     setCurrent(((index % total) + total) % total);
   }
 
-  const t = featured[current];
+  const t = visible[current % total];
 
   return (
     <section id="testimonials" className="py-24 px-6 bg-gradient-to-b from-background to-card/30">
@@ -189,7 +197,7 @@ export function Testimonials() {
             </Button>
 
             <div className="flex gap-2">
-              {featured.map((_, i) => (
+              {visible.map((_, i) => (
                 <button
                   key={i}
                   onClick={() => goTo(i)}
@@ -216,13 +224,13 @@ export function Testimonials() {
         {/* Mini testimonial grid (show all except current on desktop) */}
         {total > 1 && (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-4">
-            {featured
+            {visible
               .filter((_, i) => i !== current)
               .slice(0, 3)
               .map((testimonial, i) => (
                 <button
                   key={testimonial.id ?? i}
-                  onClick={() => goTo(featured.indexOf(testimonial))}
+                  onClick={() => goTo(visible.indexOf(testimonial))}
                   className="text-left p-4 rounded-2xl bg-card/50 border border-border/60 hover:border-primary/30 hover:bg-card/80 transition-all duration-200 space-y-3 group"
                 >
                   <StarRating rating={testimonial.rating} />

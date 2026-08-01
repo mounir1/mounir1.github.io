@@ -8,6 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useLinks, type PortfolioLink, type PortfolioLinkInput } from "@/hooks/useLinks";
+import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2, ExternalLink, Link, Loader2, RefreshCw, Download, Edit } from "lucide-react";
 
 const LINK_CATEGORIES = [
@@ -98,6 +99,7 @@ function LinkFormFields({
 // ─── Main component ───────────────────────────────────────────────────────────
 export function LinksTab() {
   const { links, loading, addLink, deleteLink, updateLink, seedDefaults } = useLinks();
+  const { toast } = useToast();
 
   // Add dialog
   const [addOpen, setAddOpen] = useState(false);
@@ -128,6 +130,9 @@ export function LinksTab() {
       await addLink(addForm);
       setAddForm({ ...EMPTY_LINK });
       setAddOpen(false);
+      toast({ title: "Link added", description: addForm.label });
+    } catch (e) {
+      toast({ title: "Failed to add link", description: String(e), variant: "destructive" });
     } finally { setSaving(false); }
   }
 
@@ -137,12 +142,29 @@ export function LinksTab() {
     try {
       await updateLink(editId, editForm);
       setEditOpen(false);
+      toast({ title: "Link updated", description: editForm.label });
+    } catch (e) {
+      toast({ title: "Failed to update link", description: String(e), variant: "destructive" });
     } finally { setSaving(false); }
+  }
+
+  async function handleToggle(id: string, active: boolean) {
+    try {
+      await updateLink(id, { active });
+      toast({ title: active ? "Link activated" : "Link hidden" });
+    } catch (e) {
+      toast({ title: "Failed to toggle link", description: String(e), variant: "destructive" });
+    }
   }
 
   async function handleDelete(id: string, label: string) {
     if (!confirm(`Delete "${label}"? This cannot be undone.`)) return;
-    await deleteLink(id);
+    try {
+      await deleteLink(id);
+      toast({ title: "Link deleted", description: label });
+    } catch (e) {
+      toast({ title: "Failed to delete link", description: String(e), variant: "destructive" });
+    }
   }
 
   async function handleSeedDefaults() {
@@ -236,7 +258,7 @@ export function LinksTab() {
                 <div className="flex items-center gap-1 ml-3 shrink-0">
                   <Switch
                     checked={link.active}
-                    onCheckedChange={v => updateLink(link.id, { active: v })}
+                    onCheckedChange={v => handleToggle(link.id, v)}
                     className="scale-75"
                   />
                   <Button size="sm" variant="ghost" className="h-7 w-7 p-0 hover:text-primary" onClick={() => openEdit(link)}>
