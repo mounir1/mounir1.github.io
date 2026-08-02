@@ -126,6 +126,19 @@ export function ExperienceTab() {
     }
   }
 
+  async function handleToggleField(id: string, field: "disabled" | "featured", value: boolean) {
+    try {
+      await toggleField(id, field, value);
+      toast({
+        title: field === "featured"
+          ? (value ? "Marked as featured" : "Removed from featured")
+          : (value ? "Experience hidden from site" : "Experience visible on site"),
+      });
+    } catch (e) {
+      toast({ title: "Failed to toggle experience", description: String(e), variant: "destructive" });
+    }
+  }
+
   return (
     <div className="space-y-4">
       {/* Header */}
@@ -225,11 +238,11 @@ export function ExperienceTab() {
                     {expanded === exp.id ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                   </Button>
                   <Button size="sm" variant="outline" className="h-8 w-8 p-0"
-                    onClick={() => toggleField(exp.id, "featured", !exp.featured)}>
+                    onClick={() => handleToggleField(exp.id, "featured", !exp.featured)}>
                     <Star className={`h-4 w-4 ${exp.featured ? "fill-current text-yellow-500" : ""}`} />
                   </Button>
                   <Button size="sm" variant="outline" className="h-8 w-8 p-0"
-                    onClick={() => toggleField(exp.id, "disabled", !exp.disabled)}>
+                    onClick={() => handleToggleField(exp.id, "disabled", !exp.disabled)}>
                     {exp.disabled ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                   </Button>
                   <Button size="sm" variant="outline" className="h-8 w-8 p-0" onClick={() => openEdit(exp)}>

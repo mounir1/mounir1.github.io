@@ -136,6 +136,19 @@ export function SkillsTab() {
     }
   }
 
+  async function handleToggleField(id: string, field: "disabled" | "featured", value: boolean) {
+    try {
+      await toggleField(id, field, value);
+      toast({
+        title: field === "featured"
+          ? (value ? "Marked as featured" : "Removed from featured")
+          : (value ? "Skill hidden from site" : "Skill visible on site"),
+      });
+    } catch (e) {
+      toast({ title: "Failed to toggle skill", description: String(e), variant: "destructive" });
+    }
+  }
+
   return (
     <div className="space-y-4">
       {/* Header */}
@@ -245,11 +258,11 @@ export function SkillsTab() {
                   <span className="text-xs text-muted-foreground">{skill.yearsOfExperience}y exp</span>
                   <div className="flex gap-0.5">
                     <Button size="sm" variant="ghost" className="h-7 w-7 p-0"
-                      onClick={() => toggleField(skill.id, "featured", !skill.featured)}>
+                      onClick={() => handleToggleField(skill.id, "featured", !skill.featured)}>
                       <Star className={`h-3.5 w-3.5 ${skill.featured ? "fill-current text-yellow-500" : "text-muted-foreground"}`} />
                     </Button>
                     <Button size="sm" variant="ghost" className="h-7 w-7 p-0"
-                      onClick={() => toggleField(skill.id, "disabled", !skill.disabled)}>
+                      onClick={() => handleToggleField(skill.id, "disabled", !skill.disabled)}>
                       {skill.disabled ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5 text-muted-foreground" />}
                     </Button>
                     <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => openEdit(skill)}>
