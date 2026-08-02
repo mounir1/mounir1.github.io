@@ -179,6 +179,38 @@ all 9 logo SVGs confirmed present in `public/`.
 `/admin` deep route serves `404.html` with the `spa_redirect`
 sessionStorage restore script; root and resume PDF return 200.
 
+## P0 — Completed (2026-08-02, session 4): Admin CRUD reliability
+
+### [x] Links/Upcoming: "No document to update" crash fixed (63d5910)
+
+When Firestore collections were empty the UI showed DEFAULT_LINKS /
+DEFAULT_UPCOMING fallbacks (ids d*/u*) with no backing docs, so toggling
+one threw `FirebaseError: No document to update`. `ensureSeeded()` now
+materialises all defaults with stable ids before the first mutation and
+updates use `setDoc(..., {merge:true})` upserts.
+
+### [x] Feature flags auto-save (fcaf155)
+
+Flipping Testimonials/Contact/etc. switches only edited a local draft —
+nothing persisted until the separate Save click. Switches now write to
+Firestore instantly with success toast + rollback on failure.
+
+### [x] Testimonials section no longer requires "featured" (d0b76cf)
+
+Section shows all non-disabled testimonials (featured sorted first) and
+still auto-hides when empty.
+
+### [x] Admin can see & re-enable hidden projects (fd81c13)
+
+`useProjects(adminMode)` — the admin list previously filtered
+`disabled == false`, so hiding a project removed it from Admin forever.
+
+### [x] Toast feedback on every admin mutation (e14d1a1 → b7ab4e0)
+
+Projects / Skills / Experience / Testimonials / Upcoming / Links /
+Settings: all add/edit/delete/toggle actions surface success or
+destructive-error toasts — no more uncaught promise rejections.
+
 ## P1 — High Priority
 
 ### [ ] Type the Firestore data layer (eliminate `any` warnings)
