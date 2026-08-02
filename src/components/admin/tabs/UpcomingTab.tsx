@@ -9,6 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useUpcoming, type UpcomingProjectInput, type UpcomingStatus } from "@/hooks/useUpcoming";
+import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2, Calendar, Loader2, Clock, Edit, Eye, EyeOff, ExternalLink, Download } from "lucide-react";
 
 function downloadJSON(data: any, filename: string) {
@@ -46,6 +47,7 @@ const EMPTY: UpcomingProjectInput = {
 
 export function UpcomingTab() {
   const { upcoming, loading, addUpcoming, deleteUpcoming, updateUpcoming } = useUpcoming();
+  const { toast } = useToast();
 
   // ── Dialog state ──────────────────────────────────────────────────────────────
   const [open, setOpen]         = useState(false);
@@ -97,6 +99,9 @@ export function UpcomingTab() {
         await addUpcoming(payload);
       }
       setOpen(false);
+      toast({ title: editId ? "Upcoming project updated" : "Upcoming project added", description: form.title });
+    } catch (e) {
+      toast({ title: "Failed to save", description: String(e), variant: "destructive" });
     } finally {
       setSaving(false);
     }
@@ -104,11 +109,21 @@ export function UpcomingTab() {
 
   async function handleDelete(id: string, title: string) {
     if (!confirm(`Delete "${title}"? This cannot be undone.`)) return;
-    await deleteUpcoming(id);
+    try {
+      await deleteUpcoming(id);
+      toast({ title: "Upcoming project deleted", description: title });
+    } catch (e) {
+      toast({ title: "Failed to delete", description: String(e), variant: "destructive" });
+    }
   }
 
   async function toggleVisibility(id: string, current: boolean) {
-    await updateUpcoming(id, { publicVisible: !current });
+    try {
+      await updateUpcoming(id, { publicVisible: !current });
+      toast({ title: !current ? "Visible on site" : "Hidden from site" });
+    } catch (e) {
+      toast({ title: "Failed to toggle visibility", description: String(e), variant: "destructive" });
+    }
   }
 
   // ── Render ────────────────────────────────────────────────────────────────────

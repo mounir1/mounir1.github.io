@@ -12,6 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useExperience, type ExperienceInput, EXPERIENCE_COLLECTION } from "@/hooks/useExperience";
+import { useToast } from "@/hooks/use-toast";
 import { db, isFirebaseEnabled } from "@/lib/firebase";
 import { addDoc, collection, updateDoc, deleteDoc, doc } from "firebase/firestore";
 import { ImageUpload } from "@/components/admin/ImageUpload";
@@ -52,6 +53,7 @@ const EXP_TYPES = ["full-time", "part-time", "freelance", "contract", "internshi
 
 export function ExperienceTab() {
   const { experiences, loading } = useExperience(true);
+  const { toast } = useToast();
   // export all experience records as JSON
   const handleExport = () => {
     const ts = new Date().toISOString().slice(0, 10);
@@ -106,13 +108,22 @@ export function ExperienceTab() {
         await addDoc(collection(db, EXPERIENCE_COLLECTION), { ...data, createdAt: Date.now() });
       }
       setOpen(false);
-    } catch (e) { console.error(e); }
+      toast({ title: editId ? "Experience updated" : "Experience added", description: form.title });
+    } catch (e) {
+      console.error(e);
+      toast({ title: "Failed to save experience", description: String(e), variant: "destructive" });
+    }
     finally { setSaving(false); }
   }
 
   async function handleDelete(id: string, title: string) {
     if (!db || !confirm(`Delete "${title}"?`)) return;
-    await deleteDoc(doc(db, EXPERIENCE_COLLECTION, id));
+    try {
+      await deleteDoc(doc(db, EXPERIENCE_COLLECTION, id));
+      toast({ title: "Experience deleted", description: title });
+    } catch (e) {
+      toast({ title: "Failed to delete experience", description: String(e), variant: "destructive" });
+    }
   }
 
   return (

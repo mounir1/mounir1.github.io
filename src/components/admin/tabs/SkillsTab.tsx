@@ -13,6 +13,7 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useSkills, type SkillInput, type SkillCategory, SKILLS_COLLECTION } from "@/hooks/useSkills";
+import { useToast } from "@/hooks/use-toast";
 import { db, isFirebaseEnabled } from "@/lib/firebase";
 import { addDoc, collection, updateDoc, deleteDoc, doc } from "firebase/firestore";
 import { ImageUpload } from "@/components/admin/ImageUpload";
@@ -59,6 +60,7 @@ const DEFAULT_SKILL: SkillInput = {
 
 export function SkillsTab() {
   const { skills, skillsByCategory, loading } = useSkills(true);
+  const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState<SkillInput>(DEFAULT_SKILL);
@@ -116,13 +118,22 @@ export function SkillsTab() {
         await addDoc(collection(db, SKILLS_COLLECTION), { ...data, createdAt: Date.now() });
       }
       setOpen(false);
-    } catch (e) { console.error(e); }
+      toast({ title: editId ? "Skill updated" : "Skill added", description: form.name });
+    } catch (e) {
+      console.error(e);
+      toast({ title: "Failed to save skill", description: String(e), variant: "destructive" });
+    }
     finally { setSaving(false); }
   }
 
   async function handleDelete(id: string, name: string) {
     if (!db || !confirm(`Delete "${name}"? This cannot be undone.`)) return;
-    await deleteDoc(doc(db, SKILLS_COLLECTION, id));
+    try {
+      await deleteDoc(doc(db, SKILLS_COLLECTION, id));
+      toast({ title: "Skill deleted", description: name });
+    } catch (e) {
+      toast({ title: "Failed to delete skill", description: String(e), variant: "destructive" });
+    }
   }
 
   return (
