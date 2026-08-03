@@ -42,7 +42,9 @@ const App = () => (
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          {/* react-router-dom v7.18+: both v7_startTransition and v7_relativeSplatPath
+              are now the default behavior — the `future` flag prop was removed. */}
+          <BrowserRouter>
             <Suspense fallback={<PageLoader />}>
               <Routes>
                 <Route path="/"      element={<Index />} />

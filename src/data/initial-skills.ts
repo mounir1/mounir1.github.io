@@ -97,7 +97,7 @@ export const initialSkills: SkillInput[] = [
   // ── Testing & Quality ──────────────────────────────────────────────────────
   {
     name: "Vitest & Playwright",
-    category: "Testing & Quality",
+    category: "Testing",
     level: 84,
     yearsOfExperience: 2,
     description:
@@ -113,7 +113,7 @@ export const initialSkills: SkillInput[] = [
   },
   {
     name: "MSW (API Mocking)",
-    category: "Testing & Quality",
+    category: "Testing",
     level: 82,
     yearsOfExperience: 1,
     description:
@@ -131,7 +131,7 @@ export const initialSkills: SkillInput[] = [
   // ── E-commerce & PIM ───────────────────────────────────────────────────────
   {
     name: "Magento 2 / Adobe Commerce",
-    category: "E-commerce & PIM",
+    category: "E-commerce",
     level: 90,
     yearsOfExperience: 4,
     description:
@@ -147,7 +147,7 @@ export const initialSkills: SkillInput[] = [
   },
   {
     name: "Akeneo PIM",
-    category: "E-commerce & PIM",
+    category: "E-commerce",
     level: 85,
     yearsOfExperience: 2,
     description:

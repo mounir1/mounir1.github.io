@@ -59,3 +59,6 @@ public/*.dmg
 
 # OS files
 Thumbs.db
+
+# Wrangler local dev state (miniflare cache/db, never commit)
+.wrangler/

@@ -34,6 +34,10 @@ export interface Skill {
   projects?: string[];
   icon?: string;
   color?: string;
+  /** For category === "Languages": a human-readable proficiency label (e.g. "native", "fluent"). */
+  languageLevel?: string;
+  /** Surfaces a "Trending" badge on the skill card. */
+  trending?: boolean;
   featured: boolean;
   disabled: boolean;
   priority: number;

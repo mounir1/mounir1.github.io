@@ -56,7 +56,13 @@ function ProjectForm({
   onCancel: () => void;
   submitting: boolean;
 }) {
-  const [form, setForm] = useState<ProjectInput>({ ...DEFAULT_PROJECT, ...initial });
+  const [form, setForm] = useState<ProjectInput>({
+    ...DEFAULT_PROJECT,
+    title: "",
+    description: "",
+    category: "Web Application",
+    ...initial,
+  });
   const [assetsOpen, setAssetsOpen] = useState(false);
 
   function set(key: keyof ProjectInput, value: any) {
