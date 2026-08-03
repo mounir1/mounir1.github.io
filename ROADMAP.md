@@ -238,12 +238,93 @@ fixes if merged as-is.
   need a maintainer with full repo write access to merge manually via the
   GitHub UI.
 
+## P0 — Completed (2026-08-03, session 6): type-check gate repaired + real bugs fixed
+
+### [x] **CRITICAL:** `npm run type-check` was silently checking 0 files
+
+**Discovery:** the root `tsconfig.json` is a TypeScript "solution-style" config
+(`"files": []` + `"references"`). Plain `tsc --noEmit` resolves against it and
+walks zero files — confirmed via `tsc --noEmit --listFilesOnly` (empty output)
+and by injecting a deliberately broken line that produced no error. This means
+the CI "Type-check" step has reported green with **zero actual protection**
+since it was added, and every prior "type-check clean" note in this ROADMAP's
+history was a false positive.
+
+**Fix (9255d2a):** `"type-check": "tsc --build tsconfig.json"` — `--build`
+mode correctly resolves the project references (`tsconfig.app.json` +
+`tsconfig.node.json`) and now genuinely walks all of `src/`.
+
+**Fallout — 11 real, previously-hidden type errors found and fixed:**
+- `src/App.tsx`: removed obsolete `BrowserRouter future={{...}}` prop — both
+  flags are default behavior as of react-router-dom v7.18, the prop no longer
+  exists on `BrowserRouterProps`.
+- `src/components/admin/tabs/ProjectsTab.tsx`: `ProjectForm`'s initial
+  `useState` now supplies required `title`/`description`/`category` defaults.
+- `src/hooks/useSkills.ts`: added optional `languageLevel?`/`trending?` fields
+  to `Skill` — used in `skills.tsx` but never declared on the interface.
+- `src/data/initial-skills.ts`: fixed 4 entries using non-canonical category
+  strings (`"Testing & Quality"`, `"E-commerce & PIM"`) → canonical
+  `SkillCategory` values already used everywhere else.
+- `tsconfig.app.json`: added `ES2022.Error` to `lib[]` so the two-arg
+  `new Error(msg, { cause })` calls in `src/lib/image-upload.ts` type-check.
+
+Verified clean: `npx tsc --build tsconfig.json` → 0 errors, lint 0 errors,
+53/53 tests, production build succeeds (firebase-vendor still one 390 KB
+chunk per the TDZ rule below).
+
+### [x] `database-uploader.ts` real bug: `seedTestimonials()` would crash
+
+`seedTestimonials()` referenced `COLLECTIONS.testimonials` (didn't exist) and
+`initialTestimonials` (never imported) — a `ReferenceError` if ever invoked
+from the browser console. Fixed: `TESTIMONIALS_COLLECTION` now re-exported
+from `useTestimonials.ts` and wired into `COLLECTIONS`; `initialTestimonials`
+imported; the testimonials job added to `uploadAllData()`. Also replaced all
+`Record<string, any>` / `as any` in the file with a `SeedItem =
+Record<string, unknown>` type and `catch (err: unknown)` narrowing, and moved
+the `window.seedPortfolio` etc. console-helper exposure from unsafe
+`(window as any).x = ...` casts to a proper `declare global { interface
+Window {...} }` augmentation that merges with the ambient `Window` interface
+in `vite-env.d.ts`.
+
+### [x] Pre-commit hooks activated (Husky + lint-staged)
+
+`.husky/pre-commit` now runs `npx lint-staged` → `eslint --fix` on staged
+`*.ts`/`*.tsx` files. Closes the P2 item below.
+
+### [x] Firestore data-layer typing — first pass
+
+`useTestimonials.ts` (`constraints: any[]` → `QueryConstraint[]`),
+`useProjects.ts` (`ProjectMetrics.customMetrics` → typed union instead of
+`Record<string, any>`), and `database-uploader.ts` (see above) are now
+`any`-free. Remaining `any` usages (see P1 item below, now updated) are
+narrower in scope: `contact.tsx` (1) and `brandfetch.ts` (6).
+
+### [x] Reviewed: `npm audit` flags `react-router` GHSA-qwww-vcr4-c8h2
+
+High-severity advisory is a CSRF bypass **scoped to React Router's unstable
+RSC (React Server Components) request-handling mode**. This app is a plain
+client-rendered SPA (`BrowserRouter`, no `unstable_RSC*` APIs anywhere in
+`src/`) — confirmed via grep, the vulnerable code path is not reachable. npm's
+only "fix" (`npm audit fix --force`) would **downgrade** `react-router-dom`
+to `7.11.0`, a regression on an otherwise up-to-date, non-exploitable
+dependency. Decision: leave as-is, re-evaluate if the app ever adopts RSC/data
+mode. Tracked here instead of actioned so this isn't rediscovered as a fresh
+alarm every session.
+
+---
+
 ## P1 — High Priority
 
-### [ ] Type the Firestore data layer (eliminate `any` warnings)
+### [ ] Type the Firestore data layer (eliminate remaining `any` warnings)
 
-**Current:** 97 `@typescript-eslint/no-explicit-any` warnings across admin tabs,
-hooks, and `database-uploader.ts`. Firestore `DocumentData` is untyped.
+**Current:** down from 97 to ~7 `@typescript-eslint/no-explicit-any` warnings
+after session 6 (`useTestimonials.ts`, `useProjects.ts`, `database-uploader.ts`
+fixed). Remaining: `src/components/sections/contact.tsx` (1),
+`src/lib/services/brandfetch.ts` (6). Firestore `DocumentData` is still
+untyped at the admin-tabs layer (`BrandAssetPicker.tsx`, `DataManager.tsx`,
+`ExperienceTab.tsx`, `LinksTab.tsx`, `MessagesTab.tsx`, `SettingsTab.tsx`,
+`SkillsTab.tsx`, `TestimonialsTab.tsx`, `UpcomingTab.tsx` — none currently emit
+`any` warnings but haven't been audited for Firestore-shape type safety).
 
 **Plan:**
 1. Define Zod schemas for each Firestore collection (projects, experiences,
@@ -293,16 +374,19 @@ websocket-driver critical, #11 postcss, #14/#15/#17/#19).
 
 ## P2 — Medium Priority
 
-### [ ] Bundle size: firebase-vendor is 557 KB
+### [ ] Bundle size: firebase-vendor is ~391 KB (was 557 KB, now smaller post-Vite-8)
 
-**Current:** Firebase single-chunk is unavoidable (see TDZ note) but is the
-dominant bundle cost.
+**Current (verified session 6):** `src/lib/firebase.ts` already lazy-loads
+`firebase/auth`, `firebase/storage`, and `firebase/analytics` via dynamic
+`import()` — only `firebase/app` and `firebase/firestore` load synchronously.
+This is already close to the tree-shaking plan below; `messaging` and
+`app-check` are confirmed unused (no imports anywhere in `src/`). Remaining
+bulk is inherent to the Firestore SDK itself.
 
 **Plan:**
-- Tree-shake unused Firebase services (only `auth` + `firestore` + `analytics`
-  are needed — confirm `storage`, `messaging`, `app-check` aren't imported)
-- Consider Firebase modular SDK lazy-init pattern (already partially done)
-- Set up Lighthouse CI budget: `max-firebase-vendor: 580 KB`
+- ~~Tree-shake unused Firebase services~~ — done, see above
+- ~~Consider Firebase modular SDK lazy-init pattern~~ — already implemented
+- Set up Lighthouse CI budget: `max-firebase-vendor: 420 KB` (current: 391 KB)
 
 ### [ ] Service worker cache strategy
 
@@ -322,14 +406,7 @@ isn't in the repo. Update flow relies on `controllerchange` reload.
 **Plan:** Integrate Sentry (free tier) with source maps for the SPA. Add
 `Sentry.ErrorBoundary` wrapping the router.
 
-### [ ] Pre-commit hooks (Husky is configured but empty)
-
-**Current:** `.husky/_/` exists but no `pre-commit` hook is active.
-
-**Plan:** Add `.husky/pre-commit` running `lint-staged`:
-```json
-{ "*.ts": "eslint --fix", "*.tsx": "eslint --fix" }
-```
+### [x] Pre-commit hooks — done session 6, see P0 above
 
 ---
 
@@ -349,17 +426,16 @@ isn't in the repo. Update flow relies on `controllerchange` reload.
 
 ---
 
-## Open Dependabot PRs (as of 2026-07-20)
+## Open Dependabot PRs (as of 2026-08-03, session 6)
 
-| PR | Branch | Severity | Status |
-|----|--------|----------|--------|
-| #18 | `websocket-driver-0.7.5` | Critical | Open |
-| #11 | `postcss-8.5.14` | — | Open |
-| #14 | `multi-84120a5570` | — | Open |
-| #15 | `grpc/grpc-js-1.9.16` | — | Open |
-| #17 | `js-yaml-4.3.0` | — | Open |
-| #19 | `multi-0251c034cf` | — | Open |
+| PR | Branch | Status | Notes |
+|----|--------|--------|-------|
+| #22 | `actions/upload-artifact-7` | **Blocked** | GitHub App token lacks `workflows` scope — cannot merge/push changes to `.github/workflows/*.yml`. `gh pr merge --admin`, direct `git push`, and `gh api` branch-protection all fail with 403 "Resource not accessible by integration". **Needs manual merge by repo owner via GitHub UI.** |
+| #23 | `actions/setup-node-7` | **Blocked** | Same `workflows` permission gap as #22. **Needs manual merge by repo owner.** |
 
-**Note:** `npm audit fix` already resolved the runtime vulnerabilities by
-updating transitive deps in the lockfile. These Dependabot PRs propose direct
-dependency bumps — review and merge after CI validates them.
+All other Dependabot PRs open as of 2026-07-20 (#11, #14, #15, #17, #18, #19)
+were closed as stale/superseded, and #21/#25/#27/#28/#32 were merged, during
+session 5 (2026-08-03) — see the P0 entry above. Branch protection on `main`
+(require PR + CI status checks before merge) is similarly blocked by the same
+GitHub App permission gap and needs manual setup by the repo owner via
+Settings → Branches.
