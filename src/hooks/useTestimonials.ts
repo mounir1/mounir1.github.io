@@ -3,6 +3,7 @@ import { db, isFirebaseEnabled } from "@/lib/firebase";
 import {
   collection, onSnapshot, addDoc, deleteDoc,
   updateDoc, doc, orderBy, query, where,
+  type QueryConstraint,
 } from "firebase/firestore";
 import { initialTestimonials } from "@/data/initial-testimonials";
 
@@ -85,7 +86,7 @@ export function useTestimonials(adminMode = false) {
       return;
     }
 
-    const constraints: any[] = [orderBy("priority", "desc")];
+    const constraints: QueryConstraint[] = [orderBy("priority", "desc")];
     if (!adminMode) constraints.unshift(where("disabled", "==", false));
 
     const q = query(collection(db, TESTIMONIALS_COLLECTION), ...constraints);

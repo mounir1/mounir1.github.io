@@ -3,7 +3,8 @@
  * ─────────────────────────────────────────────────────────────────────────────
  * Uploads seed data from the canonical initial-*.ts files into Firestore.
  * Single source of truth: initial-projects.ts, initial-experience.ts,
- * initial-skills.ts, and hook-level defaults (useUpcoming, useLinks).
+ * initial-skills.ts, initial-testimonials.ts, and hook-level defaults
+ * (useUpcoming, useLinks).
  *
  * Duplicate detection: before inserting, checks existing docs by title/name
  * and skips items already present (by exact title/name match).
@@ -19,21 +20,27 @@ import { db } from '@/lib/firebase';
 import { initialProjects }  from '@/data/initial-projects';
 import { initialExperience } from '@/data/initial-experience';
 import { initialSkills }    from '@/data/initial-skills';
+import { initialTestimonials } from '@/data/initial-testimonials';
 import { DEFAULT_UPCOMING } from '@/hooks/useUpcoming';
 import { DEFAULT_LINKS }    from '@/hooks/useLinks';
 import { DEFAULT_SETTINGS } from '@/hooks/useSettings';
+import { TESTIMONIALS_COLLECTION } from '@/hooks/useTestimonials';
 
 // ─── Collection names ─────────────────────────────────────────────────────────
 export const COLLECTIONS = {
-  projects:    'projects',
-  experiences: 'experiences',
-  skills:      'skills',
-  upcoming:    'upcoming_projects',
-  links:       'links',
-  settings:    'settings',
+  projects:     'projects',
+  experiences:  'experiences',
+  skills:       'skills',
+  testimonials: TESTIMONIALS_COLLECTION,
+  upcoming:     'upcoming_projects',
+  links:        'links',
+  settings:     'settings',
 } as const;
 
 export type CollectionKey = keyof typeof COLLECTIONS;
+
+/** Generic shape accepted by the uploader — any seed item is a plain object. */
+export type SeedItem = Record<string, unknown>;
 
 // ─── Progress / Result types ──────────────────────────────────────────────────
 export interface UploadProgress {
@@ -56,9 +63,21 @@ export interface UploadResult {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
+/** Extract a string field from a seed item, if present. */
+function strField(item: SeedItem, key: string): string | undefined {
+  const v = item[key];
+  return typeof v === 'string' ? v : undefined;
+}
+
 /** Derive a dedup key from an item (title for projects/experience, name for skills, label for links). */
-function dedupKey(item: Record<string, any>): string {
-  return (item.title ?? item.name ?? item.label ?? item.id ?? '').trim().toLowerCase();
+function dedupKey(item: SeedItem): string {
+  const v = strField(item, 'title') ?? strField(item, 'name') ?? strField(item, 'label') ?? strField(item, 'id') ?? '';
+  return v.trim().toLowerCase();
+}
+
+/** Human-readable label for an item, for progress logs. */
+function itemLabel(item: SeedItem, fallback: string): string {
+  return strField(item, 'title') ?? strField(item, 'name') ?? strField(item, 'label') ?? fallback;
 }
 
 /** Fetch existing dedup keys from a Firestore collection. */
@@ -67,7 +86,7 @@ async function fetchExistingKeys(collectionName: string): Promise<Set<string>> {
   const snap = await getDocs(collection(db, collectionName));
   const keys = new Set<string>();
   snap.docs.forEach(d => {
-    const k = dedupKey(d.data());
+    const k = dedupKey(d.data() as SeedItem);
     if (k) keys.add(k);
   });
   return keys;
@@ -82,6 +101,11 @@ export async function getCollectionCount(collectionName: string): Promise<number
   } catch {
     return 0;
   }
+}
+
+/** Normalise a caught error into a readable message. */
+function errorMessage(err: unknown): string {
+  return err instanceof Error ? err.message : String(err);
 }
 
 // ─── DatabaseUploader class ───────────────────────────────────────────────────
@@ -112,7 +136,7 @@ export class DatabaseUploader {
   /** Upload a single collection with optional dedup and clear-first. */
   async uploadCollection(
     collectionName: string,
-    data: Record<string, any>[],
+    data: SeedItem[],
     opts: { clearFirst?: boolean; skipDuplicates?: boolean } = {},
   ): Promise<UploadResult> {
     if (!db) throw new Error('Firebase not initialised');
@@ -143,7 +167,7 @@ export class DatabaseUploader {
     for (let i = 0; i < data.length; i++) {
       const item = data[i];
       const key  = dedupKey(item);
-      const label = item.title ?? item.name ?? item.label ?? `Item ${i + 1}`;
+      const label = itemLabel(item, `Item ${i + 1}`);
 
       this.onProgress?.([{
         collection: collectionName,
@@ -163,7 +187,7 @@ export class DatabaseUploader {
       try {
         const now = Date.now();
         // Strip any local-only 'id' field — Firestore generates its own
-        const { id: _id, ...rest } = item as any;
+        const { id: _id, ...rest } = item;
         const docData = {
           ...rest,
           createdAt: rest.createdAt || now,
@@ -174,9 +198,9 @@ export class DatabaseUploader {
         result.success++;
         result.details.push(`✅ Uploaded: ${label}`);
         if (key) existingKeys.add(key); // prevent in-batch duplicates
-      } catch (err: any) {
+      } catch (err: unknown) {
         result.errors++;
-        result.details.push(`❌ Error (${label}): ${err.message}`);
+        result.details.push(`❌ Error (${label}): ${errorMessage(err)}`);
       }
     }
 
@@ -198,12 +222,13 @@ export class DatabaseUploader {
     const results: UploadResult[] = [];
 
     // ── Ordered upload sequence ──
-    const jobs: Array<{ key: CollectionKey; data: Record<string, any>[] }> = [
-      { key: 'projects',    data: initialProjects as any },
-      { key: 'experiences', data: initialExperience as any },
-      { key: 'skills',      data: initialSkills as any },
-      { key: 'upcoming',    data: DEFAULT_UPCOMING as any },
-      { key: 'links',       data: DEFAULT_LINKS as any },
+    const jobs: Array<{ key: CollectionKey; data: SeedItem[] }> = [
+      { key: 'projects',     data: initialProjects as unknown as SeedItem[] },
+      { key: 'experiences',  data: initialExperience as unknown as SeedItem[] },
+      { key: 'skills',       data: initialSkills as unknown as SeedItem[] },
+      { key: 'testimonials', data: initialTestimonials as unknown as SeedItem[] },
+      { key: 'upcoming',     data: DEFAULT_UPCOMING as unknown as SeedItem[] },
+      { key: 'links',        data: DEFAULT_LINKS as unknown as SeedItem[] },
     ];
 
     for (const { key, data } of jobs) {
@@ -230,14 +255,14 @@ export class DatabaseUploader {
           details: ['✅ Site settings saved'],
         });
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       results.push({
         collection: 'settings/site',
         success: 0,
         skipped: 0,
         errors: 1,
         total: 1,
-        details: [`❌ Settings error: ${err.message}`],
+        details: [`❌ Settings error: ${errorMessage(err)}`],
       });
     }
 
@@ -271,43 +296,64 @@ export async function clearAndSeed() {
 // Per-collection helpers
 export async function seedProjects(clearFirst = false) {
   const u = new DatabaseUploader();
-  return u.uploadCollection(COLLECTIONS.projects, initialProjects as any, { clearFirst, skipDuplicates: !clearFirst });
+  return u.uploadCollection(COLLECTIONS.projects, initialProjects as unknown as SeedItem[], { clearFirst, skipDuplicates: !clearFirst });
 }
 export async function seedExperience(clearFirst = false) {
   const u = new DatabaseUploader();
-  return u.uploadCollection(COLLECTIONS.experiences, initialExperience as any, { clearFirst, skipDuplicates: !clearFirst });
+  return u.uploadCollection(COLLECTIONS.experiences, initialExperience as unknown as SeedItem[], { clearFirst, skipDuplicates: !clearFirst });
 }
 export async function seedSkills(clearFirst = false) {
   const u = new DatabaseUploader();
-  return u.uploadCollection(COLLECTIONS.skills, initialSkills as any, { clearFirst, skipDuplicates: !clearFirst });
+  return u.uploadCollection(COLLECTIONS.skills, initialSkills as unknown as SeedItem[], { clearFirst, skipDuplicates: !clearFirst });
 }
 export async function seedTestimonials(clearFirst = false) {
   const u = new DatabaseUploader();
-  return u.uploadCollection(COLLECTIONS.testimonials, initialTestimonials as any, { clearFirst, skipDuplicates: !clearFirst });
+  return u.uploadCollection(COLLECTIONS.testimonials, initialTestimonials as unknown as SeedItem[], { clearFirst, skipDuplicates: !clearFirst });
 }
 export async function seedUpcoming(clearFirst = false) {
   const u = new DatabaseUploader();
-  return u.uploadCollection(COLLECTIONS.upcoming, DEFAULT_UPCOMING as any, { clearFirst, skipDuplicates: !clearFirst });
+  return u.uploadCollection(COLLECTIONS.upcoming, DEFAULT_UPCOMING as unknown as SeedItem[], { clearFirst, skipDuplicates: !clearFirst });
 }
 export async function seedLinks(clearFirst = false) {
   const u = new DatabaseUploader();
-  return u.uploadCollection(COLLECTIONS.links, DEFAULT_LINKS as any, { clearFirst, skipDuplicates: !clearFirst });
+  return u.uploadCollection(COLLECTIONS.links, DEFAULT_LINKS as unknown as SeedItem[], { clearFirst, skipDuplicates: !clearFirst });
 }
 
-// Expose to browser console
+// ─── Browser console exposure ──────────────────────────────────────────────────
+// Use declaration merging (not a type alias) so this augments the existing
+// ambient `interface Window` from src/vite-env.d.ts instead of being ignored.
+declare global {
+  interface Window {
+    seedPortfolio?: typeof seedPortfolio;
+    clearAndSeed?: typeof clearAndSeed;
+    seedProjects?: typeof seedProjects;
+    seedExperience?: typeof seedExperience;
+    seedSkills?: typeof seedSkills;
+    seedTestimonials?: typeof seedTestimonials;
+    seedUpcoming?: typeof seedUpcoming;
+    seedLinks?: typeof seedLinks;
+    // Legacy aliases
+    uploadAllPortfolioData?: typeof seedPortfolio;
+    clearAndUploadAll?: typeof clearAndSeed;
+    uploadProjectsOnly?: typeof seedProjects;
+    uploadSkillsOnly?: typeof seedSkills;
+    uploadExperienceOnly?: typeof seedExperience;
+  }
+}
+
 if (typeof window !== 'undefined') {
-  (window as any).seedPortfolio      = seedPortfolio;
-  (window as any).clearAndSeed       = clearAndSeed;
-  (window as any).seedProjects       = seedProjects;
-  (window as any).seedExperience     = seedExperience;
-  (window as any).seedSkills         = seedSkills;
-  (window as any).seedTestimonials   = seedTestimonials;
-  (window as any).seedUpcoming       = seedUpcoming;
-  (window as any).seedLinks          = seedLinks;
+  window.seedPortfolio      = seedPortfolio;
+  window.clearAndSeed       = clearAndSeed;
+  window.seedProjects       = seedProjects;
+  window.seedExperience     = seedExperience;
+  window.seedSkills         = seedSkills;
+  window.seedTestimonials   = seedTestimonials;
+  window.seedUpcoming       = seedUpcoming;
+  window.seedLinks          = seedLinks;
   // Legacy aliases
-  (window as any).uploadAllPortfolioData = seedPortfolio;
-  (window as any).clearAndUploadAll      = clearAndSeed;
-  (window as any).uploadProjectsOnly     = seedProjects;
-  (window as any).uploadSkillsOnly       = seedSkills;
-  (window as any).uploadExperienceOnly   = seedExperience;
+  window.uploadAllPortfolioData = seedPortfolio;
+  window.clearAndUploadAll      = clearAndSeed;
+  window.uploadProjectsOnly     = seedProjects;
+  window.uploadSkillsOnly       = seedSkills;
+  window.uploadExperienceOnly   = seedExperience;
 }

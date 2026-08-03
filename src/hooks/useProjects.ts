@@ -33,7 +33,7 @@ export interface ProjectMetrics {
   performanceImprovement?: string;
   revenueImpact?: string;
   uptime?: string;
-  customMetrics?: Record<string, any>;
+  customMetrics?: Record<string, string | number | boolean>;
 }
 
 export interface ProjectInput {
