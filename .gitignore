@@ -57,6 +57,9 @@ public/*.dmg
 # Vite cache
 .vite/
 
+# TypeScript build info (incremental builds via tsc --build)
+*.tsbuildinfo
+
 # OS files
 Thumbs.db
 

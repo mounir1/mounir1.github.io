@@ -17,7 +17,8 @@
  */
 
 import { existsSync, readFileSync, readdirSync } from "fs";
-import { join } from "path";
+import { join, resolve } from "path";
+import { fileURLToPath } from "url";
 import { projectsIndex } from "./projects-index";
 import { initialProjects } from "./initial-projects";
 
@@ -162,7 +163,8 @@ function printReport(summary: ReturnType<typeof verifyAll>): void {
 // ─── CLI Entry Point ────────────────────────────────────────────────────
 const isMainModule =
   process.argv[1] &&
-  import.meta.url.replace(/\\/g, "/").endsWith(process.argv[1].replace(/\\/g, "/"));
+  fileURLToPath(import.meta.url).toLowerCase() ===
+    resolve(process.argv[1]).toLowerCase();
 
 if (isMainModule) {
   const summary = verifyAll();
