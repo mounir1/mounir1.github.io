@@ -30,11 +30,19 @@ export type ProjectImportance = "core" | "supporting" | "legacy";
 export interface ProjectDiskEntry {
   slug: string;
   title: string;
+  /**
+   * Relative path under C:\projects.
+   * Empty string ("") means the project is cloud-hosted only (e.g. a live
+   * deployment or a remote Git repo) with no local working copy — the
+   * verifier skips the on-disk existence check for those.
+   */
   diskPath: string;
   type: ProjectDiskType;
   status: ProjectDiskStatus;
   importance: ProjectImportance;
   description: string;
+  /** Source repository / forge URL for cloud-hosted projects. */
+  repoUrl?: string;
 }
 
 export const projectsIndex: Record<string, ProjectDiskEntry> = {
@@ -109,7 +117,38 @@ export const projectsIndex: Record<string, ProjectDiskEntry> = {
     type: "contract",
     status: "active",
     importance: "core",
-    description: "Ext JS web extension platform for hospitality ERP",
+    description: "HoTech's flagship web extension platform for the OREST ERP (since 2017)",
+    repoUrl: "https://gitlab.hotech.dev/webapp/webex",
+  },
+  "hotech-builder": {
+    slug: "hotech-builder",
+    title: "Hotech Builder — Tourism Website Development Platform",
+    diskPath: "Hotech/builder",
+    type: "contract",
+    status: "active",
+    importance: "core",
+    description: "GrapesJS + React drag-and-drop website/CMS builder for hotels",
+    repoUrl: "https://gitlab.hotech.dev/webcms/builder",
+  },
+  "hotech-website": {
+    slug: "hotech-website",
+    title: "Hotech Website — Server-Rendered Hotel Website Engine",
+    diskPath: "Hotech/website",
+    type: "contract",
+    status: "active",
+    importance: "core",
+    description: "Go (Fiber) + Jet engine rendering hotel sites from OREST data",
+    repoUrl: "https://gitlab.hotech.dev/webcms/website",
+  },
+  "akeneo-pim": {
+    slug: "akeneo-pim",
+    title: "Akeneo PIM — Production Deployment & Hardening",
+    diskPath: "",
+    type: "client",
+    status: "active",
+    importance: "core",
+    description: "Production Akeneo PIM 6 (PHP 8.3) for Techno Stationery product data",
+    repoUrl: "https://github.com/mounirtms/akeneoPim",
   },
 
   // ── SUPPORTING — Active but secondary ────────────────────────────────

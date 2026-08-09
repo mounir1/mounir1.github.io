@@ -961,7 +961,143 @@ export const initialProjects: ProjectInput[] = [
     version: 1,
   },
 
-  // ── 16. WebCMS App ────────────────────────────────────────────────────────
+  // ── 16. Hotech Builder ────────────────────────────────────────────────────
+  {
+    title: "Hotech Builder — Tourism Website Development Platform",
+    description:
+      "GrapesJS + React drag-and-drop website and CMS builder for hotel and tourism businesses — enabling non-technical staff to create and manage branded property websites.",
+    longDescription:
+      "A full-featured website builder platform built on GrapesJS with a React front-end. Designed for the hospitality industry, it provides drag-and-drop page composition with pre-built tourism-themed blocks, real-time preview, template management, and brand customization. The CMS layer handles media, navigation, SEO settings, and content versioning. Integrates with the HoTech ecosystem for seamless publishing and OREST data binding.",
+    category: "Hospitality Solutions",
+    status: "active",
+    achievements: [
+      "GrapesJS drag-and-drop builder with custom React UI panels",
+      "Tourism-themed pre-built block library for rapid site creation",
+      "Template management with brand theming support",
+      "Real-time preview with device viewport emulation",
+      "CMS layer for media, navigation, SEO, and content versioning",
+      "Integration with HoTech publishing pipeline and OREST data",
+    ],
+    technologies: [
+      "GrapesJS", "React", "TypeScript", "Vite",
+      "Tailwind CSS", "Go", "REST APIs", "Docker",
+    ],
+    tags: ["builder", "cms", "hospitality", "drag-drop", "grapesjs", "react"],
+    image: "https://images.unsplash.com/photo-1461749280684-397df9c3f3c7?w=800&h=600&fit=crop",
+    logo: "/hotech-logo.svg",
+    icon: "🏗️",
+    liveUrl: "",
+    githubUrl: "",
+    demoUrl: "",
+    caseStudyUrl: "https://hotech.systems",
+    featured: true,
+    disabled: false,
+    priority: 82,
+    startDate: "2024-01-01",
+    endDate: "",
+    duration: "Ongoing",
+    clientInfo: {
+      name: "HoTech Systems",
+      industry: "Hospitality Technology",
+      size: "enterprise",
+      location: "International",
+      website: "https://hotech.systems",
+      isPublic: true,
+    },
+    metrics: {
+      customMetrics: {
+        builder: "GrapesJS + React",
+        theme_engine: "Tailwind CSS custom properties",
+        backend: "Go API server",
+        deployment: "Docker + Jenkins",
+      },
+    },
+    challenges: [
+      "Building a drag-and-drop UX complex enough for tourism sites but simple for hotel staff",
+      "Twirling GrapesJS APIs into a cohesive React application with state sync",
+      "Managing template validity across hospitality- and brand-specific type safety",
+    ],
+    solutions: [
+      "Custom React wrapper around GrapesJS with typed API seams",
+      "Tailwind-based brand theming with CSS custom properties",
+      "Template schema validation at build and publish time",
+    ],
+    teamSize: 2,
+    role: "Full-Stack Developer",
+    createdAt: 1704067200000,
+    updatedAt: Date.now(),
+    version: 1,
+  },
+
+  // ── 17. Hotech Website ────────────────────────────────────────────────────
+  {
+    title: "Hotech Website — Server-Rendered Hotel Website Engine",
+    description:
+      "Go (Fiber) + Jet server-rendered website engine that generates high-performance hotel websites from OREST data — serving as the public-facing web layer for the HoTech platform.",
+    longDescription:
+      "A server-side rendered website engine built on Go (Fiber) with the Jet template engine. It generates fast, SEO-optimized hotel websites by pulling data from the OREST hospitality ERP. The engine handles routing, templating, image optimization, multi-language support, and caching. Deployed as the public web layer for hotel properties across the HoTech ecosystem. Includes a component-based template architecture with Jet's template inheritance, partials, and custom extension points.",
+    category: "Hospitality Solutions",
+    status: "active",
+    achievements: [
+      "Go (Fiber) + Jet server-rendered hotel website engine",
+      "Component-based template architecture with inheritance and partials",
+      "SEO-optimized rendering with meta tag management",
+      "Multi-language support for international hotel properties",
+      "Image optimization and responsive srcset generation",
+      "Redis-backed caching for high-traffic hospitality sites",
+    ],
+    technologies: [
+      "Go", "Fiber", "Jet", "Redis",
+      "Nginx", "Docker", "REST APIs", "SCSS",
+    ],
+    tags: ["go", "fiber", "hospitality", "ssr", "jet-templates", "seo"],
+    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=600&fit=crop",
+    logo: "/hotech-logo.svg",
+    icon: "🌐",
+    liveUrl: "",
+    githubUrl: "",
+    demoUrl: "",
+    caseStudyUrl: "https://hotech.systems",
+    featured: true,
+    disabled: false,
+    priority: 80,
+    startDate: "2023-06-01",
+    endDate: "",
+    duration: "Ongoing",
+    clientInfo: {
+      name: "HoTech Systems",
+      industry: "Hospitality Technology",
+      size: "enterprise",
+      location: "International",
+      website: "https://hotech.systems",
+      isPublic: true,
+    },
+    metrics: {
+      customMetrics: {
+        engine: "Go (Fiber) + Jet",
+        cache: "Redis",
+        languages: "Multi-language via i18n bundles",
+        deployment: "Docker + Nginx",
+      },
+    },
+    challenges: [
+      "Building a template engine that handles complex hotel data layouts",
+      "Maintaining fast page-load times for image-heavy hospitality sites",
+      "Supporting multiple brand themes from a single engine",
+    ],
+    solutions: [
+      "Jet template inheritance with component-based partials",
+      "Redis caching layer with cache invalidation on data updates",
+      "Theme system using SCSS variables and CSS custom properties",
+    ],
+    teamSize: 2,
+    role: "Backend Developer & Template Architect",
+    createdAt: 1685577600000,
+    updatedAt: Date.now(),
+    version: 1,
+  },
+
+  // ── 18. WebCMS App ────────────────────────────────────────────────────────
   {
     title: "WebCMS — Hotel Content Management System",
     description:
