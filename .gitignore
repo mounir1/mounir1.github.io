@@ -65,3 +65,6 @@ Thumbs.db
 
 # Wrangler local dev state (miniflare cache/db, never commit)
 .wrangler/
+
+# Playwright MCP test artifacts
+.playwright-mcp/
