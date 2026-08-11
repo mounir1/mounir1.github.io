@@ -111,6 +111,37 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   updatedAt: Date.now(),
 };
 
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/** Recursively merge `override` into `base` so nested optional keys always fall back to a default. */
+export function deepMerge(base: unknown, override: unknown): unknown {
+  if (!isPlainObject(base) || !isPlainObject(override)) {
+    return override === undefined ? base : override;
+  }
+  const result: Record<string, unknown> = { ...base };
+  for (const [key, value] of Object.entries(override)) {
+    result[key] = deepMerge(base[key], value);
+  }
+  return result;
+}
+
+/** Firestore rejects `undefined` field values — deep-strip them before writing. */
+export function stripUndefined(value: unknown): unknown {
+  if (Array.isArray(value)) {
+    return value.map(stripUndefined).filter((v) => v !== undefined);
+  }
+  if (isPlainObject(value)) {
+    const out: Record<string, unknown> = {};
+    for (const [key, v] of Object.entries(value)) {
+      if (v !== undefined) out[key] = stripUndefined(v);
+    }
+    return out;
+  }
+  return value;
+}
+
 export function useSettings() {
   const [settings, setSettings] = useState<SiteSettings>(DEFAULT_SETTINGS);
   // Defaults already available synchronously — only load when Firebase is on.
@@ -123,7 +154,8 @@ export function useSettings() {
     const ref = doc(db, "settings", "site");
     const unsub = onSnapshot(ref, (snap) => {
       if (snap.exists()) {
-        setSettings({ ...DEFAULT_SETTINGS, ...(snap.data() as SiteSettings) });
+        const merged = deepMerge(DEFAULT_SETTINGS, snap.data()) as SiteSettings;
+        setSettings(merged);
       }
       setLoading(false);
     }, () => setLoading(false));
@@ -132,7 +164,12 @@ export function useSettings() {
 
   const saveSettings = async (data: Partial<SiteSettings>) => {
     if (!isFirebaseEnabled || !db) return;
-    await setDoc(doc(db, "settings", "site"), { ...settings, ...data, updatedAt: Date.now() }, { merge: true });
+    const merged: SiteSettings = {
+      ...settings,
+      ...data,
+      updatedAt: Date.now(),
+    };
+    await setDoc(doc(db, "settings", "site"), stripUndefined(merged) as Record<string, unknown>, { merge: true });
   };
 
   return { settings, loading, saveSettings };
