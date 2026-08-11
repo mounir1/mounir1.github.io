@@ -52,8 +52,11 @@ export function useContactMessages() {
 
   const submitMessage = async (data: ContactMessageInput) => {
     if (!isFirebaseEnabled || !db) return;
+    const clean = Object.fromEntries(
+      Object.entries(data).filter(([, v]) => v !== undefined)
+    );
     await addDoc(collection(db, CONTACT_COLLECTION), {
-      ...data,
+      ...clean,
       status: "unread",
       createdAt: Date.now(),
     });

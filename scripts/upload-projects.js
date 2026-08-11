@@ -89,7 +89,7 @@ const projects = [
     technologies: ["React", "Next.js", "Stripe", "PayPal", "MongoDB", "Node.js", "Tailwind CSS", "Vercel", "Algolia", "SendGrid"],
     tags: ["ecommerce", "payments", "inventory", "analytics", "responsive", "b2c"],
     image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=600&fit=crop",
-    logo: "/technostationery-logo.svg",
+    logo: "https://technostationery.com/media/logo/default/logo_techno_2.png",
     liveUrl: "https://technostationery.com",
     githubUrl: "",
     demoUrl: "",
