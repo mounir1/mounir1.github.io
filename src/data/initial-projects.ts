@@ -1155,4 +1155,73 @@ export const initialProjects: ProjectInput[] = [
     updatedAt: Date.now(),
     version: 1,
   },
+
+  // ── 19. Mab ERP (Nexus-ERP) ─────────────────────────────────────────────
+  {
+    title: "Mab ERP — Algerian Enterprise Resource Planning (Founder)",
+    description:
+      "Founder project: a complete ERP for Algerian businesses built with Go + Vue 3 and shipped as a single self-contained binary — the only external dependency is PostgreSQL. Native SCF accounting, IRG/CNAS payroll, and G50/G29 tax compliance out of the box.",
+    longDescription:
+      "Mab ERP is a full Enterprise Resource Planning system engineered for the Algerian market and distributed as one executable — the Vue 3 single-page app is embedded into the Go binary via go:embed, so deployment is a single binary plus PostgreSQL. It ships 14 modules: Accounting (Algerian SCF chart of accounts, journal entries, fixed assets with linear/diminishing depreciation, bank reconciliation, trial balance, balance sheet, income statement, budgets, cost centers), HR & Payroll (employees, departments, attendance, leave, payroll with IRG brackets and CNAS 9%/26% contributions, G29 export), Sales & CRM (leads, Kanban pipeline, quotations, sales orders, TVA/stamp-tax invoices, customer aging), Purchase (suppliers, RFQs, purchase orders with approval workflow, goods receipts, 3-way matching, supplier evaluations), Inventory (items with CMUP/FIFO valuation, warehouses, stock levels, movements, counts), Manufacturing (BOM, work centers, manufacturing orders with MRP, auto purchase suggestions), Projects (tasks, timesheets, budget vs actual), Treasury (cash, bank accounts, cheques with deposit/bounce, payments, cash position), Tax (G50 monthly TVA declarations, VAT register), plus rule-based Workflow approvals, Reports/BI, and multi-company settings. Built on raw SQL via pgx (zero ORM) with transactional integrity on invoices, payroll, and stock movements, JWT auth (access + refresh tokens), and a Vue 3 + Tailwind SPA with a Ctrl+K command palette.",
+    category: "Enterprise Integration",
+    status: "active",
+    achievements: [
+      "Complete 14-module ERP: Accounting, HR/Payroll, Sales/CRM, Purchase, Inventory, Manufacturing, Projects, Treasury, Tax, Workflow, Reports, Dashboard, Settings",
+      "Single-binary deployment: Vue 3 SPA embedded in the Go executable via go:embed — only PostgreSQL required",
+      "Native Algerian compliance: SCF chart of accounts, IRG payroll brackets, CNAS 9%/26%, TVA 19%, G50/G29 declarations",
+      "100+ REST API endpoints with JWT auth (access + refresh tokens)",
+      "Zero-ORM data layer on pgx/v5 raw SQL with transactional integrity on critical operations",
+      "Vue 3 + TypeScript + Tailwind SPA with Ctrl+K command palette and real-time approval badges",
+      "Docker Compose + multi-stage Dockerfile for one-command production startup",
+    ],
+    technologies: [
+      "Go", "Vue 3", "TypeScript", "Vite", "Tailwind CSS",
+      "PostgreSQL", "pgx/v5", "JWT", "go:embed", "Docker", "docker-compose",
+    ],
+    tags: ["erp", "founder", "go", "vue", "postgresql", "algeria", "accounting", "hr-payroll"],
+    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=600&fit=crop",
+    logo: "/mounir-icon.svg",
+    icon: "🏢",
+    liveUrl: "",
+    githubUrl: "",
+    demoUrl: "",
+    caseStudyUrl: "",
+    featured: true,
+    disabled: false,
+    priority: 91,
+    startDate: "2026-08-01",
+    endDate: "",
+    duration: "Ongoing",
+    clientInfo: {
+      name: "Founder project",
+      industry: "ERP / Enterprise Software",
+      size: "startup",
+      location: "Algeria",
+      isPublic: false,
+    },
+    metrics: {
+      customMetrics: {
+        repository: "Private — demo on request",
+        modules: 14,
+        api_endpoints: "100+",
+        compliance: "SCF, IRG, CNAS, TVA, G50/G29",
+        deployment: "Single binary + PostgreSQL",
+      },
+    },
+    challenges: [
+      "Modeling Algerian fiscal and legal requirements (SCF, IRG, CNAS, G50/G29) in a general ERP data model",
+      "Packing a full ERP front-end plus API into a single deployable artifact",
+      "Keeping complex financial transactions atomic (invoices, payroll, stock movements)",
+    ],
+    solutions: [
+      "Pre-loaded Algerian compliance data: SCF chart of accounts, IRG brackets, CNAS rates",
+      "go:embed bundles the Vue 3 SPA into the Go binary — one executable, no external web server",
+      "Raw SQL with pgx/v5 inside single PostgreSQL transactions for critical operations",
+    ],
+    teamSize: 1,
+    role: "Founder & Lead Developer",
+    createdAt: 1785542400000,
+    updatedAt: Date.now(),
+    version: 1,
+  },
 ];

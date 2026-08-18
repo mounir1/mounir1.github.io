@@ -161,6 +161,15 @@ export const projectsIndex: Record<string, ProjectDiskEntry> = {
     importance: "supporting",
     description: "Edge-native platform for reasoning session rating",
   },
+  "mab-erp": {
+    slug: "mab-erp",
+    title: "Mab ERP — Algerian Enterprise Resource Planning (Founder)",
+    diskPath: "Nexus-ERP",
+    type: "personal",
+    status: "active",
+    importance: "supporting",
+    description: "Single-binary Go + Vue 3 ERP with native Algerian compliance (SCF, IRG, CNAS, G50/G29)",
+  },
   "mdm-app": {
     slug: "mdm-app",
     title: "MDM Application — Master Data Management with Azure AD",

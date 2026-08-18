@@ -21,6 +21,7 @@ import { join, resolve } from "path";
 import { fileURLToPath } from "url";
 import { projectsIndex } from "./projects-index";
 import { initialProjects } from "./initial-projects";
+import { initialSkills } from "./initial-skills";
 
 const PROJECTS_ROOT = "C:\\projects";
 
@@ -54,6 +55,15 @@ function verifySingleEntry(
     issues,
   };
 
+  // Cloud-hosted-only entries (no local working copy) are verified by their
+  // repoUrl instead — skip all on-disk checks for them.
+  if (!entry.diskPath) {
+    if (!entry.repoUrl) {
+      issues.push("Cloud-hosted entry has neither diskPath nor repoUrl");
+    }
+    return result;
+  }
+
   if (!result.directoryExists) {
     issues.push(`Directory does not exist: ${fullDiskPath}`);
     return result;
@@ -76,11 +86,24 @@ function verifySingleEntry(
     issues.push("No README.md found — consider adding one");
   }
   if (!result.hasPackageJson) {
-    // Check for other project files
+    // Check for other recognized project files
     const goModPath = join(fullDiskPath, "go.mod");
     const pyProjectPath = join(fullDiskPath, "pyproject.toml");
-    if (!existsSync(goModPath) && !existsSync(pyProjectPath)) {
-      issues.push("No recognizable project file (package.json, go.mod, pyproject.toml)");
+    const composerPath = join(fullDiskPath, "composer.json");
+    const pomPath = join(fullDiskPath, "pom.xml");
+    const gradlePath = join(fullDiskPath, "build.gradle");
+    const firebasePath = join(fullDiskPath, "firebase.json");
+    const dockerfilePath = join(fullDiskPath, "Dockerfile");
+    if (
+      !existsSync(goModPath) &&
+      !existsSync(pyProjectPath) &&
+      !existsSync(composerPath) &&
+      !existsSync(pomPath) &&
+      !existsSync(gradlePath) &&
+      !existsSync(firebasePath) &&
+      !existsSync(dockerfilePath)
+    ) {
+      issues.push("No recognizable project file (package.json, go.mod, composer.json, pom.xml, etc.)");
     }
   }
 
@@ -115,6 +138,24 @@ function verifyAll(): {
     console.warn(
       "\n⚠️  Seed projects without projects-index entries:",
       unmatchedSeedProjects.map((p) => `"${p.title}"`).join(", "),
+    );
+  }
+
+  // Cross-check: every project slug referenced by a skill must exist in the index
+  const knownSlugs = new Set(Object.keys(projectsIndex));
+  const badSkillRefs = initialSkills
+    .filter((s) => (s.projects ?? []).some((slug) => !knownSlugs.has(slug)))
+    .map((s) => ({
+      skill: s.name,
+      bad: (s.projects ?? []).filter((slug) => !knownSlugs.has(slug)),
+    }));
+
+  if (badSkillRefs.length > 0) {
+    console.warn(
+      "\n⚠️  Skills referencing unknown project slugs:",
+      badSkillRefs
+        .map((b) => `"${b.skill}" → [${b.bad.join(", ")}]`)
+        .join("; "),
     );
   }
 

@@ -93,6 +93,22 @@ export const initialSkills: SkillInput[] = [
     createdAt: 1735689600000,
     updatedAt: Date.now(),
   },
+  {
+    name: "Vue 3 / Vite",
+    category: "Frontend Development",
+    level: 80,
+    yearsOfExperience: 2,
+    description:
+      "Composition-API SPAs — the WebCMS content-management frontend (Vue 3 + Quasar) and the Mab ERP client (Vue 3 + Tailwind).",
+    projects: ["webcms-app", "mab-erp"],
+    icon: "💚",
+    color: "#4FC08D",
+    featured: false,
+    disabled: false,
+    priority: 69,
+    createdAt: 1725148800000,
+    updatedAt: Date.now(),
+  },
 
   // ── Testing & Quality ──────────────────────────────────────────────────────
   {
@@ -196,6 +212,22 @@ export const initialSkills: SkillInput[] = [
     updatedAt: Date.now(),
   },
   {
+    name: "Go / Golang",
+    category: "Backend Development",
+    level: 85,
+    yearsOfExperience: 2,
+    description:
+      "Server-rendered hotel website engine (Go + Fiber + Jet), the WebCMS and Builder API servers, and the entire single-binary Mab ERP backend.",
+    projects: ["hotech-website", "hotech-builder", "webcms-app", "mab-erp"],
+    icon: "🐹",
+    color: "#00ADD8",
+    featured: true,
+    disabled: false,
+    priority: 77,
+    createdAt: 1685577600000,
+    updatedAt: Date.now(),
+  },
+  {
     name: "Cloudflare Workers & Hono",
     category: "Backend Development",
     level: 84,
@@ -260,6 +292,24 @@ export const initialSkills: SkillInput[] = [
     updatedAt: Date.now(),
   },
 
+  // ── ERP Solutions ──────────────────────────────────────────────────────────
+  {
+    name: "ERP Development",
+    category: "ERP Solutions",
+    level: 84,
+    yearsOfExperience: 1,
+    description:
+      "Designed and shipped a complete 14-module ERP as a single Go + Vue 3 binary with native Algerian compliance (SCF, IRG, CNAS, G50/G29).",
+    projects: ["mab-erp"],
+    icon: "🏢",
+    color: "#336791",
+    featured: true,
+    disabled: false,
+    priority: 67,
+    createdAt: 1785542400000,
+    updatedAt: Date.now(),
+  },
+
   // ── Database ───────────────────────────────────────────────────────────────
   {
     name: "MySQL / MariaDB",
@@ -307,6 +357,22 @@ export const initialSkills: SkillInput[] = [
     disabled: false,
     priority: 55,
     createdAt: 1640995200000,
+    updatedAt: Date.now(),
+  },
+  {
+    name: "PostgreSQL",
+    category: "Database",
+    level: 80,
+    yearsOfExperience: 1,
+    description:
+      "Transactional data layer for Mab ERP — pgx/v5 raw SQL, migrations, and multi-module schema design for finance, HR, and inventory.",
+    projects: ["mab-erp"],
+    icon: "🐘",
+    color: "#336791",
+    featured: false,
+    disabled: false,
+    priority: 61,
+    createdAt: 1785542400000,
     updatedAt: Date.now(),
   },
   {
