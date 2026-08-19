@@ -99,7 +99,7 @@ export const initialSkills: SkillInput[] = [
     level: 80,
     yearsOfExperience: 2,
     description:
-      "Composition-API SPAs — the WebCMS content-management frontend (Vue 3 + Quasar) and the Mab ERP client (Vue 3 + Tailwind).",
+      "Composition-API SPAs — the WebCMS content-management frontend (Vue 3 + Vite) and the Mab ERP client (Vue 3 + Tailwind).",
     projects: ["webcms-app", "mab-erp"],
     icon: "💚",
     color: "#4FC08D",
@@ -107,6 +107,22 @@ export const initialSkills: SkillInput[] = [
     disabled: false,
     priority: 69,
     createdAt: 1725148800000,
+    updatedAt: Date.now(),
+  },
+  {
+    name: "Ext JS / Sencha",
+    category: "Frontend Development",
+    level: 88,
+    yearsOfExperience: 9,
+    description:
+      "Core framework behind WebEX — HoTech's flagship OREST extension platform, in continuous production development since 2017.",
+    projects: ["webex"],
+    icon: "🔌",
+    color: "#ED1C24",
+    featured: true,
+    disabled: false,
+    priority: 73,
+    createdAt: 1483228800000,
     updatedAt: Date.now(),
   },
 
@@ -382,7 +398,7 @@ export const initialSkills: SkillInput[] = [
     yearsOfExperience: 4,
     description:
       "NoSQL document modeling, security rules, and real-time sync for CMS-driven apps.",
-    projects: ["portfolio", "jskit"],
+    projects: ["portfolio", "noor-almaarifa"],
     icon: "📄",
     color: "#FFA000",
     featured: false,

@@ -210,12 +210,12 @@ export const projectsIndex: Record<string, ProjectDiskEntry> = {
   },
   "jskit": {
     slug: "jskit",
-    title: "JSKit — Firebase-Based CRM & PMS Toolkit",
+    title: "JSKit — Sencha Ext JS + Firebase ERP Platform",
     diskPath: "Mab Project/jskit",
     type: "personal",
     status: "maintenance",
     importance: "legacy",
-    description: "Open-source Firebase CRM toolkit",
+    description: "Open-source Sencha Ext JS + Firebase ERP platform",
   },
   "portfolio": {
     slug: "portfolio",

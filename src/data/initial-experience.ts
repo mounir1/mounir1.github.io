@@ -110,11 +110,12 @@ export const initialExperience: ExperienceInput[] = [
     startDate: "2025-07-01",
     current: true,
     description:
-      "Designing and building MabCoin / Mab Arena, an edge-native gaming and rewards platform running entirely on Cloudflare Workers. Full-stack ownership: Hono API on Workers, D1 (SQLite) persistence, a Model Context Protocol (MCP) server exposing 12 tools, and a Telegram bot front-end (@Mymabcoinbot).",
+      "Designing and building MabCoin / Mab Arena, an edge-native reasoning-rating platform running entirely on Cloudflare Workers. Full-stack ownership: Hono API on Workers, D1 (SQLite) persistence, a Model Context Protocol (MCP) server exposing 12 tools, a Reasoning Session and Challenge Engine, and a Telegram developer console (@Mymabcoinbot).",
     achievements: [
-      "Architected an edge-first platform on Cloudflare Workers with Hono and D1",
+      "Architected an edge-first reasoning-rating platform on Cloudflare Workers with Hono and D1",
       "Built an MCP server exposing 12 tools for AI-agent integration",
-      "Shipped the @Mymabcoinbot Telegram bot as the user-facing client",
+      "Shipped the @Mymabcoinbot Telegram bot as the developer console",
+      "Implemented the Reasoning Session + Challenge Engine data model",
       "Maintains a CI quality gate passing 89/89 automated checks",
     ],
     technologies: [
@@ -150,9 +151,9 @@ export const initialExperience: ExperienceInput[] = [
     endDate: "2021-12-31",
     current: false,
     description:
-      "Delivered websites and web applications for local businesses and organizations, growing from front-end work into full-stack development. Projects included the Noor Al Maarifa publishing site (nooralmaarifa.com), Firebase-hosted tools such as JSKit, and various PHP/JavaScript builds.",
+      "Delivered websites and web applications for local businesses and organizations, growing from front-end work into full-stack development. Projects included the Noor Al Maarifa educational-association website (nooralmaarifa.com), Firebase-hosted tools such as JSKit, and various PHP/JavaScript builds.",
     achievements: [
-      "Built and shipped nooralmaarifa.com for an Algerian publishing house — still live today",
+      "Built and shipped nooralmaarifa.com for Noor Al Maarifa, an Algerian educational association — still live today",
       "Published JSKit (jskit-app.web.app), a developer utility toolkit on Firebase Hosting",
       "Progressed from front-end sites to complete full-stack delivery: design, build, deploy, and maintain",
       "Established long-term client relationships that led to the full-time Techno Stationery role",

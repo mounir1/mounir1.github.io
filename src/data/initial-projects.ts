@@ -438,7 +438,8 @@ export const initialProjects: ProjectInput[] = [
       "Deployed and maintained in production",
     ],
     technologies: [
-      "React", "TypeScript", "Firebase", "Tailwind CSS", "Vite",
+      "React", "TypeScript", "Vite", "CSS Modules",
+      "Firebase", "Firestore", "React Testing Library",
     ],
     tags: ["education", "website", "rtl", "arabic", "responsive"],
     image: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&h=600&fit=crop",
@@ -477,23 +478,26 @@ export const initialProjects: ProjectInput[] = [
 
   // ── 8. JSKit ───────────────────────────────────────────────────────────────
   {
-    title: "JSKit — Firebase-Based CRM & PMS Toolkit",
+    title: "JSKit — Sencha Ext JS + Firebase ERP Platform",
     description:
-      "Open-source JavaScript toolkit exploring a Firebase-based CRM and project-management solution — deployed on Firebase Hosting with a public repository.",
+      "Open-source JavaScript ERP platform built on Sencha Ext JS with Firebase — Material Design theming, 23+ business packages, multi-language support, and runtime Firebase project switching.",
     longDescription:
-      "JSKit is an open-source JavaScript project building CRM and project-management primitives on Firebase — realtime data, auth, and hosting. It served as a foundation for later Firebase-based client work (dashboards, admin panels) and remains public on GitHub with a live Firebase deployment.",
-    category: "Web Application",
+      "JSKit is an open-source JavaScript ERP platform built on Sencha Ext JS with Firebase integration (v12, real-time database with runtime project switching), a Material Design 3.0 theme system with dark/light modes, 23+ business packages (tasks, books, movies, and more), i18n multi-language support, and WCAG 2.1 AA accessibility. Deployed on Firebase Hosting with a public repository. It served as a foundation for later Firebase-based client work (dashboards, admin panels) and remains public on GitHub.",
+    category: "Enterprise Integration",
     status: "maintenance",
     achievements: [
       "Public open-source repository (github.com/mounir1/jskit)",
       "Live deployment on Firebase Hosting",
-      "Firebase realtime data, auth, and hosting integration patterns",
+      "Sencha Ext JS ERP platform with Material Design 3.0 theming",
+      "Firebase integration with runtime project switching",
+      "23+ business packages and i18n multi-language support",
       "Foundation for later Firebase-based dashboard and admin work",
     ],
     technologies: [
-      "JavaScript", "Firebase", "Firebase Auth", "Firestore", "Firebase Hosting",
+      "JavaScript", "Sencha Ext JS", "Firebase",
+      "Firebase Realtime Database", "Firebase Hosting", "Material Design",
     ],
-    tags: ["open-source", "firebase", "crm", "toolkit", "javascript"],
+    tags: ["open-source", "firebase", "erp", "sencha", "extjs", "javascript"],
     image: "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=800&h=600&fit=crop",
     logo: "/jskit-logo.svg",
     icon: "🔧",
@@ -511,13 +515,15 @@ export const initialProjects: ProjectInput[] = [
       customMetrics: {
         repository: "Public on GitHub",
         hosting: "Firebase",
+        framework: "Sencha Ext JS",
+        packages: "23+",
       },
     },
     teamSize: 1,
     role: "Author",
     createdAt: 1667260800000,
     updatedAt: Date.now(),
-    version: 2,
+    version: 3,
   },
 
   // ── 9. This Portfolio ──────────────────────────────────────────────────────
@@ -907,12 +913,13 @@ export const initialProjects: ProjectInput[] = [
   {
     title: "WebEX — HoTech Web Extension Platform",
     description:
-      "Enterprise Ext JS web extension platform for the OREST hospitality ERP — enabling custom UI extensions, dashboard widgets, and integrated business logic for hotel operations.",
+      "HoTech's flagship web extension platform for the OREST hospitality ERP — Ext JS framework enabling custom UI extensions, dashboard widgets, and integrated business logic. Continuously developed since 2017.",
     longDescription:
-      "WebEX is an enterprise web extension platform built for the OREST hospitality ecosystem. Built on Ext JS with a Sencha-based architecture, it provides a framework for extending OREST's core functionality with custom UI panels, dashboard widgets, and integrated business logic. The platform supports multi-brand theming (Amonra, Otello), a comprehensive widget system for operational dashboards, font and icon extensibility, and integrates deeply with the OWeb framework for seamless embedding within the OREST desktop environment. Deployed across production HoTech sites for hotel management operations.",
+      "WebEX is the longest-running project in this portfolio — HoTech's enterprise web extension platform for the OREST hospitality ecosystem, in continuous production development since 2017. Built on Ext JS with a Sencha-based architecture, it provides a framework for extending OREST's core functionality with custom UI panels, dashboard widgets, and integrated business logic. The platform supports multi-brand theming (Amonra, Otello), a comprehensive widget system for operational dashboards, font and icon extensibility, and integrates deeply with the OWeb framework for seamless embedding within the OREST desktop environment. Deployed across production HoTech sites for hotel management operations.",
     category: "Enterprise Integration",
     status: "active",
     achievements: [
+      "In continuous production development since 2017 — the most actively worked project in the portfolio",
       "Ext JS extension framework for OREST hospitality ERP",
       "Multi-brand theming system (Amonra, Otello)",
       "Custom dashboard widget system for operational views",
@@ -932,10 +939,10 @@ export const initialProjects: ProjectInput[] = [
     githubUrl: "",
     demoUrl: "",
     caseStudyUrl: "https://hotech.systems",
-    featured: false,
+    featured: true,
     disabled: false,
-    priority: 68,
-    startDate: "2022-06-01",
+    priority: 99,
+    startDate: "2017-08-01",
     endDate: "",
     duration: "Ongoing",
     clientInfo: {
@@ -948,6 +955,7 @@ export const initialProjects: ProjectInput[] = [
     },
     metrics: {
       customMetrics: {
+        since: "2017",
         framework: "Ext JS + Sencha",
         brands: "Amonra, Otello",
         integration: "OWeb desktop framework",
@@ -956,9 +964,9 @@ export const initialProjects: ProjectInput[] = [
     },
     teamSize: 2,
     role: "Front-End Developer",
-    createdAt: 1654041600000,
+    createdAt: 1483228800000,
     updatedAt: Date.now(),
-    version: 1,
+    version: 2,
   },
 
   // ── 16. Hotech Builder ────────────────────────────────────────────────────
@@ -1101,13 +1109,13 @@ export const initialProjects: ProjectInput[] = [
   {
     title: "WebCMS — Hotel Content Management System",
     description:
-      "Vue 3 + Go content management system for hotel websites — providing drag-and-drop page building (GrapesJS), real-time content editing, and Go backend for high-performance API serving.",
+      "Vue 3 + Go content management system for hotel websites — providing drag-and-drop page building (GrapesJS), real-time content editing, and a Go backend for high-performance API serving.",
     longDescription:
-      "A content management system purpose-built for hotel website management. The front-end is built with Vue 3 + Quasar + Vite, featuring GrapesJS drag-and-drop page builder for non-technical hotel staff to create and edit pages. Backed by a Go (Golang) server for high-performance API serving, the system provides real-time content updates, media management, and role-based publishing workflows. Part of the HoTech ecosystem, complementing CloudWeb by providing the CMS layer for hotel website content management.",
+      "A content management system purpose-built for hotel website management. The front-end is built with Vue 3 + Vite + Pinia, featuring GrapesJS drag-and-drop page building for non-technical hotel staff to create and edit pages. Backed by a Go (Golang) server for high-performance API serving, the system provides real-time content updates, media management, and role-based publishing workflows. Part of the HoTech ecosystem, complementing CloudWeb by providing the CMS layer for hotel website content management.",
     category: "Hospitality Solutions",
     status: "active",
     achievements: [
-      "Vue 3 + Quasar frontend with Vite build tooling",
+      "Vue 3 + Vite frontend with Pinia state management",
       "GrapesJS drag-and-drop page builder for hotel staff",
       "Go backend server for high-performance API serving",
       "Real-time content editing and publishing workflows",
@@ -1115,8 +1123,7 @@ export const initialProjects: ProjectInput[] = [
       "Role-based content publishing approvals",
     ],
     technologies: [
-      "Vue 3", "Quasar CLI", "Vite", "TypeScript",
-      "Pinia", "Vue Router", "Chart.js",
+      "Vue 3", "Vite", "Pinia", "Vue Router", "Chart.js",
       "Go", "GrapesJS", "Axios", "Tailwind CSS",
     ],
     tags: ["cms", "vue", "go", "hotel", "content-management", "drag-drop"],
@@ -1143,7 +1150,7 @@ export const initialProjects: ProjectInput[] = [
     },
     metrics: {
       customMetrics: {
-        frontend: "Vue 3 + Quasar + Vite",
+        frontend: "Vue 3 + Vite + Pinia",
         backend: "Go (Golang)",
         page_builder: "GrapesJS",
         state: "Pinia",
