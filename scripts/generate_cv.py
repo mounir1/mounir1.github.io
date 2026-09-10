@@ -4,7 +4,8 @@
 Data source of truth: src/data/initial-experience.ts, initial-projects.ts,
 initial-skills.ts and src/hooks/useSettings.ts (all real-data-policy files).
 Run:  python3 scripts/generate_cv.py
-Outputs: Mounir_CV_2025.pdf and public/Mounir_CV_2025.pdf
+Outputs: public/Mounir_Abderrahmani_Resume.pdf (the file served by the site
+and linked from useSettings.resumeUrl / hero download button).
 """
 import os
 from reportlab.lib.pagesizes import A4
@@ -69,11 +70,12 @@ story.append(Spacer(1, 4))
 # ── Summary ─────────────────────────────────────────────────────────────────
 story += section("Profile")
 story.append(Paragraph(
-    "Full-stack developer with 10+ years of shipped, verifiable work: a live Magento 2.4 "
-    "storefront and Akeneo PIM 6 in production, an open-source suite of 28 Magento extensions, "
-    "the front-end of a hospitality Property Management System (Nava PMS), and an edge-native "
-    "platform on Cloudflare Workers. Strong on typed React/TypeScript front-ends, API "
-    "integration, automated testing, and running production infrastructure end to end.",
+    "Full-stack developer with 10+ years of shipped, verifiable work: HoTech's WebEX "
+    "hospitality extension platform (in continuous production development since 2017), a live "
+    "Magento 2.4 storefront and Akeneo PIM 6 in production, an open-source suite of 28 Magento "
+    "extensions, the front-end of a hospitality Property Management System (Nava PMS), and an "
+    "edge-native platform on Cloudflare Workers. Strong on typed React/TypeScript front-ends, "
+    "API integration, automated testing, and running production infrastructure end to end.",
     styles["body"]))
 
 # ── Experience ──────────────────────────────────────────────────────────────
@@ -87,6 +89,16 @@ exp = [
             "Build core PMS screens including the Syncfusion-based Room Rack reservation timeline.",
             "Typed integration layer over the OREST hospitality API; MSW mocks for offline development.",
             "Automated testing with Vitest (unit) and Playwright (end-to-end).",
+        ],
+    },
+    {
+        "role": "Web Extension Platform Developer — WebEX",
+        "org": "HoTech · Remote", "dates": "2017 – Present",
+        "points": [
+            "Longest-running engagement: Ext JS extension platform for the OREST hospitality ERP, "
+            "in continuous production development since 2017.",
+            "Multi-brand theming system (Amonra, Otello) and dashboard widget framework.",
+            "Deep OWeb-framework integration for embedding inside the OREST desktop environment.",
         ],
     },
     {
@@ -114,7 +126,7 @@ exp = [
         "org": "Independent · Algeria / Remote", "dates": "2016 – 2021",
         "points": [
             "Delivered sites and web apps for local businesses — including nooralmaarifa.com (still live).",
-            "Published JSKit (jskit-app.web.app), a Firebase-hosted developer toolkit.",
+            "Published JSKit (jskit-app.web.app), an open-source Sencha Ext JS + Firebase ERP platform.",
             "Grew from front-end builds into complete design–build–deploy–maintain delivery.",
         ],
     },
@@ -131,11 +143,13 @@ for e in exp:
 # ── Selected Projects ───────────────────────────────────────────────────────
 story += section("Selected Projects")
 projects = [
+    ("WebEX", "HoTech's Ext JS web-extension platform for OREST — in production since 2017."),
     ("Nava PMS", "Hospitality PMS front-end (React/TS, Syncfusion, OREST API)."),
     ("MAB Modules Suite", "28 open-source Magento 2.4 extensions — mounirtms.github.io."),
     ("TechnoStationery.com", "Production Magento 2.4 storefront, live in Algeria."),
     ("MabCoin / Mab Arena", "Cloudflare Workers + Hono + D1; MCP server (12 tools); Telegram bot."),
     ("Akeneo PIM", "Production PIM 6 deployment — pim.technostationery.com."),
+    ("JSKit", "Open-source Sencha Ext JS + Firebase ERP platform — jskit-app.web.app."),
     ("Portfolio + Admin CMS", "React 18 + Firebase with full content management — mounir1.github.io."),
 ]
 for name, desc in projects:
@@ -145,7 +159,7 @@ story.append(Spacer(1, 4))
 # ── Skills ──────────────────────────────────────────────────────────────────
 story += section("Skills")
 skills = [
-    ("Frontend", "React, TypeScript, Vite, Tailwind CSS, Syncfusion UI, HTML/CSS (incl. RTL)"),
+    ("Frontend", "React, TypeScript, Vite, Tailwind CSS, Ext JS / Sencha, Syncfusion UI, HTML/CSS (incl. RTL)"),
     ("Backend / Edge", "Node.js, PHP 8, Cloudflare Workers, Hono, Firebase, REST APIs, MCP, Telegram Bot API"),
     ("E-commerce / PIM", "Magento 2.4 / Adobe Commerce, Akeneo PIM 6, custom module development"),
     ("Data", "MySQL/MariaDB, SQLite / Cloudflare D1, Firestore, Elasticsearch"),
@@ -161,17 +175,15 @@ story.append(Paragraph("Arabic (native) · French (professional) · English (pro
 
 # ── Build ───────────────────────────────────────────────────────────────────
 root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-out = os.path.join(root, "Mounir_CV_2025.pdf")
+out = os.path.join(root, "public", "Mounir_Abderrahmani_Resume.pdf")
 
 doc = BaseDocTemplate(out, pagesize=A4,
                       leftMargin=18 * mm, rightMargin=18 * mm,
                       topMargin=16 * mm, bottomMargin=14 * mm,
-                      title="Mounir Abderrahmani — CV 2025",
+                      title="Mounir Abderrahmani — Resume",
                       author="Mounir Abderrahmani")
 frame = Frame(doc.leftMargin, doc.bottomMargin, doc.width, doc.height, id="main")
 doc.addPageTemplates([PageTemplate(id="cv", frames=[frame])])
 doc.build(story)
 
-import shutil
-shutil.copy(out, os.path.join(root, "public", "Mounir_CV_2025.pdf"))
-print(f"Generated {out} ({os.path.getsize(out)} bytes) + copied to public/")
+print(f"Generated {out} ({os.path.getsize(out)} bytes)")
