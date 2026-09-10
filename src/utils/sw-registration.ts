@@ -1,7 +1,6 @@
 // Service Worker Registration and Management
 const SW_URL = '/sw.js';
 const isProduction = import.meta.env.PROD;
-const isDevelopment = import.meta.env.DEV;
 
 interface ServiceWorkerMessage {
   type: string;
@@ -25,9 +24,9 @@ export class ServiceWorkerManager {
       return null;
     }
 
-    // Only register in production or if explicitly enabled in development
-    if (!isProduction && !isDevelopment) {
-      console.log('Service Worker registration skipped (not production)');
+    // Only register in production — a SW in dev interferes with Vite HMR
+    // and caches stale modules.
+    if (!isProduction) {
       return null;
     }
 

@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
+import { UpdateNotification } from "@/components/ui/update-notification";
 import { lazy, Suspense } from "react";
 
 // ── Lazy-loaded pages (code-split at each route boundary) ─────────────────────
@@ -42,6 +43,9 @@ const App = () => (
         <TooltipProvider>
           <Toaster />
           <Sonner />
+          {/* Registers the service worker (production only) and shows an
+              "Update available" prompt when a new deploy is waiting. */}
+          <UpdateNotification />
           {/* react-router-dom v7.18+: both v7_startTransition and v7_relativeSplatPath
               are now the default behavior — the `future` flag prop was removed. */}
           <BrowserRouter>
