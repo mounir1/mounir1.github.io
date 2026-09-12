@@ -10,7 +10,7 @@ export interface Experience {
   companyUrl?: string;
   companyLogo?: string;
   location: string;
-  type: "full-time" | "part-time" | "contract" | "freelance" | "internship";
+  type: "full-time" | "part-time" | "contract" | "freelance" | "internship" | "consulting";
   startDate: string;
   endDate?: string;
   current: boolean;

@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { useExperience, type ExperienceInput, EXPERIENCE_COLLECTION } from "@/hooks/useExperience";
+import { useExperience, type Experience, type ExperienceInput, EXPERIENCE_COLLECTION } from "@/hooks/useExperience";
 import { useToast } from "@/hooks/use-toast";
 import { db, isFirebaseEnabled } from "@/lib/firebase";
 import { addDoc, collection, updateDoc, deleteDoc, doc } from "firebase/firestore";
@@ -29,7 +29,7 @@ async function toggleField(id: string, field: "disabled" | "featured", value: bo
   await updateDoc(doc(db, EXPERIENCE_COLLECTION, id), { [field]: value, updatedAt: Date.now() });
 }
 
-function downloadJSON(data: any, filename: string) {
+function downloadJSON(data: unknown, filename: string) {
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -85,7 +85,7 @@ export function ExperienceTab() {
     setOpen(true);
   }
 
-  function openEdit(exp: any) {
+  function openEdit(exp: Experience) {
     setEditId(exp.id);
     setForm({ ...DEFAULT_EXP, ...exp });
     setLogoOpen(false);
@@ -93,8 +93,8 @@ export function ExperienceTab() {
   }
 
   function handleBrandAsset(logoUrl: string, iconUrl: string) {
-    if (logoUrl) setF("companyLogo" as any, logoUrl);
-    else if (iconUrl) setF("companyLogo" as any, iconUrl);
+    if (logoUrl) setF("companyLogo", logoUrl);
+    else if (iconUrl) setF("companyLogo", iconUrl);
   }
 
   async function handleSave() {
@@ -103,7 +103,7 @@ export function ExperienceTab() {
     try {
       const data: ExperienceInput = { ...form, updatedAt: Date.now() };
       if (editId) {
-        await updateDoc(doc(db, EXPERIENCE_COLLECTION, editId), data as any);
+        await updateDoc(doc(db, EXPERIENCE_COLLECTION, editId), { ...data });
       } else {
         await addDoc(collection(db, EXPERIENCE_COLLECTION), { ...data, createdAt: Date.now() });
       }
@@ -177,9 +177,9 @@ export function ExperienceTab() {
                 <div className="flex items-start gap-3 flex-1 min-w-0">
                   {/* Company logo or icon */}
                   <div className="shrink-0 w-11 h-11 rounded-lg bg-muted/50 border flex items-center justify-center overflow-hidden">
-                    {(exp as any).companyLogo ? (
+                    {exp.companyLogo ? (
                       <img
-                        src={(exp as any).companyLogo}
+                        src={exp.companyLogo}
                         alt={exp.company}
                         className="w-8 h-8 object-contain"
                         onError={(e) => { e.currentTarget.style.display = "none"; }}
@@ -313,7 +313,7 @@ export function ExperienceTab() {
                   </div>
                   <div className="space-y-1.5">
                     <Label>Type</Label>
-                    <Select value={form.type} onValueChange={v => setF("type", v as any)}>
+                    <Select value={form.type} onValueChange={v => setF("type", v as ExperienceInput["type"])}>
                       <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
                         {EXP_TYPES.map(t => (
@@ -324,7 +324,7 @@ export function ExperienceTab() {
                   </div>
                   <div className="space-y-1.5">
                     <Label>Company URL</Label>
-                    <Input value={(form as any).companyUrl || ""} onChange={e => setF("companyUrl" as any, e.target.value)} placeholder="https://company.com" />
+                    <Input value={form.companyUrl || ""} onChange={e => setF("companyUrl", e.target.value)} placeholder="https://company.com" />
                   </div>
                   <div className="space-y-1.5">
                     <Label>Start Date</Label>
@@ -386,10 +386,10 @@ export function ExperienceTab() {
                 <div className="space-y-1.5">
                   <Label>Company Logo URL</Label>
                   <div className="flex gap-2 items-center">
-                    {(form as any).companyLogo && (
+                    {form.companyLogo && (
                       <div className="shrink-0 w-10 h-10 rounded border bg-white flex items-center justify-center overflow-hidden">
                         <img
-                          src={(form as any).companyLogo}
+                          src={form.companyLogo}
                           alt="logo"
                           className="w-8 h-8 object-contain"
                           onError={(e) => (e.currentTarget.style.display = "none")}
@@ -397,8 +397,8 @@ export function ExperienceTab() {
                       </div>
                     )}
                     <Input
-                      value={(form as any).companyLogo || ""}
-                      onChange={e => setF("companyLogo" as any, e.target.value)}
+                      value={form.companyLogo || ""}
+                      onChange={e => setF("companyLogo", e.target.value)}
                       placeholder="/hotech-logo.svg  or  https://..."
                       className="flex-1"
                     />
@@ -422,12 +422,12 @@ export function ExperienceTab() {
                       folder="experience/logos"
                       currentImageUrl=""
                       showUrlTab={false}
-                      onUploadComplete={url => setF("companyLogo" as any, url)}
-                      onRemove={() => setF("companyLogo" as any, "")}
+                      onUploadComplete={url => setF("companyLogo", url)}
+                      onRemove={() => setF("companyLogo", "")}
                     />
                     <BrandAssetPicker
                       label="Auto-Fetch Company Logo (Brandfetch)"
-                      currentLogoUrl={(form as any).companyLogo}
+                      currentLogoUrl={form.companyLogo}
                       onAssetSelect={handleBrandAsset}
                     />
                   </CollapsibleContent>

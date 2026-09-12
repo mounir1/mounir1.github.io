@@ -36,24 +36,23 @@ export function BrandAssetPicker({
 
     try {
       // Try searching first
-      const searchResults = await searchBrand(query.trim());
-      
-      if (searchResults.length > 0) {
-        setResults(searchResults);
-      } else {
+      let found: BrandSearchResult[] = await searchBrand(query.trim());
+
+      if (found.length === 0) {
         // If no search results, try direct domain lookup
         const brand = await getBrandByDomain(query.trim());
         if (brand) {
-          setResults([{
+          found = [{
             domain: query.trim(),
             name: query.trim(),
             logo: brand.logo,
             icon: brand.icon,
-          }]);
+          }];
         }
       }
+      setResults(found);
 
-      if (results.length === 0) {
+      if (found.length === 0) {
         toast({
           title: 'No Results',
           description: `No brand assets found for "${query}"`,
