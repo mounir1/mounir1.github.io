@@ -3,20 +3,26 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ExternalLink, Github, Star, Search, Filter, X } from "lucide-react";
-import { useProjects } from "@/hooks/useProjects";
+import { useProjects, PROJECT_CATEGORIES } from "@/hooks/useProjects";
 import { useState, useMemo } from "react";
 
-const CATEGORIES = [
-  "All",
-  "Enterprise Integration",
-  "Web Application",
-  "E-commerce",
-  "Mobile Application",
-  "Machine Learning",
-  "API Development",
-  "DevOps & Infrastructure",
-  "Other",
-];
+/**
+ * Filter chips are derived from the live project data plus the canonical
+ * category vocabulary — so any category set in the admin panel (Hospitality
+ * Solutions, ERP Solutions, …) becomes filterable without a code change.
+ */
+function useCategoryFilters(projects: { category: string }[]): string[] {
+  return useMemo(() => {
+    const known = new Set<string>(PROJECT_CATEGORIES);
+    projects.forEach((p) => {
+      if (p.category) known.add(p.category);
+    });
+    const used = [...known]
+      .filter((c) => projects.some((p) => p.category === c))
+      .sort((a, b) => a.localeCompare(b));
+    return ["All", ...used];
+  }, [projects]);
+}
 
 function ProjectSkeleton() {
   return (
@@ -41,6 +47,7 @@ function ProjectSkeleton() {
 
 export const Projects = () => {
   const { projects, featured, others, loading } = useProjects();
+  const CATEGORIES = useCategoryFilters(projects);
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
   const [showAll, setShowAll] = useState(false);

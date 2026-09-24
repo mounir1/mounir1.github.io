@@ -70,8 +70,9 @@ story.append(Spacer(1, 4))
 # ── Summary ─────────────────────────────────────────────────────────────────
 story += section("Profile")
 story.append(Paragraph(
-    "Full-stack developer with 10+ years of shipped, verifiable work: HoTech's WebEX "
-    "hospitality extension platform (in continuous production development since 2017), a live "
+    "Full-stack developer with 10+ years of shipped, verifiable work: HoTech's WebEX hotel ERP "
+    "(OWeb Cloud — an Ext JS 8 multi-tenant suite covering front office, reservations, POS, "
+    "accounting, HR and CRM, in continuous production development since 2017), a live "
     "Magento 2.4 storefront and Akeneo PIM 6 in production, an open-source suite of 28 Magento "
     "extensions, the front-end of a hospitality Property Management System (Nava PMS), and an "
     "edge-native platform on Cloudflare Workers. Strong on typed React/TypeScript front-ends, "
@@ -92,13 +93,15 @@ exp = [
         ],
     },
     {
-        "role": "Web Extension Platform Developer — WebEX",
+        "role": "Hotel ERP Developer — WebEX (OWeb Cloud)",
         "org": "HoTech · Remote", "dates": "2017 – Present",
         "points": [
-            "Longest-running engagement: Ext JS extension platform for the OREST hospitality ERP, "
-            "in continuous production development since 2017.",
-            "Multi-brand theming system (Amonra, Otello) and dashboard widget framework.",
-            "Deep OWeb-framework integration for embedding inside the OREST desktop environment.",
+            "Build the multi-tenant hotel ERP front-end (Ext JS 8 SPA): front office, reservations, "
+            "rooms, POS, sales, stock, accounting, HR, CRM and statistics modules.",
+            "Maintain 14+ dynamically loaded Sencha packages over shared core packages, two brand "
+            "themes (Otello, Amonra) and the OREST API integration layer.",
+            "Own production build/performance tooling (Sencha Cmd + npm, Workbox, Brotli, font "
+            "subsetting) and ~6,478 Siesta tests, released via Jenkins → Docker → Kubernetes.",
         ],
     },
     {
@@ -143,7 +146,7 @@ for e in exp:
 # ── Selected Projects ───────────────────────────────────────────────────────
 story += section("Selected Projects")
 projects = [
-    ("WebEX", "HoTech's Ext JS web-extension platform for OREST — in production since 2017."),
+    ("WebEX (OWeb Cloud)", "HoTech's multi-tenant hotel ERP front-end — Ext JS 8, 14+ modules on OREST, in production since 2017."),
     ("Nava PMS", "Hospitality PMS front-end (React/TS, Syncfusion, OREST API)."),
     ("MAB Modules Suite", "28 open-source Magento 2.4 extensions — mounirtms.github.io."),
     ("TechnoStationery.com", "Production Magento 2.4 storefront, live in Algeria."),

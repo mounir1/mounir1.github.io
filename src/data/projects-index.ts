@@ -112,12 +112,12 @@ export const projectsIndex: Record<string, ProjectDiskEntry> = {
   },
   "webex": {
     slug: "webex",
-    title: "WebEX — HoTech Web Extension Platform",
+    title: "WebEX (OWeb Cloud) — Multi-Tenant Hotel ERP Suite",
     diskPath: "Hotech/webex",
     type: "contract",
     status: "active",
     importance: "core",
-    description: "HoTech's flagship web extension platform for the OREST ERP (since 2017)",
+    description: "Ext JS 8 multi-tenant hotel ERP (front office, reservations, POS, accounting…) on the OREST API — in production since 2017",
     repoUrl: "https://gitlab.hotech.dev/webapp/webex",
   },
   "hotech-builder": {
