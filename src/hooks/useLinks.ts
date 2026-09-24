@@ -11,6 +11,7 @@ import {
   query,
   getDocs,
 } from "firebase/firestore";
+import { sanitizeDoc } from "@/utils/firestore-write";
 
 export interface PortfolioLink {
   id: string;
@@ -110,7 +111,7 @@ export function useLinks() {
     const now = Date.now();
     await Promise.all(
       DEFAULT_LINKS.map(({ id, ...data }) =>
-        setDoc(doc(db!, LINKS_COLLECTION, id), { ...data, createdAt: now, updatedAt: now })
+        setDoc(doc(db!, LINKS_COLLECTION, id), sanitizeDoc({ ...data, createdAt: now, updatedAt: now }))
       )
     );
   };
@@ -124,11 +125,11 @@ export function useLinks() {
       return;
     }
     await ensureSeeded();
-    await addDoc(collection(db, LINKS_COLLECTION), {
+    await addDoc(collection(db, LINKS_COLLECTION), sanitizeDoc({
       ...data,
       createdAt: Date.now(),
       updatedAt: Date.now(),
-    });
+    }));
   };
 
   const updateLink = async (id: string, data: Partial<PortfolioLinkInput>) => {
@@ -140,7 +141,7 @@ export function useLinks() {
     }
     await ensureSeeded();
     // setDoc+merge is an upsert — never throws "No document to update".
-    await setDoc(doc(db, LINKS_COLLECTION, id), { ...data, updatedAt: Date.now() }, { merge: true });
+    await setDoc(doc(db, LINKS_COLLECTION, id), sanitizeDoc({ ...data, updatedAt: Date.now() }), { merge: true });
   };
 
   const deleteLink = async (id: string) => {

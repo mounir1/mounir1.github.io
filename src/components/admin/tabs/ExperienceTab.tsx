@@ -14,6 +14,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { useExperience, type Experience, type ExperienceInput, EXPERIENCE_COLLECTION } from "@/hooks/useExperience";
 import { useToast } from "@/hooks/use-toast";
 import { db, isFirebaseEnabled } from "@/lib/firebase";
+import { sanitizeDoc } from "@/utils/firestore-write";
 import { addDoc, collection, updateDoc, deleteDoc, doc } from "firebase/firestore";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { BrandAssetPicker } from "@/components/admin/BrandAssetPicker";
@@ -25,7 +26,7 @@ import {
 // Module-scope handler: uses Date.now(), so it must stay out of the
 // render path (react-hooks/purity). db is a module import.
 async function toggleField(id: string, field: "disabled" | "featured", value: boolean) {
-  if (!db) return;
+  if (!db) throw new Error("Firestore unavailable — refresh the page");
   await updateDoc(doc(db, EXPERIENCE_COLLECTION, id), { [field]: value, updatedAt: Date.now() });
 }
 
@@ -98,14 +99,14 @@ export function ExperienceTab() {
   }
 
   async function handleSave() {
-    if (!isFirebaseEnabled || !db) return;
+    if (!isFirebaseEnabled || !db) { toast({ title: "Firestore unavailable", description: "Refresh the page and try again.", variant: "destructive" }); return; }
     setSaving(true);
     try {
-      const data: ExperienceInput = { ...form, updatedAt: Date.now() };
+      const now = Date.now();
       if (editId) {
-        await updateDoc(doc(db, EXPERIENCE_COLLECTION, editId), { ...data });
+        await updateDoc(doc(db, EXPERIENCE_COLLECTION, editId), sanitizeDoc({ ...form, updatedAt: now }));
       } else {
-        await addDoc(collection(db, EXPERIENCE_COLLECTION), { ...data, createdAt: Date.now() });
+        await addDoc(collection(db, EXPERIENCE_COLLECTION), sanitizeDoc({ ...form, createdAt: now, updatedAt: now }));
       }
       setOpen(false);
       toast({ title: editId ? "Experience updated" : "Experience added", description: form.title });
@@ -117,7 +118,8 @@ export function ExperienceTab() {
   }
 
   async function handleDelete(id: string, title: string) {
-    if (!db || !confirm(`Delete "${title}"?`)) return;
+    if (!db) { toast({ title: "Firestore unavailable", variant: "destructive" }); return; }
+    if (!confirm(`Delete "${title}"?`)) return;
     try {
       await deleteDoc(doc(db, EXPERIENCE_COLLECTION, id));
       toast({ title: "Experience deleted", description: title });

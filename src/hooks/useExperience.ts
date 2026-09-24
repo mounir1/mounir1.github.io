@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { collection, query, orderBy, onSnapshot, where } from "firebase/firestore";
+import { collection, onSnapshot } from "firebase/firestore";
 import { db, isFirebaseEnabled } from "@/lib/firebase";
 import { initialExperience } from "@/data/initial-experience";
 
@@ -79,29 +79,29 @@ export function useExperience(adminMode = false) {
       return;
     }
 
-    // Build query — admin sees all, public only sees non-disabled
-    const q = adminMode
-      ? query(
-          collection(db, EXPERIENCE_COLLECTION),
-          orderBy("priority", "desc"),
-          orderBy("startDate", "desc")
-        )
-      : query(
-          collection(db, EXPERIENCE_COLLECTION),
-          where("disabled", "==", false),
-          orderBy("priority", "desc"),
-          orderBy("startDate", "desc")
-        );
+    // Index-free by design: this collection's composite index was never
+    // deployed, so a server-side where+orderBy fails ("query requires an
+    // index") and silently falls back to local data with phantom ids.
+    // Fetch everything (single-field auto-index) and sort/filter client-side.
+    const q = collection(db, EXPERIENCE_COLLECTION);
 
     const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
-        const experienceData = snapshot.docs.map((doc) => ({
+        const all = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         })) as Experience[];
 
-        setExperiences(experienceData);
+        const sorted = [...all].sort(
+          (a, b) =>
+            (b.priority ?? 0) - (a.priority ?? 0) ||
+            String(b.startDate ?? "").localeCompare(String(a.startDate ?? "")) ||
+            a.id.localeCompare(b.id)
+        );
+        setExperiences(
+          adminMode ? sorted : sorted.filter((e) => e.disabled !== true)
+        );
         setLoading(false);
         setError(null);
       },

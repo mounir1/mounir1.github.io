@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { db, isFirebaseEnabled } from "@/lib/firebase";
 import { doc, onSnapshot, setDoc } from "firebase/firestore";
+import { stripUndefined } from "@/utils/firestore-write";
+
+export { stripUndefined };
 
 export type AvailabilityStatus = "available" | "limited" | "busy" | "unavailable";
 
@@ -127,20 +130,8 @@ export function deepMerge(base: unknown, override: unknown): unknown {
   return result;
 }
 
-/** Firestore rejects `undefined` field values — deep-strip them before writing. */
-export function stripUndefined(value: unknown): unknown {
-  if (Array.isArray(value)) {
-    return value.map(stripUndefined).filter((v) => v !== undefined);
-  }
-  if (isPlainObject(value)) {
-    const out: Record<string, unknown> = {};
-    for (const [key, v] of Object.entries(value)) {
-      if (v !== undefined) out[key] = stripUndefined(v);
-    }
-    return out;
-  }
-  return value;
-}
+// stripUndefined is shared with every Firestore write path — see
+// @/utils/firestore-write (re-exported above for existing imports/tests).
 
 export function useSettings() {
   const [settings, setSettings] = useState<SiteSettings>(DEFAULT_SETTINGS);

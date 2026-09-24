@@ -8,11 +8,11 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { useTestimonials, DEFAULT_TESTIMONIAL, type TestimonialInput } from "@/hooks/useTestimonials";
+import { useTestimonials, DEFAULT_TESTIMONIAL, type Testimonial, type TestimonialInput } from "@/hooks/useTestimonials";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Edit, Trash2, Eye, EyeOff, Star, MessageSquare, ExternalLink, Loader2, Download } from "lucide-react";
 
-function downloadJSON(data: any, filename: string) {
+function downloadJSON(data: unknown, filename: string) {
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -60,7 +60,7 @@ export function TestimonialsTab() {
     setOpen(true);
   }
 
-  function openEdit(t: any) {
+  function openEdit(t: Testimonial) {
     setEditId(t.id);
     setForm({
       author:      t.author      ?? "",
@@ -85,7 +85,7 @@ export function TestimonialsTab() {
   }
 
   async function handleSave() {
-    if (!form.author || !form.content) return;
+    if (!form.author || !form.content) { toast({ title: "Author and content are required", variant: "destructive" }); return; }
     setSaving(true);
     try {
       if (editId) await updateTestimonial(editId, form);
@@ -369,7 +369,7 @@ export function TestimonialsTab() {
                 <Label>Source</Label>
                 <Select
                   value={form.source}
-                  onValueChange={(v) => set("source", v as any)}
+                  onValueChange={(v) => set("source", v as TestimonialInput["source"])}
                 >
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -404,15 +404,15 @@ export function TestimonialsTab() {
 
             {/* Toggles */}
             <div className="flex flex-wrap gap-5 pt-1">
-              {[
+              {([
                 { key: "featured", label: "Featured" },
                 { key: "verified", label: "Verified" },
                 { key: "disabled", label: "Hidden" },
-              ].map(({ key, label }) => (
+              ] as const).map(({ key, label }) => (
                 <div key={key} className="flex items-center gap-2">
                   <Switch
-                    checked={!!(form as any)[key]}
-                    onCheckedChange={(v) => set(key as any, v)}
+                    checked={!!form[key]}
+                    onCheckedChange={(v) => set(key, v)}
                   />
                   <Label>{label}</Label>
                 </div>

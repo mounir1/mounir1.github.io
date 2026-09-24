@@ -2,9 +2,9 @@ import { useEffect, useState, useMemo } from "react";
 import { db, isFirebaseEnabled } from "@/lib/firebase";
 import {
   collection, onSnapshot, addDoc, deleteDoc,
-  updateDoc, doc, orderBy, query, where,
-  type QueryConstraint,
+  updateDoc, doc,
 } from "firebase/firestore";
+import { sanitizeDoc } from "@/utils/firestore-write";
 import { initialTestimonials } from "@/data/initial-testimonials";
 
 export interface Testimonial {
@@ -86,28 +86,30 @@ export function useTestimonials(adminMode = false) {
       return;
     }
 
-    const constraints: QueryConstraint[] = [orderBy("priority", "desc")];
-    if (!adminMode) constraints.unshift(where("disabled", "==", false));
-
-    const q = query(collection(db, TESTIMONIALS_COLLECTION), ...constraints);
+    // Index-free by design — see useProjects for rationale.
+    const q = collection(db, TESTIMONIALS_COLLECTION);
 
     const unsub = onSnapshot(
       q,
       (snap) => {
+        const all = snap.docs.map((d) => {
+          const data = d.data();
+          // Backward-compat: map old clientName/clientTitle/clientCompany fields
+          return {
+            id: d.id,
+            author:  data.author  ?? data.clientName    ?? "",
+            role:    data.role    ?? data.clientTitle   ?? "",
+            company: data.company ?? data.clientCompany ?? "",
+            avatar:  data.avatar  ?? data.clientPhoto   ?? "",
+            linkedin: data.linkedin ?? data.clientLinkedin ?? "",
+            ...data,
+          } as Testimonial;
+        });
+        const sorted = [...all].sort(
+          (a, b) => (b.priority ?? 0) - (a.priority ?? 0) || a.id.localeCompare(b.id)
+        );
         setTestimonials(
-          snap.docs.map((d) => {
-            const data = d.data();
-            // Backward-compat: map old clientName/clientTitle/clientCompany fields
-            return {
-              id: d.id,
-              author:  data.author  ?? data.clientName    ?? "",
-              role:    data.role    ?? data.clientTitle   ?? "",
-              company: data.company ?? data.clientCompany ?? "",
-              avatar:  data.avatar  ?? data.clientPhoto   ?? "",
-              linkedin: data.linkedin ?? data.clientLinkedin ?? "",
-              ...data,
-            } as Testimonial;
-          })
+          adminMode ? sorted : sorted.filter((t) => t.disabled !== true)
         );
         setLoading(false);
       },
@@ -124,12 +126,12 @@ export function useTestimonials(adminMode = false) {
 
   const addTestimonial = async (data: TestimonialInput) => {
     if (!isFirebaseEnabled || !db) { console.warn("Firebase not available"); return; }
-    return addDoc(collection(db, TESTIMONIALS_COLLECTION), { ...data, createdAt: Date.now(), updatedAt: Date.now() });
+    return addDoc(collection(db, TESTIMONIALS_COLLECTION), sanitizeDoc({ ...data, createdAt: Date.now(), updatedAt: Date.now() }));
   };
 
   const updateTestimonial = async (id: string, data: Partial<TestimonialInput>) => {
     if (!isFirebaseEnabled || !db) { console.warn("Firebase not available"); return; }
-    return updateDoc(doc(db, TESTIMONIALS_COLLECTION, id), { ...data, updatedAt: Date.now() });
+    return updateDoc(doc(db, TESTIMONIALS_COLLECTION, id), sanitizeDoc({ ...data, updatedAt: Date.now() }));
   };
 
   const deleteTestimonial = async (id: string) => {
