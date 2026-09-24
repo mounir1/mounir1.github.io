@@ -8,9 +8,10 @@ import { useContactMessages, type ContactMessage, type MessageStatus } from "@/h
 import {
   Mail, MailOpen, Reply, Archive, Trash2, Search,
   Clock, Building, Phone, Loader2, Inbox, RefreshCw, Download,
+  type LucideIcon,
 } from "lucide-react";
 
-function downloadJSON(data: any, filename: string) {
+function downloadJSON(data: unknown, filename: string) {
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -20,7 +21,7 @@ function downloadJSON(data: any, filename: string) {
   URL.revokeObjectURL(url);
 }
 
-const STATUS_CONFIG: Record<MessageStatus, { label: string; color: string; icon: any }> = {
+const STATUS_CONFIG: Record<MessageStatus, { label: string; color: string; icon: LucideIcon }> = {
   unread:   { label: "Unread",   color: "bg-blue-500/15 text-blue-700 border-blue-500/30",     icon: Mail },
   read:     { label: "Read",     color: "bg-muted/50 text-muted-foreground border-border",      icon: MailOpen },
   replied:  { label: "Replied",  color: "bg-green-500/15 text-green-700 border-green-500/30",  icon: Reply },
@@ -169,7 +170,7 @@ export function MessagesTab() {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <Select value={filterStatus} onValueChange={(v) => setFilterStatus(v as any)}>
+        <Select value={filterStatus} onValueChange={(v) => setFilterStatus(v as MessageStatus | "all")}>
           <SelectTrigger className="w-40">
             <SelectValue placeholder="All" />
           </SelectTrigger>

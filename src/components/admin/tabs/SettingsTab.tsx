@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import {
   Settings, User, Globe, BarChart3, Zap, Save, Loader2,
   Linkedin, Github, Twitter, Youtube, Link, CheckCircle,
+  type LucideIcon,
 } from "lucide-react";
 
 const AVAILABILITY_OPTIONS: { value: AvailabilityStatus; label: string; color: string }[] = [
@@ -21,7 +22,7 @@ const AVAILABILITY_OPTIONS: { value: AvailabilityStatus; label: string; color: s
   { value: "unavailable", label: "Unavailable", color: "bg-red-500" },
 ];
 
-function SectionHeader({ icon: Icon, title, description }: { icon: any; title: string; description?: string }) {
+function SectionHeader({ icon: Icon, title, description }: { icon: LucideIcon; title: string; description?: string }) {
   return (
     <div className="flex items-center gap-3 pb-3 border-b mb-5">
       <div className="p-2 bg-primary/10 rounded-lg">

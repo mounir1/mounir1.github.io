@@ -21,7 +21,7 @@ const EMPTY_LINK: PortfolioLinkInput = {
   description: "", icon: "", active: true, priority: 50, openInNewTab: true,
 };
 
-function downloadJSON(data: any, filename: string) {
+function downloadJSON(data: unknown, filename: string) {
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -124,7 +124,7 @@ export function LinksTab() {
   }
 
   async function handleAdd() {
-    if (!addForm.label || !addForm.url) return;
+    if (!addForm.label || !addForm.url) { toast({ title: "Label and URL are required", variant: "destructive" }); return; }
     setSaving(true);
     try {
       await addLink(addForm);
@@ -137,7 +137,8 @@ export function LinksTab() {
   }
 
   async function handleEditSave() {
-    if (!editId || !editForm.label || !editForm.url) return;
+    if (!editId) return;
+    if (!editForm.label || !editForm.url) { toast({ title: "Label and URL are required", variant: "destructive" }); return; }
     setSaving(true);
     try {
       await updateLink(editId, editForm);

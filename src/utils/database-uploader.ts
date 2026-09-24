@@ -11,10 +11,11 @@
  */
 
 import {
-  collection, addDoc, getDocs, deleteDoc,
+  collection, addDoc, getDocs, deleteDoc, updateDoc,
   writeBatch, doc, query, orderBy,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { sanitizeDoc } from '@/utils/firestore-write';
 
 // ─── Canonical seed sources ───────────────────────────────────────────────────
 import { initialProjects }  from '@/data/initial-projects';
@@ -56,6 +57,8 @@ export interface UploadResult {
   collection: string;
   success: number;
   skipped: number;
+  /** Documents updated in place (sync mode). */
+  updated: number;
   errors: number;
   total: number;
   details: string[];
@@ -80,17 +83,32 @@ function itemLabel(item: SeedItem, fallback: string): string {
   return strField(item, 'title') ?? strField(item, 'name') ?? strField(item, 'label') ?? fallback;
 }
 
-/** Fetch existing dedup keys from a Firestore collection. */
-async function fetchExistingKeys(collectionName: string): Promise<Set<string>> {
-  if (!db) return new Set();
+/** Fetch existing docs keyed by their dedup key (title / name / label). */
+async function fetchExistingDocs(
+  collectionName: string,
+): Promise<Map<string, { id: string; data: SeedItem }>> {
+  const map = new Map<string, { id: string; data: SeedItem }>();
+  if (!db) return map;
   const snap = await getDocs(collection(db, collectionName));
-  const keys = new Set<string>();
-  snap.docs.forEach(d => {
-    const k = dedupKey(d.data() as SeedItem);
-    if (k) keys.add(k);
+  snap.docs.forEach((d) => {
+    const data = d.data() as SeedItem;
+    const k = dedupKey(data);
+    if (k) map.set(k, { id: d.id, data });
   });
-  return keys;
+  return map;
 }
+
+// ─── Canonical seed sources (collection → seed rows) ──────────────────────────
+
+export const SEED_SOURCES: Record<CollectionKey, SeedItem[]> = {
+  projects: initialProjects as unknown as SeedItem[],
+  experiences: initialExperience as unknown as SeedItem[],
+  skills: initialSkills as unknown as SeedItem[],
+  testimonials: initialTestimonials as unknown as SeedItem[],
+  upcoming: DEFAULT_UPCOMING as unknown as SeedItem[],
+  links: DEFAULT_LINKS as unknown as SeedItem[],
+  settings: [],
+};
 
 /** Fetch current doc count from a collection. */
 export async function getCollectionCount(collectionName: string): Promise<number> {
@@ -133,20 +151,26 @@ export class DatabaseUploader {
     return count;
   }
 
-  /** Upload a single collection with optional dedup and clear-first. */
+  /**
+   * Upload a single collection.
+   * @param opts.updateExisting — rows whose title/name already exists are
+   *   updated in place (keeping their Firestore id and createdAt) instead of
+   *   being skipped. This is what pushes edited seed data live.
+   */
   async uploadCollection(
     collectionName: string,
     data: SeedItem[],
-    opts: { clearFirst?: boolean; skipDuplicates?: boolean } = {},
+    opts: { clearFirst?: boolean; skipDuplicates?: boolean; updateExisting?: boolean } = {},
   ): Promise<UploadResult> {
     if (!db) throw new Error('Firebase not initialised');
 
-    const { clearFirst = false, skipDuplicates = true } = opts;
+    const { clearFirst = false, skipDuplicates = true, updateExisting = false } = opts;
 
     const result: UploadResult = {
       collection: collectionName,
       success: 0,
       skipped: 0,
+      updated: 0,
       errors: 0,
       total: data.length,
       details: [],
@@ -158,10 +182,10 @@ export class DatabaseUploader {
       result.details.push(`🗑️  Cleared ${cleared} existing documents`);
     }
 
-    // Load existing keys for dedup (only if not clearing first)
-    const existingKeys = (skipDuplicates && !clearFirst)
-      ? await fetchExistingKeys(collectionName)
-      : new Set<string>();
+    // Load existing docs for dedup/update (only if not clearing first)
+    const existingDocs = (!clearFirst && (skipDuplicates || updateExisting))
+      ? await fetchExistingDocs(collectionName)
+      : new Map<string, { id: string; data: SeedItem }>();
 
     // Upload items one by one (addDoc — auto ID)
     for (let i = 0; i < data.length; i++) {
@@ -177,8 +201,30 @@ export class DatabaseUploader {
         skipped: result.skipped,
       }]);
 
+      const existing = key ? existingDocs.get(key) : undefined;
+
+      // Sync mode — update the existing record in place
+      if (existing && existing.id && updateExisting) {
+        try {
+          const now = Date.now();
+          const payload = sanitizeDoc({
+            ...item,
+            createdAt: existing.data.createdAt ?? item.createdAt ?? now,
+            updatedAt: now,
+            version: Number(existing.data.version ?? 1) + 1,
+          });
+          await updateDoc(doc(db, collectionName, existing.id), payload);
+          result.updated++;
+          result.details.push(`♻️  Updated: ${label}`);
+        } catch (err: unknown) {
+          result.errors++;
+          result.details.push(`❌ Update error (${label}): ${errorMessage(err)}`);
+        }
+        continue;
+      }
+
       // Skip duplicate
-      if (skipDuplicates && !clearFirst && key && existingKeys.has(key)) {
+      if (skipDuplicates && existing) {
         result.skipped++;
         result.details.push(`⏭️  Skipped (duplicate): ${label}`);
         continue;
@@ -186,18 +232,17 @@ export class DatabaseUploader {
 
       try {
         const now = Date.now();
-        // Strip any local-only 'id' field — Firestore generates its own
-        const { id: _id, ...rest } = item;
-        const docData = {
-          ...rest,
-          createdAt: rest.createdAt || now,
+        const docData = sanitizeDoc({
+          ...item,
+          createdAt: item.createdAt || now,
           updatedAt: now,
-          version: rest.version ?? 1,
-        };
+          version: item.version ?? 1,
+        });
         await addDoc(collection(db, collectionName), docData);
         result.success++;
         result.details.push(`✅ Uploaded: ${label}`);
-        if (key) existingKeys.add(key); // prevent in-batch duplicates
+        // Prevent in-batch duplicates (empty id = no doc id to update later)
+        if (key) existingDocs.set(key, { id: '', data: item });
       } catch (err: unknown) {
         result.errors++;
         result.details.push(`❌ Error (${label}): ${errorMessage(err)}`);
@@ -217,19 +262,14 @@ export class DatabaseUploader {
 
   /** Upload ALL portfolio collections from the canonical seed sources. */
   async uploadAllData(
-    opts: { clearFirst?: boolean; skipDuplicates?: boolean } = {},
+    opts: { clearFirst?: boolean; skipDuplicates?: boolean; updateExisting?: boolean } = {},
   ): Promise<UploadResult[]> {
     const results: UploadResult[] = [];
 
-    // ── Ordered upload sequence ──
-    const jobs: Array<{ key: CollectionKey; data: SeedItem[] }> = [
-      { key: 'projects',     data: initialProjects as unknown as SeedItem[] },
-      { key: 'experiences',  data: initialExperience as unknown as SeedItem[] },
-      { key: 'skills',       data: initialSkills as unknown as SeedItem[] },
-      { key: 'testimonials', data: initialTestimonials as unknown as SeedItem[] },
-      { key: 'upcoming',     data: DEFAULT_UPCOMING as unknown as SeedItem[] },
-      { key: 'links',        data: DEFAULT_LINKS as unknown as SeedItem[] },
-    ];
+    // ── Ordered upload sequence (settings is a single doc, handled below) ──
+    const jobs = (Object.keys(SEED_SOURCES) as CollectionKey[])
+      .filter((key) => key !== 'settings')
+      .map((key) => ({ key, data: SEED_SOURCES[key] }));
 
     for (const { key, data } of jobs) {
       const collectionName = COLLECTIONS[key];
@@ -243,13 +283,14 @@ export class DatabaseUploader {
         const { setDoc, doc: fsDoc } = await import('firebase/firestore');
         await setDoc(
           fsDoc(db, COLLECTIONS.settings, 'site'),
-          { ...DEFAULT_SETTINGS, updatedAt: Date.now() },
+          sanitizeDoc({ ...DEFAULT_SETTINGS, updatedAt: Date.now() }),
           { merge: true },
         );
         results.push({
           collection: 'settings/site',
           success: 1,
           skipped: 0,
+          updated: 0,
           errors: 0,
           total: 1,
           details: ['✅ Site settings saved'],
@@ -260,6 +301,7 @@ export class DatabaseUploader {
         collection: 'settings/site',
         success: 0,
         skipped: 0,
+        updated: 0,
         errors: 1,
         total: 1,
         details: [`❌ Settings error: ${errorMessage(err)}`],
@@ -277,20 +319,57 @@ export async function seedPortfolio(clearFirst = false) {
   console.log(`🚀 Seeding portfolio data (clearFirst=${clearFirst})…`);
   const results = await uploader.uploadAllData({ clearFirst, skipDuplicates: !clearFirst });
 
-  let ok = 0, skip = 0, fail = 0;
+  let ok = 0, skip = 0, fail = 0, upd = 0;
   results.forEach(r => {
     ok   += r.success;
     skip += r.skipped;
+    upd  += r.updated;
     fail += r.errors;
     const icon = r.errors > 0 ? '⚠️' : '✅';
-    console.log(`${icon} ${r.collection}: +${r.success} / ⏭${r.skipped} / ❌${r.errors}`);
+    console.log(`${icon} ${r.collection}: +${r.success} / ♻️${r.updated} / ⏭${r.skipped} / ❌${r.errors}`);
   });
-  console.log(`\n🎯 Total: +${ok} uploaded, ⏭${skip} skipped, ❌${fail} errors`);
+  console.log(`\n🎯 Total: +${ok} uploaded, ♻️${upd} updated, ⏭${skip} skipped, ❌${fail} errors`);
   return results;
 }
 
 export async function clearAndSeed() {
   return seedPortfolio(true);
+}
+
+/**
+ * Sync Firestore with the canonical seed data: rows that already exist
+ * (matched by title/name) are UPDATED in place — keeping their Firestore id
+ * and createdAt — instead of being skipped. This is how edited seed data
+ * (initial-*.ts) is published without wiping manual admin edits.
+ */
+export async function syncPortfolio() {
+  const uploader = new DatabaseUploader(p => console.log('📊', p));
+  console.log('🔄 Syncing Firestore with the canonical seed data…');
+  const results = await uploader.uploadAllData({ updateExisting: true, skipDuplicates: false });
+
+  let created = 0, skip = 0, fail = 0, upd = 0;
+  results.forEach(r => {
+    created += r.success;
+    skip    += r.skipped;
+    upd     += r.updated;
+    fail    += r.errors;
+    const icon = r.errors > 0 ? '⚠️' : '✅';
+    console.log(`${icon} ${r.collection}: +${r.success} new / ♻️${r.updated} updated / ❌${r.errors}`);
+  });
+  console.log(`\n🎯 Total: +${created} new, ♻️${upd} updated, ⏭${skip} skipped, ❌${fail} errors`);
+  return results;
+}
+
+/** Sync a single collection by its Firestore collection name. */
+export async function syncCollection(collectionName: string) {
+  const key = (Object.keys(COLLECTIONS) as CollectionKey[])
+    .find((k) => COLLECTIONS[k] === collectionName);
+  if (!key) throw new Error(`Unknown collection: ${collectionName}`);
+  const uploader = new DatabaseUploader();
+  return uploader.uploadCollection(collectionName, SEED_SOURCES[key], {
+    updateExisting: true,
+    skipDuplicates: false,
+  });
 }
 
 // Per-collection helpers
@@ -326,6 +405,8 @@ declare global {
   interface Window {
     seedPortfolio?: typeof seedPortfolio;
     clearAndSeed?: typeof clearAndSeed;
+    syncPortfolio?: typeof syncPortfolio;
+    syncCollection?: typeof syncCollection;
     seedProjects?: typeof seedProjects;
     seedExperience?: typeof seedExperience;
     seedSkills?: typeof seedSkills;
@@ -344,6 +425,8 @@ declare global {
 if (typeof window !== 'undefined') {
   window.seedPortfolio      = seedPortfolio;
   window.clearAndSeed       = clearAndSeed;
+  window.syncPortfolio      = syncPortfolio;
+  window.syncCollection     = syncCollection;
   window.seedProjects       = seedProjects;
   window.seedExperience     = seedExperience;
   window.seedSkills         = seedSkills;

@@ -115,7 +115,7 @@ export const initialSkills: SkillInput[] = [
     level: 88,
     yearsOfExperience: 9,
     description:
-      "Core framework behind WebEX — HoTech's flagship OREST extension platform, in continuous production development since 2017.",
+      "Core framework behind WebEX (OWeb Cloud) — HoTech's multi-tenant hotel ERP suite, 14+ business modules on one Ext JS 8 SPA, in continuous production development since 2017.",
     projects: ["webex"],
     icon: "🔌",
     color: "#ED1C24",

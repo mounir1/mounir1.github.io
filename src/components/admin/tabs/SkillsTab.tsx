@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,9 +12,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useSkills, type SkillInput, type SkillCategory, SKILLS_COLLECTION } from "@/hooks/useSkills";
+import { useSkills, type Skill, type SkillInput, type SkillCategory, SKILLS_COLLECTION } from "@/hooks/useSkills";
 import { useToast } from "@/hooks/use-toast";
 import { db, isFirebaseEnabled } from "@/lib/firebase";
+import { sanitizeDoc } from "@/utils/firestore-write";
 import { addDoc, collection, updateDoc, deleteDoc, doc } from "firebase/firestore";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { SKILL_ICONS, getSkillColor } from "@/lib/skill-icons";
@@ -23,11 +24,11 @@ import { Plus, Edit, Trash2, Eye, EyeOff, Star, Zap, Palette, Search, Download }
 // Module-scope handler: uses Date.now(), so it must stay out of the
 // render path (react-hooks/purity). db is a module import.
 async function toggleField(id: string, field: "disabled" | "featured", value: boolean) {
-  if (!db) return;
+  if (!db) throw new Error("Firestore unavailable — refresh the page");
   await updateDoc(doc(db, SKILLS_COLLECTION, id), { [field]: value, updatedAt: Date.now() });
 }
 
-function downloadJSON(data: any, filename: string) {
+function downloadJSON(data: unknown, filename: string) {
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -90,7 +91,7 @@ export function SkillsTab() {
     setOpen(true);
   }
 
-  function openEdit(skill: any) {
+  function openEdit(skill: Skill) {
     setEditId(skill.id);
     setForm({ ...DEFAULT_SKILL, ...skill });
     setIconSearch("");
@@ -108,14 +109,14 @@ export function SkillsTab() {
   }
 
   async function handleSave() {
-    if (!isFirebaseEnabled || !db) return;
+    if (!isFirebaseEnabled || !db) { toast({ title: "Firestore unavailable", description: "Refresh the page and try again.", variant: "destructive" }); return; }
     setSaving(true);
     try {
-      const data = { ...form, updatedAt: Date.now() };
+      const now = Date.now();
       if (editId) {
-        await updateDoc(doc(db, SKILLS_COLLECTION, editId), data as any);
+        await updateDoc(doc(db, SKILLS_COLLECTION, editId), sanitizeDoc({ ...form, updatedAt: now }));
       } else {
-        await addDoc(collection(db, SKILLS_COLLECTION), { ...data, createdAt: Date.now() });
+        await addDoc(collection(db, SKILLS_COLLECTION), sanitizeDoc({ ...form, createdAt: now, updatedAt: now }));
       }
       setOpen(false);
       toast({ title: editId ? "Skill updated" : "Skill added", description: form.name });
@@ -127,7 +128,8 @@ export function SkillsTab() {
   }
 
   async function handleDelete(id: string, name: string) {
-    if (!db || !confirm(`Delete "${name}"? This cannot be undone.`)) return;
+    if (!db) { toast({ title: "Firestore unavailable", variant: "destructive" }); return; }
+    if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
     try {
       await deleteDoc(doc(db, SKILLS_COLLECTION, id));
       toast({ title: "Skill deleted", description: name });
@@ -232,7 +234,7 @@ export function SkillsTab() {
                         <Star className="h-2.5 w-2.5" />
                       </Badge>
                     )}
-                    {(skill as any).trending && (
+                    {skill.trending && (
                       <Badge className="bg-orange-500/10 text-orange-600 border-orange-400/20 text-[10px] px-1.5">🔥</Badge>
                     )}
                   </div>
@@ -249,7 +251,7 @@ export function SkillsTab() {
                   <Progress
                     value={skill.level}
                     className="h-1.5"
-                    style={skill.color ? { "--progress-color": skill.color } as any : {}}
+                    style={skill.color ? { "--progress-color": skill.color } as CSSProperties : {}}
                   />
                 </div>
 
@@ -507,8 +509,8 @@ export function SkillsTab() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Switch
-                    checked={(form as any).trending || false}
-                    onCheckedChange={v => setForm(f => ({ ...f, trending: v } as any))}
+                    checked={form.trending || false}
+                    onCheckedChange={v => setF("trending", v)}
                   />
                   <Label>🔥 Trending</Label>
                 </div>

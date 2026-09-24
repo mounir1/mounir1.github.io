@@ -11,6 +11,7 @@ import {
   query,
   getDocs,
 } from "firebase/firestore";
+import { sanitizeDoc } from "@/utils/firestore-write";
 
 export type UpcomingStatus = "idea" | "planned" | "in-development" | "beta" | "soon";
 
@@ -173,7 +174,7 @@ export function useUpcoming() {
     const now = Date.now();
     await Promise.all(
       DEFAULT_UPCOMING.map(({ id, ...data }) =>
-        setDoc(doc(db!, UPCOMING_COLLECTION, id), { ...data, createdAt: now, updatedAt: now })
+        setDoc(doc(db!, UPCOMING_COLLECTION, id), sanitizeDoc({ ...data, createdAt: now, updatedAt: now }))
       )
     );
   };
@@ -187,11 +188,11 @@ export function useUpcoming() {
       return;
     }
     await ensureSeeded();
-    await addDoc(collection(db, UPCOMING_COLLECTION), {
+    await addDoc(collection(db, UPCOMING_COLLECTION), sanitizeDoc({
       ...data,
       createdAt: Date.now(),
       updatedAt: Date.now(),
-    });
+    }));
   };
 
   const updateUpcoming = async (id: string, data: Partial<UpcomingProjectInput>) => {
@@ -203,7 +204,7 @@ export function useUpcoming() {
     }
     await ensureSeeded();
     // setDoc+merge is an upsert — never throws "No document to update".
-    await setDoc(doc(db, UPCOMING_COLLECTION, id), { ...data, updatedAt: Date.now() }, { merge: true });
+    await setDoc(doc(db, UPCOMING_COLLECTION, id), sanitizeDoc({ ...data, updatedAt: Date.now() }), { merge: true });
   };
 
   const deleteUpcoming = async (id: string) => {

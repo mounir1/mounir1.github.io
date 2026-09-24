@@ -49,6 +49,10 @@ Key patterns:
   re-enablable.
 - **Instant feature flags** — Settings switches auto-save immediately with
   toast feedback and rollback on failure.
+- **Canonical vocabularies** — `PROJECT_CATEGORIES` / `PROJECT_STATUSES` in
+  `src/hooks/useProjects.ts` are the single source of truth for the admin
+  editors *and* the public filter chips (which are derived from live data, so
+  a category added in the admin panel becomes filterable immediately).
 - **Toast feedback** on every admin mutation across all tabs.
 
 ### Firestore collections
@@ -57,7 +61,7 @@ Key patterns:
 |---------------|----------------------|--------------------------------|
 | `projects`    | Projects             | `src/data/initial-projects.ts` |
 | `skills`      | Skills               | `src/data/initial-skills.ts`   |
-| `experience`  | Experience           | `src/data/initial-experience.ts` |
+| `experiences` | Experience           | `src/data/initial-experience.ts` |
 | `links`       | Links                | `DEFAULT_LINKS` in `useLinks.ts` |
 | `testimonials`| Testimonials         | none (empty until added)       |
 | `upcoming`    | Upcoming             | `DEFAULT_UPCOMING` in `useUpcoming.ts` |
@@ -70,9 +74,26 @@ Access: navigate to `/admin`, or triple-click the signature in the footer.
 Authentication: Firebase Auth (Google OAuth or email/password).
 
 Tabs: **Overview** (stats), **Projects**, **Skills**, **Experience**,
-**Links**, **Testimonials**, **Upcoming**, **Messages**, **Settings**
-(feature flags, personal info, resume URL). Full CRUD with visibility /
-featured toggles; changes reflect on the public site in real time.
+**Links**, **Testimonials**, **Upcoming**, **Messages**, **Data Upload**,
+**Settings** (feature flags, personal info, resume URL). Full CRUD with
+visibility / featured toggles; changes reflect on the public site in real time.
+The project editor covers every field the public site renders — including
+client details, metrics (users reached, uptime, performance, revenue) and
+custom key/value metrics.
+
+### Publishing seed-file changes to Firestore
+
+The **Data Upload** tab is the bridge between `src/data/*.ts` and Firestore:
+
+| Action | Behaviour |
+|--------|-----------|
+| **Seed All** | Inserts rows that are missing (skips duplicates by title/name) |
+| **Sync (update existing)** | Rewrites every row whose title/name already exists **in place**, preserving Firestore doc ids — this is what publishes edits made to the seed files |
+| **Clear All & Reseed** | Deletes every document and re-inserts (new ids) — recovery only |
+
+The same functions are on `window` for the browser console:
+`syncPortfolio()`, `seedPortfolio()`, `clearAndSeed()`,
+`syncCollection("projects")`.
 
 ## Development
 

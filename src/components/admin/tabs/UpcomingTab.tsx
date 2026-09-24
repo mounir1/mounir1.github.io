@@ -8,11 +8,11 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { useUpcoming, type UpcomingProjectInput, type UpcomingStatus } from "@/hooks/useUpcoming";
+import { useUpcoming, type UpcomingProject, type UpcomingProjectInput, type UpcomingStatus } from "@/hooks/useUpcoming";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2, Calendar, Loader2, Clock, Edit, Eye, EyeOff, ExternalLink, Download } from "lucide-react";
 
-function downloadJSON(data: any, filename: string) {
+function downloadJSON(data: unknown, filename: string) {
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -69,7 +69,7 @@ export function UpcomingTab() {
     setOpen(true);
   }
 
-  function openEdit(p: any) {
+  function openEdit(p: UpcomingProject) {
     setEditId(p.id);
     setForm({
       title:             p.title             ?? "",
@@ -88,7 +88,7 @@ export function UpcomingTab() {
   }
 
   async function handleSave() {
-    if (!form.title) return;
+    if (!form.title) { toast({ title: "Title is required", description: "Give the upcoming project a name before saving.", variant: "destructive" }); return; }
     setSaving(true);
     try {
       const techArr = techInput.split(",").map(t => t.trim()).filter(Boolean);
@@ -203,9 +203,9 @@ export function UpcomingTab() {
                     {project.estimatedDuration && (
                       <span className="text-xs text-muted-foreground">⏱ {project.estimatedDuration}</span>
                     )}
-                    {(project as any).githubUrl && (
+                    {project.githubUrl && (
                       <a
-                        href={(project as any).githubUrl}
+                        href={project.githubUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-xs text-primary hover:underline flex items-center gap-1"

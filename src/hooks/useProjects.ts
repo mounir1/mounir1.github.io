@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { db, isFirebaseEnabled } from "@/lib/firebase";
-import { collection, onSnapshot, orderBy, query, where } from "firebase/firestore";
+import { collection, onSnapshot } from "firebase/firestore";
 import { initialProjects } from "@/data/initial-projects";
 
 export type ProjectCategory = 
@@ -11,6 +11,7 @@ export type ProjectCategory =
   | "Machine Learning"
   | "API Development"
   | "DevOps & Infrastructure"
+  | "ERP Solutions"
   | "Hospitality Solutions"
   | "Education Technology"
   | "Training / Education"
@@ -18,6 +19,33 @@ export type ProjectCategory =
   | "Other";
 
 export type ProjectStatus = "completed" | "in-progress" | "in-development" | "active" | "maintenance" | "archived";
+
+// Canonical vocabularies — the single source of truth shared by the admin
+// editors and the public portfolio filters. Never hard-code these lists again.
+export const PROJECT_CATEGORIES: ProjectCategory[] = [
+  "Web Application",
+  "Mobile Application",
+  "Enterprise Integration",
+  "E-commerce",
+  "Machine Learning",
+  "API Development",
+  "DevOps & Infrastructure",
+  "ERP Solutions",
+  "Hospitality Solutions",
+  "Education Technology",
+  "Training / Education",
+  "Data Platform",
+  "Other",
+];
+
+export const PROJECT_STATUSES: ProjectStatus[] = [
+  "active",
+  "in-development",
+  "in-progress",
+  "completed",
+  "maintenance",
+  "archived",
+];
 
 export interface ClientInfo {
   name: string;
@@ -142,30 +170,29 @@ export function useProjects(adminMode = false) {
       return;
     }
 
-    // Use Firebase in production. Admin mode must see disabled projects too —
+    // Index-free by design — fetch the whole collection (single-field
+    // auto-indexes always exist) and sort/filter client-side; a composite-
+    // index query fails on any collection whose index was never deployed and
+    // would silently fall back to local data with phantom `local-*` ids that
+    // admin edits can't write to. Admin still sees disabled projects —
     // otherwise hiding a project removes it from the admin list permanently.
-    const q = adminMode
-      ? query(
-          collection(db, PROJECTS_COLLECTION),
-          orderBy("priority", "desc"),
-          orderBy("createdAt", "desc")
-        )
-      : query(
-          collection(db, PROJECTS_COLLECTION),
-          where("disabled", "==", false),
-          orderBy("priority", "desc"),
-          orderBy("createdAt", "desc")
-        );
+    const q = collection(db, PROJECTS_COLLECTION);
 
     const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
-        const projectsData = snapshot.docs.map(doc => ({
+        const all = snapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         })) as Project[];
-        
-        setProjects(projectsData);
+
+        const sorted = [...all].sort(
+          (a, b) =>
+            (b.priority ?? 0) - (a.priority ?? 0) ||
+            (b.createdAt ?? 0) - (a.createdAt ?? 0) ||
+            a.id.localeCompare(b.id)
+        );
+        setProjects(adminMode ? sorted : sorted.filter(p => p.disabled !== true));
         setLoading(false);
         setError(null);
       },

@@ -4,6 +4,7 @@ import {
   collection, onSnapshot, addDoc, updateDoc, deleteDoc,
   doc, orderBy, query,
 } from "firebase/firestore";
+import { sanitizeDoc } from "@/utils/firestore-write";
 
 export type MessageStatus = "unread" | "read" | "replied" | "archived" | "spam";
 export type MessageType = "general" | "project" | "hire" | "collaboration" | "other";
@@ -52,14 +53,11 @@ export function useContactMessages() {
 
   const submitMessage = async (data: ContactMessageInput) => {
     if (!isFirebaseEnabled || !db) return;
-    const clean = Object.fromEntries(
-      Object.entries(data).filter(([, v]) => v !== undefined)
-    );
-    await addDoc(collection(db, CONTACT_COLLECTION), {
-      ...clean,
+    await addDoc(collection(db, CONTACT_COLLECTION), sanitizeDoc({
+      ...data,
       status: "unread",
       createdAt: Date.now(),
-    });
+    }));
   };
 
   const markRead = async (id: string) => {

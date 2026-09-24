@@ -16,7 +16,7 @@ interface OverviewTabProps {
 }
 
 export function OverviewTab({ onNavigate }: OverviewTabProps) {
-  const { projects }                     = useProjects();
+  const { projects }                     = useProjects(true); // admin: include hidden projects in dashboard counts
   const { messages, unreadCount }        = useContactMessages();
   const { testimonials, featured: featuredTestimonials } = useTestimonials(true);
 

@@ -1,0 +1,17 @@
+# Line endings: normalise text to LF in the repository, keep the checkout native.
+* text=auto
+
+# Binary assets must never be line-ending converted.
+# reportlab PDFs are ASCII85-only, so Git's "text" heuristic misclassifies them —
+# a CRLF conversion shifts the byte offsets in the xref table and corrupts the file.
+*.pdf  binary
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.webp binary
+*.ico  binary
+*.gif  binary
+*.woff binary
+*.woff2 binary
+*.ttf  binary
+*.eot  binary

@@ -12,8 +12,14 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
-import { useProjects, PROJECTS_COLLECTION, type ProjectInput, DEFAULT_PROJECT } from "@/hooks/useProjects";
+import {
+  useProjects, PROJECTS_COLLECTION, DEFAULT_PROJECT,
+  PROJECT_CATEGORIES, PROJECT_STATUSES,
+  type ProjectCategory, type ProjectStatus,
+  type ProjectInput, type ProjectMetrics,
+} from "@/hooks/useProjects";
 import { db } from "@/lib/firebase";
+import { sanitizeDoc } from "@/utils/firestore-write";
 import { addDoc, collection, doc, updateDoc, deleteDoc } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
 import { ImageUpload } from "@/components/admin/ImageUpload";
@@ -24,7 +30,7 @@ import {
   Palette, ExternalLink, Download,
 } from "lucide-react";
 
-function downloadJSON(data: any, filename: string) {
+function downloadJSON(data: unknown, filename: string) {
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -34,15 +40,33 @@ function downloadJSON(data: any, filename: string) {
   URL.revokeObjectURL(url);
 }
 
-const CATEGORIES = [
-  "Web Application", "Mobile Application", "Enterprise Integration",
-  "E-commerce", "Machine Learning", "API Development",
-  "ERP Solutions", "Retail Solutions", "Hospitality Solutions",
-  "Education Technology", "ITSM Solutions", "Project Management",
-  "DevOps & Infrastructure", "Other",
-];
+const CLIENT_SIZES = ["startup", "small", "medium", "large", "enterprise"] as const;
 
-const STATUSES = ["completed", "in-progress", "maintenance", "active", "archived"];
+/** Render `customMetrics` as editable "key: value" lines. */
+function customMetricsToText(metrics?: ProjectMetrics): string {
+  return Object.entries(metrics?.customMetrics ?? {})
+    .map(([key, value]) => `${key}: ${String(value)}`)
+    .join("\n");
+}
+
+/** Parse "key: value" lines back into customMetrics (numeric when possible). */
+function textToCustomMetrics(text: string): Record<string, string | number | boolean> {
+  const out: Record<string, string | number | boolean> = {};
+  text.split("\n").forEach((line) => {
+    const idx = line.indexOf(":");
+    if (idx < 1) return;
+    const key = line.slice(0, idx).trim();
+    const raw = line.slice(idx + 1).trim();
+    if (!key || !raw) return;
+    if (raw === "true" || raw === "false") {
+      out[key] = raw === "true";
+      return;
+    }
+    const num = Number(raw);
+    out[key] = Number.isFinite(num) ? num : raw;
+  });
+  return out;
+}
 
 // ─── ProjectForm ────────────────────────────────────────────────────────────
 function ProjectForm({
@@ -65,12 +89,12 @@ function ProjectForm({
   });
   const [assetsOpen, setAssetsOpen] = useState(false);
 
-  function set(key: keyof ProjectInput, value: any) {
+  function set<K extends keyof ProjectInput>(key: K, value: ProjectInput[K]) {
     setForm((p) => ({ ...p, [key]: value }));
   }
 
-  function setNested(section: "clientInfo" | "metrics", key: string, value: any) {
-    setForm((p) => ({ ...p, [section]: { ...(p[section] as any), [key]: value } }));
+  function setNested(section: "clientInfo" | "metrics", key: string, value: unknown) {
+    setForm((p) => ({ ...p, [section]: { ...(p[section] ?? {}), [key]: value } }) as ProjectInput);
   }
 
   function handleBrandAsset(logoUrl: string, iconUrl: string, colors?: string[]) {
@@ -104,16 +128,16 @@ function ProjectForm({
           </div>
           <div className="space-y-1.5">
             <Label>Category</Label>
-            <Select value={form.category} onValueChange={(v) => set("category", v)}>
+            <Select value={form.category} onValueChange={(v) => set("category", v as ProjectCategory)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>{CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+              <SelectContent>{PROJECT_CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
             </Select>
           </div>
           <div className="space-y-1.5">
             <Label>Status</Label>
-            <Select value={form.status} onValueChange={(v) => set("status", v)}>
+            <Select value={form.status} onValueChange={(v) => set("status", v as ProjectStatus)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>{STATUSES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+              <SelectContent>{PROJECT_STATUSES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
             </Select>
           </div>
           <div className="space-y-1.5 md:col-span-2">
@@ -321,9 +345,70 @@ function ProjectForm({
             <Label>Location</Label>
             <Input value={form.clientInfo.location} onChange={(e) => setNested("clientInfo", "location", e.target.value)} placeholder="City, Country" />
           </div>
+          <div className="space-y-1.5">
+            <Label>Client Size</Label>
+            <Select value={form.clientInfo.size} onValueChange={(v) => setNested("clientInfo", "size", v)}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {CLIENT_SIZES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
           <div className="flex items-center gap-2 pt-1">
             <Switch checked={form.clientInfo.isPublic} onCheckedChange={(v) => setNested("clientInfo", "isPublic", v)} />
             <Label>Public Client</Label>
+          </div>
+        </div>
+      </section>
+
+      <Separator />
+
+      {/* ── Metrics ── */}
+      <section className="space-y-3">
+        <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">Metrics &amp; Outcomes</h4>
+        <div className="grid md:grid-cols-2 gap-3">
+          <div className="space-y-1.5">
+            <Label>Users Reached</Label>
+            <Input
+              type="number"
+              min={0}
+              value={form.metrics?.usersReached ?? ""}
+              onChange={(e) => setNested("metrics", "usersReached", e.target.value === "" ? undefined : Number(e.target.value))}
+              placeholder="0"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Uptime</Label>
+            <Input
+              value={form.metrics?.uptime ?? ""}
+              onChange={(e) => setNested("metrics", "uptime", e.target.value)}
+              placeholder="99.9%"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Performance Improvement</Label>
+            <Input
+              value={form.metrics?.performanceImprovement ?? ""}
+              onChange={(e) => setNested("metrics", "performanceImprovement", e.target.value)}
+              placeholder="40% faster page loads"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Revenue Impact</Label>
+            <Input
+              value={form.metrics?.revenueImpact ?? ""}
+              onChange={(e) => setNested("metrics", "revenueImpact", e.target.value)}
+              placeholder="+18% conversion"
+            />
+          </div>
+          <div className="space-y-1.5 md:col-span-2">
+            <Label>Custom Metrics (one &quot;key: value&quot; per line)</Label>
+            <Textarea
+              value={customMetricsToText(form.metrics)}
+              onChange={(e) => setNested("metrics", "customMetrics", textToCustomMetrics(e.target.value))}
+              rows={4}
+              placeholder={"business_modules: 14&#10;deployment: Docker + Kubernetes"}
+            />
           </div>
         </div>
       </section>
@@ -382,12 +467,12 @@ export function ProjectsTab() {
   const categories = [...new Set(projects.map((p) => p.category))];
 
   async function handleAdd(data: ProjectInput) {
-    if (!db) return;
+    if (!db) { toast({ title: "Firestore unavailable", description: "Refresh the page and try again.", variant: "destructive" }); return; }
     setSubmitting(true);
     try {
-      await addDoc(collection(db, PROJECTS_COLLECTION), {
+      await addDoc(collection(db, PROJECTS_COLLECTION), sanitizeDoc({
         ...data, createdAt: Date.now(), updatedAt: Date.now(), version: 1,
-      });
+      }));
       setAddOpen(false);
       toast({ title: "Project added", description: data.title });
     } catch (e) {
@@ -398,10 +483,13 @@ export function ProjectsTab() {
   }
 
   async function handleEdit(data: ProjectInput) {
-    if (!db || !editProject) return;
+    if (!db || !editProject) { toast({ title: "Firestore unavailable", description: "Refresh the page and try again.", variant: "destructive" }); return; }
     setSubmitting(true);
     try {
-      await updateDoc(doc(db, PROJECTS_COLLECTION, editProject.id), { ...data, updatedAt: Date.now() });
+      await updateDoc(
+        doc(db, PROJECTS_COLLECTION, editProject.id),
+        sanitizeDoc({ ...data, updatedAt: Date.now() }),
+      );
       setEditProject(null);
       toast({ title: "Project updated", description: data.title });
     } catch (e) {
@@ -412,7 +500,7 @@ export function ProjectsTab() {
   }
 
   async function handleToggle(id: string, key: "featured" | "disabled", current: boolean) {
-    if (!db) return;
+    if (!db) { toast({ title: "Firestore unavailable", variant: "destructive" }); return; }
     try {
       await updateDoc(doc(db, PROJECTS_COLLECTION, id), { [key]: !current, updatedAt: Date.now() });
       toast({
@@ -426,7 +514,8 @@ export function ProjectsTab() {
   }
 
   async function handleDelete(id: string, title: string) {
-    if (!db || !confirm(`Delete "${title}"? This cannot be undone.`)) return;
+    if (!db) { toast({ title: "Firestore unavailable", variant: "destructive" }); return; }
+    if (!confirm(`Delete "${title}"? This cannot be undone.`)) return;
     try {
       await deleteDoc(doc(db, PROJECTS_COLLECTION, id));
       toast({ title: "Project deleted", description: title });

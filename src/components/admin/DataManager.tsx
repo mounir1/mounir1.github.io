@@ -21,6 +21,8 @@ import {
   getCollectionCount,
   seedPortfolio,
   clearAndSeed,
+  syncPortfolio,
+  syncCollection,
   seedProjects,
   seedExperience,
   seedSkills,
@@ -133,8 +135,8 @@ export function DataManager() {
       const raw = await fn();
       const list = Array.isArray(raw) ? raw : [raw];
       setResults(list);
-    } catch (e: any) {
-      setError(e.message ?? "Unknown error");
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Unknown error");
     } finally {
       setIsUploading(false);
       setActiveCol(null);
@@ -159,6 +161,18 @@ export function DataManager() {
   const handleSeedOne = (col: ColMeta, clearFirst: boolean) => {
     if (clearFirst && !confirm(`⚠️  Delete all "${col.label}" documents and re-upload? Continue?`)) return;
     runSeed(() => col.seedFn(clearFirst), col.label);
+  };
+
+  const handleSyncAll = () => {
+    if (!confirm(
+      "🔄 Update every Firestore record that matches the local seed data (by title/name)?\n\n" +
+      "Existing document ids are preserved and fields you edited by hand are overwritten with the local seed values."
+    )) return;
+    runSeed(() => syncPortfolio(), "All Collections (Sync)");
+  };
+
+  const handleSyncOne = (col: ColMeta) => {
+    runSeed(() => syncCollection(col.collectionName), `${col.label} (sync)`);
   };
 
   // ── Render ───────────────────────────────────────────────────────────────────
@@ -227,6 +241,8 @@ export function DataManager() {
             <Info className="h-4 w-4 text-blue-500" />
             <AlertDescription className="text-sm">
               <strong>Seed All</strong> adds missing records (skips duplicates by title/name).{" "}
+              <strong>Sync (update existing)</strong> rewrites records that already exist from the
+              local seed files, in place — the way to publish edited project/experience details.{" "}
               <strong>Clear &amp; Reseed</strong> deletes all docs in every collection first.{" "}
               Per-collection buttons below let you target individual collections.
             </AlertDescription>
@@ -244,6 +260,18 @@ export function DataManager() {
                 : <Upload className="w-4 h-4 mr-2" />
               }
               Seed All (skip duplicates)
+            </Button>
+            <Button
+              onClick={handleSyncAll}
+              disabled={isUploading}
+              variant="outline"
+              className="flex-1"
+            >
+              {isUploading && activeCol === "All Collections (Sync)"
+                ? <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                : <RefreshCw className="w-4 h-4 mr-2" />
+              }
+              Sync (update existing)
             </Button>
             <Button
               onClick={handleClearAll}
@@ -333,6 +361,18 @@ export function DataManager() {
                     </Button>
                     <Button
                       size="sm"
+                      variant="outline"
+                      disabled={isUploading}
+                      onClick={() => handleSyncOne(col)}
+                      title={`Update existing ${col.label} records from the local seed data`}
+                    >
+                      {isUploading && activeCol === `${col.label} (sync)`
+                        ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        : <RefreshCw className="h-3.5 w-3.5" />
+                      }
+                    </Button>
+                    <Button
+                      size="sm"
                       variant="ghost"
                       disabled={isUploading}
                       onClick={() => handleSeedOne(col, true)}
@@ -365,6 +405,7 @@ export function DataManager() {
                   <span className="font-medium capitalize text-sm">{r.collection}</span>
                   <div className="flex gap-2 text-xs">
                     <span className="text-green-600">✅ {r.success}</span>
+                    <span className="text-cyan-600">♻️ {r.updated ?? 0}</span>
                     <span className="text-blue-600">⏭ {r.skipped}</span>
                     <span className="text-red-600">❌ {r.errors}</span>
                   </div>
@@ -386,6 +427,9 @@ export function DataManager() {
             <div className="flex gap-4 text-sm pt-2 border-t border-border/50">
               <span className="text-green-600 font-medium">
                 ✅ {results.reduce((s, r) => s + r.success, 0)} uploaded
+              </span>
+              <span className="text-cyan-600 font-medium">
+                ♻️ {results.reduce((s, r) => s + (r.updated ?? 0), 0)} updated
               </span>
               <span className="text-blue-600 font-medium">
                 ⏭ {results.reduce((s, r) => s + r.skipped, 0)} skipped

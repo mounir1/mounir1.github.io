@@ -1,27 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { initialProjects } from "@/data/initial-projects";
-import type { ProjectInput, ProjectCategory, ProjectStatus } from "@/hooks/useProjects";
-
-const VALID_CATEGORIES: ProjectCategory[] = [
-  "Web Application",
-  "Mobile Application",
-  "Enterprise Integration",
-  "E-commerce",
-  "Machine Learning",
-  "API Development",
-  "DevOps & Infrastructure",
-  "Hospitality Solutions",
-  "Other",
-];
-
-const VALID_STATUSES: ProjectStatus[] = [
-  "completed",
-  "in-progress",
-  "in-development",
-  "active",
-  "maintenance",
-  "archived",
-];
+import { PROJECT_CATEGORIES, PROJECT_STATUSES } from "@/hooks/useProjects";
 
 describe("initial-projects data integrity", () => {
   it("has at least one project", () => {
@@ -44,15 +23,17 @@ describe("initial-projects data integrity", () => {
 
   it("every project has a valid category", () => {
     initialProjects.forEach((p, i) => {
-      // Allow categories beyond the typed union (data-driven)
-      expect(p.category, `project[${i}].category`).toBeTruthy();
+      expect(
+        PROJECT_CATEGORIES,
+        `project[${i}].category="${p.category}"`
+      ).toContain(p.category);
     });
   });
 
   it("every project has a valid status", () => {
     initialProjects.forEach((p, i) => {
       expect(
-        VALID_STATUSES,
+        PROJECT_STATUSES,
         `project[${i}].status="${p.status}"`
       ).toContain(p.status);
     });

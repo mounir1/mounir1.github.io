@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { collection, query, orderBy, onSnapshot, where } from "firebase/firestore";
+import { collection, onSnapshot } from "firebase/firestore";
 import { db, isFirebaseEnabled } from "@/lib/firebase";
 import { initialSkills } from "@/data/initial-skills";
 
@@ -70,20 +70,24 @@ export function useSkills(adminMode = false) {
       return;
     }
 
-    // Use Firebase in production
-    const q = adminMode
-      ? query(collection(db, SKILLS_COLLECTION), orderBy("priority", "desc"), orderBy("level", "desc"))
-      : query(collection(db, SKILLS_COLLECTION), where("disabled", "==", false), orderBy("priority", "desc"), orderBy("level", "desc"));
+    // Index-free by design — see useProjects for rationale.
+    const q = collection(db, SKILLS_COLLECTION);
 
     const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
-        const skillsData = snapshot.docs.map(doc => ({
+        const all = snapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         })) as Skill[];
-        
-        setSkills(skillsData);
+
+        const sorted = [...all].sort(
+          (a, b) =>
+            (b.priority ?? 0) - (a.priority ?? 0) ||
+            (b.level ?? 0) - (a.level ?? 0) ||
+            a.id.localeCompare(b.id)
+        );
+        setSkills(adminMode ? sorted : sorted.filter(s => s.disabled !== true));
         setLoading(false);
         setError(null);
       },
