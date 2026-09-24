@@ -1,7 +1,7 @@
 # ROADMAP
 
 > Issue-handling plan, priorities, and technical-debt tracker.
-> Last updated: 2026-07-28 (session 2).
+> Last updated: 2026-09-23.
 
 ## Status Legend
 
@@ -316,6 +316,81 @@ to `7.11.0`, a regression on an otherwise up-to-date, non-exploitable
 dependency. Decision: leave as-is, re-evaluate if the app ever adopts RSC/data
 mode. Tracked here instead of actioned so this isn't rediscovered as a fresh
 alarm every session.
+
+### [x] Data + admin tuning: WebEX corrected to hotel ERP, Firestore sync path (2026-09-23)
+
+**WebEX was mis-described.** The repo (`C:\projects\Hotech\webex`, shipped as
+OWeb Cloud) is not a "web extension platform" — it is HoTech's multi-tenant
+**hotel ERP**: an Ext JS 8 Classic SPA with 14+ business modules (front office,
+reservations, rooms, POS, sales, stock, accounting, HR, CRM, statistics, tasks,
+CMS, events, system definitions), 20 Sencha packages, ~8,400 source files and
+~6,478 Siesta tests on the OREST API, released via Docker/Jenkins to Kubernetes
+across 17 regions. Corrected in `initial-projects.ts`, `projects-index.ts`,
+`initial-skills.ts`, plus a new HoTech WebEX engagement in
+`initial-experience.ts`; `scripts/generate_cv.py` was updated and the resume PDF
+regenerated.
+
+**Ogent** refreshed from its README: 167 `@Tool` methods, five-layer
+architecture, pgvector RAG (was wrongly listed as Redis Stack), HITL
+propose→approve→execute writes, 4 client SDKs + web widget, production URL.
+
+**Admin gaps fixed:**
+- `PROJECT_CATEGORIES` / `PROJECT_STATUSES` exported from `useProjects.ts` as the
+  single source of truth — the admin offered categories the `ProjectCategory`
+  union rejected, and could not set `in-development` (Nava PMS's status).
+- Public filter chips are derived from live data, so Hospitality Solutions /
+  ERP Solutions projects are now filterable.
+- Project writes go through a recursive `stripUndefined()` (Firestore rejects
+  `undefined`; the editor also wrote a stray local `id` field into every doc).
+- The project editor now covers client size and the full metrics block
+  (users reached / uptime / performance / revenue + custom `key: value` metrics).
+- **New `Sync (update existing)` action** in Admin → Data Upload: seed rows whose
+  title/name already exists are updated in place (Firestore ids and `createdAt`
+  preserved) instead of skipped — the missing link that made edited seed data
+  unpublishable. Also exposed as `window.syncPortfolio()` /
+  `window.syncCollection("projects")`.
+
+**Verified:** `tsc --build` clean, ESLint 0 errors on all touched files, 58/58
+tests, production build OK, `verify-project-data` 19/19 projects resolved.
+
+### [x] Firestore list queries made index-free + unified write sanitiser
+
+**Problem (REST-verified against live `mounircvapp`):** `firestore.indexes.json`
+declares composite indexes but they were **never deployed** — `runQuery` returned
+`400 The query requires an index` for `experiences` (public + admin), `projects`
+(admin), `skills` (admin) and `testimonials` (public). The hooks caught the
+error and silently fell back to local seed data with synthetic `local-*` /
+`fallback-*` ids, so **every admin edit/toggle/delete on those collections
+targeted documents that don't exist** (`updateDoc` → NOT_FOUND, `deleteDoc`
+→ silent no-op) — the root cause of "admin can't publish edits". No Firebase
+CLI token was available to deploy the indexes.
+
+**Fix applied:** `useProjects`, `useSkills`, `useExperience`, `useTestimonials`
+now read the whole collection with a bare `collection()` snapshot (automatic
+single-field index — always exists) and filter/sort client-side, exactly
+reproducing the server-side ordering (priority desc → secondary key desc → id).
+Collections are ≤30 docs, so the cost is negligible and the class of
+missing-index regressions is gone permanently.
+
+**Admin write hardening (same session):**
+- New `src/utils/firestore-write.ts` — `sanitizeDoc()` (deep `undefined` strip
+  + top-level `id` removal) now guards **every** `addDoc`/`updateDoc`/`setDoc`
+  path: Projects/Skills/Experience tabs, Upcoming/Links/Testimonials/Contact
+  hooks, the seed uploader's sync + insert paths, and site settings.
+  Fixes the Upcoming `category: undefined` crash (Firestore rejects
+  `undefined`) and removes the stray `id` field Experience/Skills edits wrote.
+- Silent failure guards replaced with destructive toasts (save/delete/toggle
+  when Firestore is unavailable, required-field validation for Upcoming /
+  Testimonials / Links titles).
+- Remaining `any` casts eliminated across admin tabs (`downloadJSON`,
+  `openEdit`, `set`/`setNested` made generic, `LucideIcon` types,
+  `catch (e: unknown)`); Overview dashboard now counts hidden projects too
+  (`useProjects(true)`).
+- `useSettings.stripUndefined` re-exported from the shared util (tests keep
+  importing from the hook).
+
+**Verified:** `tsc --build` clean, ESLint 0 errors, **64/64 tests** (6 new for
+`firestore-write`), production build OK, `verify-project-data` 19/19.
 
 ---
 
