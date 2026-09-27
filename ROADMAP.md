@@ -372,6 +372,14 @@ reproducing the server-side ordering (priority desc → secondary key desc → i
 Collections are ≤30 docs, so the cost is negligible and the class of
 missing-index regressions is gone permanently.
 
+**Follow-up (same class, two hooks missed):** `useLinks` and `useUpcoming` still
+used `orderBy("priority", "desc")` and fell back to `DEFAULT_LINKS` /
+`DEFAULT_UPCOMING` (ids `d1…dN` / `u1…uN` — docs that don't exist in Firestore)
+on index failure, so Links/Upcoming admin edits could silently write nowhere.
+Both now use bare `collection()` snapshots with client-side sort, matching the
+four list hooks above. Also re-worded the live `dashboard.technostationery.com`
+footer link (was labelled "upcoming" but the hub is deployed and serving).
+
 **Admin write hardening (same session):**
 - New `src/utils/firestore-write.ts` — `sanitizeDoc()` (deep `undefined` strip
   + top-level `id` removal) now guards **every** `addDoc`/`updateDoc`/`setDoc`
@@ -391,6 +399,35 @@ missing-index regressions is gone permanently.
 
 **Verified:** `tsc --build` clean, ESLint 0 errors, **64/64 tests** (6 new for
 `firestore-write`), production build OK, `verify-project-data` 19/19.
+
+### [x] Firestore data synced from canonical seeds + REST sync CLI (2026-09-27)
+
+**Problem:** Live `mounircvapp` was out of sync with `src/data/`: `experiences`
+held only 4 docs (missing the WebEX / OWeb Cloud entry) and the `projects`
+WebEX doc still carried its old title/description ("WebEX — HoTech Web
+Extension Platform"). The admin "Sync (update existing)" path needs a browser
+Firebase Auth session that wasn't available here (email/password login
+rejected, Chrome profile locked), and no service-account key existed.
+
+**Fix applied:** new `src/utils/sync-firestore-rest.ts` — CLI twin of
+`syncPortfolio()`: match by title/name/label → update in place, insert missing
+rows, never delete, preserve `createdAt`, bump `version`. It refreshes the
+local Firebase CLI OAuth token from `~/.config/configstore/firebase-tools.json`
+(client id/secret are firebase-tools' own public embedded values, env-
+overridable), loads the seed modules through Vite's SSR pipeline (so
+`import.meta.env` exists), pairs a *retitled* row with its existing doc when
+exactly one pair remains unmatched and shares a word (prevented a duplicate
+WebEX project), and writes via Firestore REST with an `updateMask` that
+full-replaces the doc. HTTP retries on undici first, then falls back to
+`curl.exe` — this connection intermittently black-holes Google IPs, so a
+single-shot request fails often while a different resolver/transport succeeds.
+
+**Verified (REST against live):** experiences 4→**5** (+ "Hotel ERP Developer
+— WebEX (OWeb Cloud)"), projects 19→**19** with doc `8AfVTlAdER73PgfIGb9T`
+retitled to "WebEX (OWeb Cloud) — Multi-Tenant Hotel ERP Suite" + corrected
+description, skills 29, links 10, upcoming 4, testimonials 0 (by design),
+settings/site untouched (its 2 live-only fields survive a merge anyway).
+Dry-run is the default; writes require `--apply`.
 
 ---
 

@@ -7,8 +7,6 @@ import {
   deleteDoc,
   setDoc,
   doc,
-  orderBy,
-  query,
   getDocs,
 } from "firebase/firestore";
 import { sanitizeDoc } from "@/utils/firestore-write";
@@ -135,16 +133,19 @@ export function useUpcoming() {
       return;
     }
 
-    const q = query(
-      collection(db, UPCOMING_COLLECTION),
-      orderBy("priority", "desc")
-    );
+    // Index-free by design — see useProjects for rationale (same silent
+    // fallback-to-DEFAULT_UPCOMING failure mode with ids u1…uN).
+    const q = collection(db, UPCOMING_COLLECTION);
 
     const unsub = onSnapshot(
       q,
       (snap) => {
-        const data = snap.docs.map((d) => ({ id: d.id, ...d.data() } as UpcomingProject));
-        setUpcoming(data.length > 0 ? data : DEFAULT_UPCOMING);
+        const all = snap.docs.map((d) => ({ id: d.id, ...d.data() } as UpcomingProject));
+        const sorted = [...all].sort(
+          (a, b) =>
+            (b.priority ?? 0) - (a.priority ?? 0) || a.id.localeCompare(b.id)
+        );
+        setUpcoming(sorted.length > 0 ? sorted : DEFAULT_UPCOMING);
         setLoading(false);
       },
       () => {
