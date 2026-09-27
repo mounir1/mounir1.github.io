@@ -66,7 +66,7 @@ export const initialExperience: ExperienceInput[] = [
     achievements: [
       "Deliver the hotel ERP modules that run daily hotel operations (front office, reservations, rooms, POS, sales, stock, accounting, HR, CRM, statistics)",
       "Maintain the modular Sencha architecture — 14+ dynamically loaded feature packages over 3 shared core packages",
-      "own the OREST API integration layer (auth, request handling, error envelopes) reused by every module",
+      "Own the OREST API integration layer (auth, request handling, error envelopes) reused by every module",
       "Embed the Bryntum Scheduler for planning/occupancy views and the Ogent AI assistant inside the ERP shell",
       "Integrate the WebCMS page-builder (8 CMS types) and slider system via cross-window auth and the tenant webkey gate",
       "Keep ~6,478 Siesta tests green and the release pipeline (npm/Sencha → Docker → Jenkins → Kubernetes) healthy",

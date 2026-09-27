@@ -119,14 +119,16 @@ src/
      admin Data Upload tab.
 
 6. **Index-free Firestore list queries** — All list hooks (`useProjects`,
-   `useSkills`, `useExperience`, `useTestimonials`) read the whole collection
-   with a bare `collection()` snapshot and filter/sort in the client. The
+   `useSkills`, `useExperience`, `useTestimonials`, `useLinks`, `useUpcoming`)
+   read the whole collection with a bare `collection()` snapshot and
+   filter/sort in the client. The
    composite indexes in `firestore.indexes.json` were declared but **never
    deployed** — server-side `where`+`orderBy` queries failed with "query
    requires an index", silently fell back to local seed data with phantom
    `local-*` ids, and admin writes against those ids no-oped or threw
    NOT_FOUND. Collections are ≤30 docs, so client-side sort is cheap and
-   immune to missing-index regressions.
+   immune to missing-index regressions. Never reintroduce `orderBy()` in a
+   list hook.
 
 7. **Single Firestore write sanitiser** — EVERY `addDoc`/`updateDoc`/`setDoc`
    payload goes through `sanitizeDoc()` from `src/utils/firestore-write.ts`

@@ -7,8 +7,6 @@ import {
   deleteDoc,
   setDoc,
   doc,
-  orderBy,
-  query,
   getDocs,
 } from "firebase/firestore";
 import { sanitizeDoc } from "@/utils/firestore-write";
@@ -36,7 +34,7 @@ export const DEFAULT_LINKS: PortfolioLink[] = [
   { id: "d1",  label: "hotech.systems",               url: "https://hotech.systems",                  category: "Enterprise Solutions",     description: "Hospitality digital transformation — Otello GEM, DashBoss, GuestApp",          active: true, priority: 100, openInNewTab: true, createdAt: 0, updatedAt: 0 },
   { id: "d2",  label: "HoTech EN",                    url: "https://en.hotech.systems",               category: "Enterprise Solutions",     description: "English portal for HoTech Systems — global hospitality tech",                   active: true, priority: 95,  openInNewTab: true, createdAt: 0, updatedAt: 0 },
   { id: "d3",  label: "technostationery.com",         url: "https://technostationery.com",            category: "Enterprise Solutions",     description: "E-commerce platform for office supplies and stationery",                       active: true, priority: 90,  openInNewTab: true, createdAt: 0, updatedAt: 0 },
-  { id: "d4",  label: "Dashboard · AI · Monitoring",  url: "https://dashboard.technostationery.com",  category: "Enterprise Solutions",     description: "Task management, server monitoring & AI reporting hub — upcoming",             active: true, priority: 88,  openInNewTab: true, createdAt: 0, updatedAt: 0 },
+  { id: "d4",  label: "Dashboard · AI · Monitoring",  url: "https://dashboard.technostationery.com",  category: "Enterprise Solutions",     description: "Live internal dashboard — task management, server monitoring & AI reporting",   active: true, priority: 88,  openInNewTab: true, createdAt: 0, updatedAt: 0 },
   // etl.techno-dz.com is an internal deployment (no public DNS, curl 000 2025-08) — link the open-source repo instead (verified 200).
   { id: "d5",  label: "ETL Scripts",                  url: "https://github.com/mounirtms/ETL-scripts", category: "Enterprise Solutions",    description: "High-performance ETL data processing and transformation scripts (open source)", active: true, priority: 80,  openInNewTab: true, createdAt: 0, updatedAt: 0 },
   // ── Magento & Adobe Commerce ─────────────────────────────────────────────────
@@ -70,16 +68,21 @@ export function useLinks() {
       return;
     }
 
-    const q = query(
-      collection(db, LINKS_COLLECTION),
-      orderBy("priority", "desc")
-    );
+    // Index-free by design — see useProjects for rationale. A single-field
+    // orderBy still fails whenever its index was never deployed, which used to
+    // fall back silently to DEFAULT_LINKS (ids d1…dN) that don't exist in
+    // Firestore, so admin edits appeared to work while writing nothing.
+    const q = collection(db, LINKS_COLLECTION);
 
     const unsub = onSnapshot(
       q,
       (snap) => {
-        const data = snap.docs.map((d) => ({ id: d.id, ...d.data() } as PortfolioLink));
-        setLinks(data.length > 0 ? data : DEFAULT_LINKS);
+        const all = snap.docs.map((d) => ({ id: d.id, ...d.data() } as PortfolioLink));
+        const sorted = [...all].sort(
+          (a, b) =>
+            (b.priority ?? 0) - (a.priority ?? 0) || a.id.localeCompare(b.id)
+        );
+        setLinks(sorted.length > 0 ? sorted : DEFAULT_LINKS);
         setLoading(false);
       },
       () => {
