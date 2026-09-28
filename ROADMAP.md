@@ -464,6 +464,14 @@ with `require is not defined`, and the latter also shelled out to the Unix-only
 **Verified:** `npm run finalize` → files ✓, scripts ✓, TypeScript ✓, ESLint ✓,
 test suite ✓; `npm run lint` 0 errors, `tsc --build` clean, `npm run build` OK.
 
+**CI follow-up (why the first run failed):** adding `npm test` to `ci.yml`
+exposed that both workflows pinned `node-version: '20'`, which cannot boot the
+Vitest workers — jsdom pulls in `undici`, and `undici` calls
+`webidl.util.markAsUncloneable`, a Node 22+ API. The suite passed locally only
+because the dev box runs Node 24. Both `ci.yml` and `deploy.yml` now pin Node 22
+LTS. Worth remembering: a test step that has never run in CI is not coverage,
+it is decoration.
+
 ---
 
 ## P1 — High Priority
