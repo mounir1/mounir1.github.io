@@ -1,8 +1,13 @@
 #!/usr/bin/env node
 
-const { execSync } = require('child_process');
-const fs = require('fs');
-const path = require('path');
+// ESM: package.json declares "type": "module" — import instead of require.
+import { execSync } from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const rootDir = path.join(__dirname, '..');
 
 console.log('🚀 Building Mounir Abderrahmani Portfolio for Production...\n');
 
@@ -28,13 +33,9 @@ if (missingVars.length > 0) {
   console.log('✅ All Firebase environment variables are set.\n');
 }
 
-// Clean previous build
+// Clean previous build (cross-platform — was `rm -rf dist`)
 console.log('🧹 Cleaning previous build...');
-try {
-  execSync('rm -rf dist', { stdio: 'inherit' });
-} catch (error) {
-  // Directory might not exist, continue
-}
+fs.rmSync(path.join(rootDir, 'dist'), { recursive: true, force: true });
 
 // Run type checking
 console.log('🔍 Running TypeScript type checking...');
@@ -103,9 +104,16 @@ if (missingFiles.length > 0) {
 
 console.log('✅ Build verification passed.\n');
 
-// Calculate build size
-const buildStats = execSync('du -sh dist', { encoding: 'utf8' }).trim();
-console.log(`📊 Build size: ${buildStats.split('\t')[0]}\n`);
+// Calculate build size (cross-platform — was `du -sh dist`)
+const distDir = path.join(rootDir, 'dist');
+const dirSize = (dir) =>
+  fs.readdirSync(dir, { withFileTypes: true }).reduce((total, entry) => {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) return total + dirSize(full);
+    return total + fs.statSync(full).size;
+  }, 0);
+const sizeMb = (dirSize(distDir) / (1024 * 1024)).toFixed(2);
+console.log(`📊 Build size: ${sizeMb} MB\n`);
 
 // Success message
 console.log('🎉 Production build completed successfully!');

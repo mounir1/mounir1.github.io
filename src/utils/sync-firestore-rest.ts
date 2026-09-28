@@ -24,19 +24,18 @@ import { homedir, tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
-import { createServer } from "vite";
 
 const execFileAsync = promisify(execFile);
 
-type SeedItem = Record<string, unknown>;
-type FirestoreValue = Record<string, unknown>;
+export type SeedItem = Record<string, unknown>;
+export type FirestoreValue = Record<string, unknown>;
 
-interface ExistingDoc {
+export interface ExistingDoc {
   id: string;
   data: SeedItem;
 }
 
-interface Action {
+export interface Action {
   kind: "update" | "create";
   label: string;
   docId?: string;
@@ -44,7 +43,7 @@ interface Action {
   payload: SeedItem;
 }
 
-interface CollectionPlan {
+export interface CollectionPlan {
   collection: string;
   actions: Action[];
   skipped: string[];
@@ -233,7 +232,7 @@ async function request(
   return res.status === 204 ? null : JSON.parse(res.text);
 }
 
-function toValue(v: unknown): FirestoreValue {
+export function toValue(v: unknown): FirestoreValue {
   if (v === null) return { nullValue: null };
   if (typeof v === "string") return { stringValue: v };
   if (typeof v === "boolean") return { booleanValue: v };
@@ -251,7 +250,7 @@ function toFields(obj: SeedItem): Record<string, FirestoreValue> {
   return out;
 }
 
-function fromValue(v: FirestoreValue): unknown {
+export function fromValue(v: FirestoreValue): unknown {
   if ("nullValue" in v) return null;
   if ("stringValue" in v) return v.stringValue;
   if ("booleanValue" in v) return v.booleanValue;
@@ -303,7 +302,7 @@ function strField(item: SeedItem, key: string): string | undefined {
   return typeof v === "string" ? v : undefined;
 }
 
-function dedupKey(item: SeedItem): string {
+export function dedupKey(item: SeedItem): string {
   const v =
     strField(item, "title") ??
     strField(item, "name") ??
@@ -331,7 +330,7 @@ function tokens(text: string): Set<string> {
  * live doc may remain unmatched while sharing a word (e.g. a retitled project).
  * Pairing them updates the existing doc instead of creating a duplicate.
  */
-function pairRenames(
+export function pairRenames(
   unmatchedSeed: SeedItem[],
   unmatchedLive: ExistingDoc[],
 ): Map<SeedItem, ExistingDoc> {
@@ -345,13 +344,17 @@ function pairRenames(
 }
 
 /** Drop a top-level local `id` and deep-clone (also removes `undefined`s). */
-function sanitizeLocal(payload: object): SeedItem {
+export function sanitizeLocal(payload: object): SeedItem {
   const { id: _dropped, ...rest } = payload as SeedItem;
   return JSON.parse(JSON.stringify(rest)) as SeedItem;
 }
 
 
-function buildPlan(collection: string, seed: SeedItem[], existing: ExistingDoc[]): CollectionPlan {
+export function buildPlan(
+  collection: string,
+  seed: SeedItem[],
+  existing: ExistingDoc[],
+): CollectionPlan {
   const exact = new Map<string, ExistingDoc>();
   for (const d of existing) {
     const k = dedupKey(d.data);
@@ -464,9 +467,10 @@ function flattenLeaves(
   return out;
 }
 
-function diffSettings(live: SeedItem | null, seed: SeedItem): string[] {
+export function diffSettings(live: SeedItem | null, seed: SeedItem): string[] {
   const seedFlat = flattenLeaves(seed);
-  if (live) seedFlat.delete("updatedAt"); // always differs trivially
+  // `updatedAt` is a write-time sentinel in the caller and always differs.
+  seedFlat.delete("updatedAt");
   const liveFlat = live ? flattenLeaves(live) : new Map<string, unknown>();
   const diffs: string[] = [];
   for (const [path, v] of seedFlat) {
@@ -494,6 +498,9 @@ const COLLECTIONS: Record<string, string> = {
 };
 
 async function loadSeeds(): Promise<{ seeds: Record<string, SeedItem[]>; settings: SeedItem }> {
+  // Loaded dynamically so importing this module for its pure helpers (tests)
+  // never pulls the Vite toolchain in.
+  const { createServer } = await import("vite");
   const vite = await createServer({
     root,
     configFile: false,
@@ -637,8 +644,20 @@ async function main(): Promise<void> {
   }
 }
 
-main().catch((err: unknown) => {
-  console.error(err instanceof Error ? (err.stack ?? err.message) : err);
-  process.exitCode = 1;
-});
+// Only run the CLI when invoked directly (`npx tsx src/utils/sync-firestore-rest.ts`)
+// — importing this module for its pure helpers (tests) must have no side effects.
+const entry = process.argv[1];
+const selfPath = fileURLToPath(import.meta.url);
+const invokedDirectly =
+  typeof entry === "string" &&
+  (process.platform === "win32"
+    ? resolve(entry).toLowerCase() === selfPath.toLowerCase()
+    : resolve(entry) === selfPath);
+
+if (invokedDirectly) {
+  main().catch((err: unknown) => {
+    console.error(err instanceof Error ? (err.stack ?? err.message) : err);
+    process.exitCode = 1;
+  });
+}
 

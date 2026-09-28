@@ -1,8 +1,13 @@
 #!/usr/bin/env node
 
-const { execSync } = require('child_process');
-const fs = require('fs');
-const path = require('path');
+// ESM: package.json declares "type": "module", so this script must import
+// rather than require (it previously crashed with "require is not defined").
+import { execSync } from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 console.log('🎯 Finalizing Mounir Abderrahmani Portfolio Project...\n');
 
@@ -56,9 +61,17 @@ const requiredFiles = [
   'src/components/sections/skills.tsx',
   'src/pages/Admin.tsx',
   'src/hooks/useProjects.ts',
+  'src/hooks/useLinks.ts',
+  'src/hooks/useUpcoming.ts',
   'src/lib/firebase.ts',
-  'src/lib/seed-data.ts',
   'src/data/initial-projects.ts',
+  'src/data/initial-experience.ts',
+  'src/data/initial-skills.ts',
+  'src/data/projects-index.ts',
+  'src/utils/database-uploader.ts',
+  'src/utils/firestore-write.ts',
+  'src/utils/sync-firestore-rest.ts',
+  'src/test/setup.ts',
   'public/mounir-icon.svg',
   'public/sitemap.xml',
   'public/robots.txt',
@@ -85,8 +98,11 @@ const requiredScripts = [
   'build:prod',
   'type-check',
   'lint',
+  'test',
+  'test:coverage',
   'preview',
-  'deploy'
+  'deploy',
+  'finalize'
 ];
 
 const missingScripts = requiredScripts.filter(script => !packageJson.scripts[script]);
@@ -112,10 +128,19 @@ try {
 
 try {
   console.log('   🔧 ESLint check...');
-  execSync('npx eslint . --ext .ts,.tsx --max-warnings 10', { stdio: 'pipe' });
+  execSync('npm run lint', { stdio: 'pipe' });
   console.log('   ✅ ESLint check passed');
 } catch (error) {
-  console.log('   ⚠️  ESLint warnings found (acceptable for production)');
+  console.log('   ⚠️  ESLint errors found - run "npm run lint:fix"');
+}
+
+try {
+  console.log('   🧪 Test suite...');
+  execSync('npx vitest run --silent', { stdio: 'pipe' });
+  console.log('   ✅ Test suite passed');
+} catch (error) {
+  console.log('   ❌ Tests failed - fix before deploying');
+  process.exitCode = 1;
 }
 
 console.log('');

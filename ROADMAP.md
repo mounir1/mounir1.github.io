@@ -429,6 +429,41 @@ description, skills 29, links 10, upcoming 4, testimonials 0 (by design),
 settings/site untouched (its 2 live-only fields survive a merge anyway).
 Dry-run is the default; writes require `--apply`.
 
+### [x] Admin test coverage + repaired `finalize`/`build:production` scripts (2026-09-27)
+
+**Problem:** the admin surface had no automated coverage at all — the
+"Sync (update existing)" engine (`database-uploader.ts`), the Data Upload tab,
+and the index-free reads in `useLinks`/`useUpcoming` were only ever verified by
+hand. Separately, both npm scripts that are supposed to gate a release were
+dead on arrival: `scripts/finalize-project.js` and `scripts/build-production.js`
+used CommonJS `require` under `"type": "module"`, so `npm run finalize` crashed
+with `require is not defined`, and the latter also shelled out to the Unix-only
+`rm -rf` / `du -sh`.
+
+**Fix applied:**
+- **Tests (64 → 101, 8 → 14 files):** `sync-firestore-rest.test.ts` (REST value
+  encoding round-trips, dedup-key precedence, and the rename-pairing regression
+  that would otherwise have duplicated the WebEX project), `database-uploader.test.ts`
+  (update-in-place keeps `createdAt`/bumps `version`, skip-vs-update, batched
+  clear, settings merge, `syncCollection` wiring, error degradation),
+  `DataManager.test.tsx` (collection rows, Sync → `syncPortfolio`,
+  per-collection → `syncCollection`, Firebase-off alert), `SkillsTab.test.tsx`
+  (destructive toast instead of a silent dropped save), `useLinks.test.ts` /
+  `useUpcoming.test.ts` (bare-collection subscription — asserts `query`/`orderBy`
+  are never used — client-side priority sort, and DEFAULT_* fallback on errors).
+- **Test infra:** `ResizeObserver` stub in `src/test/setup.ts` for Radix
+  primitives; `main()` in the sync CLI is now guarded so importing it in tests
+  has no side effects, and its pure helpers are exported.
+- **Scripts:** converted both to ESM (`import` + `fileURLToPath`), replaced
+  `rm -rf`/`du -sh` with `fs.rmSync`/recursive size walk, pointed `finalize` at
+  the current file layout (it still listed the deleted `src/lib/seed-data.ts`),
+  and made `finalize` run the real test suite and `npm run lint`.
+- `diffSettings()` now always ignores the `updatedAt` sentinel (it leaked a
+  phantom "difference" when the settings doc did not exist yet).
+
+**Verified:** `npm run finalize` → files ✓, scripts ✓, TypeScript ✓, ESLint ✓,
+test suite ✓; `npm run lint` 0 errors, `tsc --build` clean, `npm run build` OK.
+
 ---
 
 ## P1 — High Priority
