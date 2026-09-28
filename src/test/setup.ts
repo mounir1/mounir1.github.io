@@ -19,3 +19,14 @@ if (!window.matchMedia) {
     dispatchEvent: vi.fn(),
   }));
 }
+
+// Radix primitives (ScrollArea in admin dialogs, Dialog/Select) require
+// ResizeObserver, which jsdom does not implement.
+if (!("ResizeObserver" in globalThis)) {
+  class ResizeObserverStub {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  }
+  globalThis.ResizeObserver = ResizeObserverStub;
+}

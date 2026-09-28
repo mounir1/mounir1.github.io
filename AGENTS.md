@@ -14,15 +14,19 @@ GitHub Actions at [mounir1.github.io](https://mounir1.github.io).
 ```bash
 npm run dev          # Start dev server (localhost:8080)
 npm run build        # Production build -> dist/
-npm run type-check   # TypeScript validation (tsc --noEmit)
+npm run type-check   # TypeScript validation (tsc --build tsconfig.json)
 npm run lint         # ESLint check
 npm run lint:fix     # ESLint auto-fix
+npm test             # Vitest suite (jsdom + Testing Library), 101 tests
+npm run test:coverage # Vitest with v8 coverage (lib/hooks/data)
 npm run preview      # Preview production build locally
 npm run clean        # Remove dist/ and Vite cache
 npm run analyze      # Bundle size analysis
+npm run finalize     # Release gate: required files + type-check + lint + tests
 ```
 
-**Always run before committing:** `npm run lint && npm run type-check && npm run build`
+**Always run before committing:** `npm run lint && npm run type-check && npm test && npm run build`
+(or `npm run finalize` for the first three).
 
 ## CI/CD Pipeline
 
@@ -147,6 +151,11 @@ src/
   Firebase dynamic data — see ROADMAP for schema-typing plan.
 - **Commits:** Conventional Commits (`feat:`, `fix:`, `chore:`, `ci:`, `docs:`)
 - **Line endings:** Git will normalize to LF; files use CRLF on Windows checkout
+- **Tests:** Vitest + Testing Library, files sit next to the source as
+  `*.test.ts(x)` (`vitest.config.ts`: jsdom, `src/test/setup.ts`). Mock
+  `@/lib/firebase` and `firebase/firestore` with `vi.hoisted(...)` factories —
+  see `useLinks.test.ts` (bare-collection assertions) and
+  `database-uploader.test.ts` (admin sync engine) for the house style.
 
 ## Environment Variables
 

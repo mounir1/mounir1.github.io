@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   quality:
-    name: Lint, Type-check & Build
+    name: Lint, Type-check, Test & Build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -26,7 +26,9 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          # Node 22 LTS: Node 20 cannot boot the vitest workers — jsdom pulls in
+          # undici, which calls webidl.util.markAsUncloneable (Node 22+ only).
+          node-version: '22'
           cache: 'npm'
 
       - name: Install dependencies
@@ -37,6 +39,9 @@ jobs:
 
       - name: Type-check
         run: npm run type-check
+
+      - name: Test
+        run: npm test
 
       - name: Build
         run: npm run build
