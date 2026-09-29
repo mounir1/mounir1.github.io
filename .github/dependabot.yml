@@ -29,6 +29,18 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "vite"
         update-types: ["version-update:semver-major"]
+      # tailwind-merge v3 drops Tailwind CSS v3 support (its release notes are
+      # explicit: "you should upgrade to Tailwind CSS v4 and tailwind-merge v3
+      # together"). We are on tailwindcss ^3.4, so a v3 bump must be paired with
+      # a deliberate Tailwind v4 migration — never an unattended Dependabot PR.
+      # `cn()` in src/lib/utils.ts drives every shadcn/ui class override, and no
+      # test asserts merge behaviour, so CI would not catch a silent regression.
+      - dependency-name: "tailwind-merge"
+        update-types: ["version-update:semver-major"]
+      # Same coupling in the other direction: Tailwind v4 majors require the
+      # tailwind-merge v3 bump above in the same change.
+      - dependency-name: "tailwindcss"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: github-actions
     directory: /

@@ -600,3 +600,35 @@ session 5 (2026-08-03) — see the P0 entry above. Branch protection on `main`
 (require PR + CI status checks before merge) is similarly blocked by the same
 GitHub App permission gap and needs manual setup by the repo owner via
 Settings → Branches.
+
+### Dependabot queue triage (2026-09-28, session 8)
+
+With CI now running the test suite, the backlog can finally be judged on evidence
+rather than assumed. Triaged by actually inspecting each diff:
+
+| PR | Bump | Verdict |
+|----|------|---------|
+| #40 | `tailwind-merge` 2.6.0 → **3.6.0 (MAJOR)** | **Reject.** v3 drops Tailwind CSS v3 support by design. |
+| #36 | `brace-expansion` 2.1.3 → 5.0.9 | Safe — transitive only, no direct dependency. |
+| #44 | `eslint` 10.8 → 10.11 | Safe — patch-level, not the major it looks like. |
+| #46 | `vitest` 4.1.10 → 4.1.11 | Safe, and exercises the new suite. |
+| #45 | `@humanfs/node` 0.16.6 → 0.16.8 | Safe (test-infra transitive). |
+| #41 | `@tailwindcss/typography` 0.5.16 → 0.5.20 | Safe — supports `tailwindcss >=3.0.0 \|\| >=4.0.0`. |
+| #51 | `postcss-selector-parser` 6.1.2 → 6.1.4 | Safe. |
+| #35 | `react-router` 7.18.1 → 7.18.2 | Safe — patch within the already-migrated v7. |
+
+**#40 is the one that matters.** Verified against the v3.0.0 release notes:
+*"This release drops support for Tailwind CSS v3 and in turn adds support for
+Tailwind CSS v4. That means you should upgrade to Tailwind CSS v4 and
+tailwind-merge v3 together."* This project is on `tailwindcss ^3.4.17`, and
+`cn()` (`src/lib/utils.ts`) feeds every shadcn/ui override. Spot-checking
+`twMerge` v2 vs v3 across padding/text/ring/shadow/opacity samples produced
+identical output, so the practical breakage is in the v4-only class group
+removals rather than the obvious cases — but nothing in the repo asserts merge
+behaviour, so **CI would go green on a broken `cn()`**. Added `tailwind-merge`
+and `tailwindcss` major bumps to the `dependabot.yml` ignore list so this pair
+can only move together, via a deliberate migration.
+
+**Lesson recorded:** a green pipeline is not evidence for a change it does not
+exercise. The test suite added this session covers the admin data path; it
+deliberately does not pretend to cover styling.
