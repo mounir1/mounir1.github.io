@@ -716,3 +716,100 @@ is exactly why they were written against the failing example.
 **Standing lesson:** when a CI system fails with *no jobs*, suspect the workflow
 file itself, not the code it was running. And test a guard against the bug it
 was written for before trusting it.
+
+---
+
+## P0 — Completed (2026-09-28, session 10): the site "not working" was the service worker
+
+The report was *"the site is not working"* while every server-side check came
+back green: `index.html` returned 200 with the correct title, all thirteen
+JS/CSS chunks returned 200, and the hashed filenames in the live HTML matched
+the deployed `gh-pages` tree. A static SPA answers a non-JS fetcher for `/admin`
+with 404, which is expected and not a bug.
+
+### [x] Root cause: cached HTML outliving its own content-hashed chunks
+
+`public/sw.js` precached `/` and `/index.html` and served every other navigation
+with **stale-while-revalidate**, so a returning visitor's worker answered
+navigations from cache. Combined with Vite's content-hashed filenames and a
+`gh-pages` deploy that replaces the previous build, the failure is:
+
+1. The worker holds `index.html` from build *N*, referencing `index-<hashN>.js`.
+2. Deploy *N+1* publishes new hashes and deletes the old files.
+3. The cached document is served, the browser requests `index-<hashN>.js`, and
+   the deploy that removed it means that request now 404s.
+4. The app cannot boot, and **hard-refreshing does not help** — the worker
+   answers before the network is consulted.
+
+Proved directly against production:
+
+```
+LIVE index.html references index-Xvyr-ARN.js  ->  200
+NEWER build's index-CJI9nQje.js               ->  404   <-- the dead request
+sw.js                                         ->  200
+```
+
+The cache names were hardcoded (`...-v1`) and the `activate` handler explicitly
+preserved them, so nothing ever evicted the stale copies. Every returning
+visitor stayed broken across every deploy, indefinitely; only first-time
+visitors saw a working site. That asymmetry is why the server-side evidence
+looked perfect and the human report was still true.
+
+**Fix (three parts):**
+
+- **Do not cache the document.** `/` and `/index.html` are no longer precached
+  and navigations use network-first with cache/`offline.html` only as offline
+  fallbacks. This removes the failure mode instead of relying on eviction.
+- **Version the caches** (`CACHE_VERSION = 'v2'`), which makes `activate` purge
+  the `v1` names — that is what discharges users who are already poisoned.
+- **Escape hatch:** `/?sw=off` unregisters every worker, drops every cache and
+  reloads. It runs in `main.tsx` before React mounts, because the case it exists
+  for is the app being too broken to render its own recovery UI.
+
+`cache-first` is retained for `/assets/**` and is safe *only* because Vite puts a
+content hash in every filename; that constraint is now documented at the
+strategy rather than left implicit.
+
+### [x] Guarded by executing the real worker
+
+`scripts/sw.test.ts` evaluates the actual `public/sw.js` — which is copied into
+`dist/` verbatim and never bundled — against injected `self`/`caches`/`fetch`
+globals, then drives its listeners. Against the pre-fix file **4 of the 6 tests
+fail**, so the suite is a real regression guard rather than decoration.
+Writing it paid for itself immediately: the tests caught a bug in the new
+recovery code, where `'serviceWorker' in navigator` is `true` for a
+defined-but-`undefined` property, so `purgeServiceWorker` threw
+`TypeError: Cannot read properties of undefined` on exactly the browsers it was
+meant to rescue. The implementation now checks for a callable
+`getRegistrations`, not for the key existing.
+
+### [x] Stale CV duplicate deleted for real
+
+`ROADMAP` already claimed `/Mounir_CV_2025.pdf` "was removed", but the copy
+tracked at the repo root was still there; only the site copy was gone. It is now
+deleted, and `scripts/generate-cv-claims.test.ts` fails if it reappears.
+
+That new guard also closes a live drift risk: `scripts/generate_cv.py` restates
+portfolio facts as Python literals instead of reading the seed data it is
+documented as being generated from, and nothing in the build runs Python. The
+CV therefore asserted `28` extensions, `89/89` checks, `12 tools`, `165+`
+centers, `6,478` Siesta tests, `Ext JS 8` and `14+` packages with **no CI check
+that the seed data still agreed**. Each is now asserted to appear in both files,
+the four unverifiable pre-verification metrics (`100K+`, `100+ hotels`, `5TB`,
+`99.9%`) are asserted absent from both, and the artifact is checked to be the
+exact file `useSettings.resumeUrl` links to and to exist in `public/`.
+
+**Regenerating the PDF still requires Python**, which is not installed on this
+machine, so `python3 scripts/generate_cv.py` remains a manual step after any
+seed-data change. The claims test is the safety net that makes forgetting it
+loud rather than silent.
+
+**Standing lessons:**
+
+1. A service worker that caches HTML will serve a dead document after the next
+   content-hashed deploy, and no hard refresh can fix it. Cache the hashed
+   assets, never the document that points at them.
+2. When the server evidence is perfect but a user says the site is broken,
+   suspect client-side state — cache, worker, or storage — not the deploy.
+3. A test that passes against the broken version is not a test. Verify the guard
+   red before trusting the green.

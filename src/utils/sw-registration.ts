@@ -196,6 +196,46 @@ export class ServiceWorkerManager {
   }
 }
 
+// ── Escape hatch ─────────────────────────────────────────────────────────────
+// A content-hashed SPA behind a service worker can wedge itself permanently:
+// if a browser ever caches an index.html whose chunks a later deploy replaced,
+// every navigation keeps serving that dead document — the worker answers before
+// the network is ever consulted, so no amount of hard refreshing helps.
+//
+// Visiting `/?sw=off` unregisters every worker, drops every cache, and reloads
+// without the parameter. It has to be reachable from the URL alone because the
+// point of failure is that the app itself cannot boot.
+export const SW_DISABLE_PARAM = 'sw';
+export const SW_DISABLE_VALUE = 'off';
+
+export function isServiceWorkerDisableRequested(href: string): boolean {
+  try {
+    return new URL(href).searchParams.get(SW_DISABLE_PARAM)?.toLowerCase() === SW_DISABLE_VALUE;
+  } catch {
+    return false;
+  }
+}
+
+export async function purgeServiceWorker(): Promise<boolean> {
+  // Presence checks are not enough here: `in` returns true for a defined-but-
+  // undefined property, and some embedded browsers expose the namespace with
+  // no methods on it. This is the recovery path, so it has to degrade to
+  // `false` rather than throw.
+  if (typeof navigator === 'undefined') return false;
+  const workers = navigator.serviceWorker;
+  if (!workers || typeof workers.getRegistrations !== 'function') return false;
+
+  const registrations = await workers.getRegistrations();
+  const results = await Promise.all(registrations.map((r) => r.unregister()));
+  const unregistered = results.some(Boolean);
+
+  if (typeof caches !== 'undefined') {
+    await Promise.all((await caches.keys()).map((name) => caches.delete(name)));
+  }
+
+  return unregistered;
+}
+
 // Singleton instance
 export const swManager = new ServiceWorkerManager();
 

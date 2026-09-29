@@ -17,7 +17,7 @@ npm run build        # Production build -> dist/
 npm run type-check   # TypeScript validation (tsc --build tsconfig.json)
 npm run lint         # ESLint check
 npm run lint:fix     # ESLint auto-fix
-npm test             # Vitest suite (jsdom + Testing Library), 101 tests
+npm test             # Vitest suite (jsdom + Testing Library), 162 tests
 npm run test:coverage # Vitest with v8 coverage (lib/hooks/data)
 npm run preview      # Preview production build locally
 npm run clean        # Remove dist/ and Vite cache
@@ -149,6 +149,37 @@ src/
    `category`) hit this on every save. `stripUndefined` is re-exported from
    `useSettings` for its unit tests. Admin tabs surface failures with
    destructive toasts instead of silent `return`s.
+8. **Never precache HTML in `public/sw.js`** — Vite emits content-hashed chunk
+   names and each deploy replaces the previous build, so a cached `index.html`
+   points at files the next deploy deletes: the worker serves that document,
+   the chunk request 404s, and the app cannot boot. Hard-refreshing does not
+   help, because the worker answers before the network is consulted. Instead:
+   cache-first only for `/assets/**` (safe *solely* because the name carries a
+   content hash), network-first for navigations with `offline.html` as the
+   fallback, and never `stale-while-revalidate` on a document. Bump
+   `CACHE_VERSION` when the strategy changes so `activate` purges the old names
+   — that is the only thing that repairs users who are already poisoned.
+   `scripts/sw.test.ts` executes the real worker against injected globals;
+   it fails 4 of 6 tests against the pre-fix version, so keep it that way.
+
+9. **`/?sw=off` is the break-glass recovery path** — it unregisters every worker,
+   deletes every cache and reloads, and runs in `main.tsx` *before* React mounts,
+   because its whole purpose is the case where the app is too broken to render
+   its own recovery UI. When a user reports a dead site that server-side checks
+   say is healthy, this is the first thing to try. Because it must never throw,
+   it checks for a callable `navigator.serviceWorker.getRegistrations` rather
+   than `'serviceWorker' in navigator` — the latter is `true` for a
+   defined-but-`undefined` property. See `src/utils/sw-registration.test.ts`.
+
+10. **CV claims are guarded against seed-data drift** — `scripts/generate_cv.py`
+    restates portfolio facts as Python literals instead of reading the seed data
+    it is documented as generated from, and no build step runs Python.
+    `scripts/generate-cv-claims.test.ts` asserts the headline numbers appear in
+    both files, that the four unverifiable pre-verification metrics stay absent,
+    and that the PDF is the exact file `useSettings.resumeUrl` links to.
+    Regenerating the PDF (`python3 scripts/generate_cv.py`) is still manual and
+    needs Python installed; the test makes forgetting it loud instead of silent.
+
 
 ## Code Conventions
 
