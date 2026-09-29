@@ -28,6 +28,31 @@ npm run finalize     # Release gate: required files + type-check + lint + tests
 **Always run before committing:** `npm run lint && npm run type-check && npm test && npm run build`
 (or `npm run finalize` for the first three).
 
+## Pushing from this machine (port 22 is blocked)
+
+`git fetch`/`git push` against `git@github.com:...` **hang indefinitely** on this
+network: outbound SSH to port 22 never completes, and `core.sshCommand` is set
+to a quiet `ssh` that suppresses the reason, so git only reports "Could not read
+from remote repository". Two things are needed:
+
+```bash
+# 1. use GitHub's port-443 endpoint, 2. bypass the configured ssh command
+export GIT_SSH_COMMAND='ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new -o ConnectTimeout=8'
+git push ssh://git@ssh.github.com:443/mounir1/mounir1.github.io.git <branch>
+```
+
+`ssh -T -p 443 git@ssh.github.com` is the quick reachability probe (it should
+answer `Hi mounir1!`). Pushes are slow enough here to exceed a shell read
+timeout, so run long ones detached and poll the log rather than blocking.
+
+`gh` needs no SSH, but its **active account is `mabderrahmani-hotech`, not the
+repo owner** — always scope PRs explicitly, or `gh` will 403:
+
+```powershell
+$env:GH_TOKEN = gh auth token -u mounir1
+gh pr create --repo mounir1/mounir1.github.io --base main --head <branch> ...
+```
+
 ## CI/CD Pipeline
 
 | Workflow | File | Trigger | Purpose |
@@ -44,12 +69,19 @@ Dependabot runs weekly (see `.github/dependabot.yml`) — groups Radix/ESLint/ty
 | Branch | Role | Status |
 |--------|------|--------|
 | `main` | **Canonical default branch** | Active development, deploys to Pages |
-| `master` | Backup mirror of `main` | Force-synced to `main` after deploys |
+| `master` | Backup snapshot of `main` | **Manual** force-sync — no automation |
 | `gh-pages` | Built site output | Auto-managed by Deploy workflow |
 
 - **Never commit directly to `main`.** Create a feature branch, open a PR.
 - PRs must pass CI (lint + type-check + test + build) before merge.
-- `master` is a safety net only — do not develop on it.
+- `master` is a safety net only — do not develop on it. **Nothing syncs it
+  automatically**: there is no workflow keeping it current, so it silently goes
+  stale after every merge. Re-sync explicitly with
+  `git push --force ssh://git@ssh.github.com:443/mounir1/mounir1.github.io.git main:master`,
+  after confirming its head is an ancestor of `main`
+  (`git merge-base --is-ancestor <master-sha> main`) so nothing unique is lost.
+  (This was documented as automatic but was not: `master` sat at the session-9
+  commit `e5ffceaf` while `main` advanced four commits, until 2026-09-29.)
 
 **Branch hygiene:** run `git fetch --prune` before creating branches, and delete
 a feature branch once its PR merges (`gh pr merge --squash --delete-branch`).
