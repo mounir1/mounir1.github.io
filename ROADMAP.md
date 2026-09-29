@@ -685,3 +685,34 @@ commits in this repo's history.
 **Lesson recorded:** a green pipeline is not evidence for a change it does not
 exercise. The test suite added this session covers the admin data path; it
 deliberately does not pretend to cover styling.
+
+**Follow-up: I broke the deploy workflow and CI could not see it.** After
+merging, every deploy failed with **zero jobs** and the message *"This run likely
+failed because of a workflow file issue."* The cause was my own line:
+
+```yaml
+- name: Report no-op
+  run: echo "Skipped: the built site is identical to what is already live."
+```
+
+That is **valid YAML** — it parses `run` as a *mapping*, not a string. GitHub
+then refuses to schedule the workflow and reports nothing useful. Two things
+made it dangerous:
+
+1. It was invisible to review, to lint, and to `tsc`.
+2. My first "fix" was to add `npx js-yaml` to CI — which **passed**, because the
+   file genuinely is valid YAML. A decorative guard is worse than none, so that
+   was discarded.
+
+What actually works is checking the *type* of the value, not that it parses:
+`scripts/check-workflow-yaml.mjs` flags any unquoted `run:`/`uses:`/`if:`/
+`name:` scalar containing `": "` (quoted values, block scalars and `${{ }}`
+expressions are fine). Wired into `ci.yml` as a step, with 14 tests including
+the exact line that caused the outage. Its first draft had a second bug — the
+regex did not allow the `- ` list marker, so it passed on real workflow files
+while failing on hand-written fixtures; the tests caught that immediately, which
+is exactly why they were written against the failing example.
+
+**Standing lesson:** when a CI system fails with *no jobs*, suspect the workflow
+file itself, not the code it was running. And test a guard against the bug it
+was written for before trusting it.
