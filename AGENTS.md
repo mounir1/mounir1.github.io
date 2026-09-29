@@ -48,8 +48,16 @@ Dependabot runs weekly (see `.github/dependabot.yml`) — groups Radix/ESLint/ty
 | `gh-pages` | Built site output | Auto-managed by Deploy workflow |
 
 - **Never commit directly to `main`.** Create a feature branch, open a PR.
-- PRs must pass CI (lint + type-check + build) before merge.
+- PRs must pass CI (lint + type-check + test + build) before merge.
 - `master` is a safety net only — do not develop on it.
+
+**Branch hygiene:** run `git fetch --prune` before creating branches, and delete
+a feature branch once its PR merges (`gh pr merge --squash --delete-branch`).
+Stale branches accumulate silently and make `git branch -vv` useless for triage.
+Before deleting a branch that is not fully merged, check for unique work with
+`git log --oneline main..<branch>`. If it holds anything worth keeping, preserve
+it as an annotated tag first (`archive/<name>`) and push the tag — tags keep the
+commits reachable, a deleted branch does not.
 
 ## Tech Stack
 
@@ -156,6 +164,7 @@ src/
   `@/lib/firebase` and `firebase/firestore` with `vi.hoisted(...)` factories —
   see `useLinks.test.ts` (bare-collection assertions) and
   `database-uploader.test.ts` (admin sync engine) for the house style.
+  `scripts/**` is included in the test glob for Node-side tooling.
 
 ## Environment Variables
 
