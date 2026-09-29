@@ -7,25 +7,37 @@ on:
     types: [completed]
     branches: [main]
   workflow_dispatch:
+    inputs:
+      force:
+        description: "Deploy even if the build is byte-identical to the live site"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
 
 concurrency:
   group: 'deploy-pages'
-  cancel-in-progress: true
+  # Do NOT cancel an in-flight deploy: a half-cancelled push to gh-pages can
+  # leave the branch mid-update. Let the newer run queue behind this one.
+  cancel-in-progress: false
 
 jobs:
   build-and-deploy:
     # `workflow_run` fires for any conclusion; only deploy on CI success.
     if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
+    # Fail loudly instead of hanging a runner forever.
+    timeout-minutes: 15
 
     steps:
       - name: Checkout
         uses: actions/checkout@v7
         with:
-          fetch-depth: 0
+          # peaceiris force-pushes gh-pages itself and only needs the one commit
+          # being deployed. fetch-depth: 0 cloned the entire history on every run
+          # for no benefit, and the checkout step dominated the job's runtime.
+          fetch-depth: 1
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js
@@ -47,13 +59,35 @@ jobs:
         env:
           NODE_ENV: production
 
-      - name: Copy CNAME to dist
-        run: cp CNAME dist/CNAME
-
       # public/404.html is the proper SPA redirect page (already in public/,
       # Vite copies it to dist/404.html automatically — no manual cp needed)
 
+      # Builds that touch only tests, docs or CI produce a bundle that is
+      # functionally identical to what is already live, and pushing it again is
+      # pure churn. `has-build-changed.mjs` answers the only question that
+      # matters — did any build input change since the last publish?
+      #
+      # The baseline is the commit recorded in the gh-pages commit message that
+      # peaceiris writes ("deploy: <sha>"). Fetching that branch needs real
+      # history, so depth 0 is used here even though the checkout above is
+      # shallow; the cost is a few seconds versus a redundant force-push.
+      - name: Check for build changes
+        id: diff
+        run: |
+          set -euo pipefail
+          git fetch --depth 50 origin gh-pages:gh-pages-local || true
+          BASELINE="$(git log -1 --format='%B' gh-pages-local 2>/dev/null \
+            | grep -oE 'deploy: [0-9a-f]{40}' | head -1 | cut -d' ' -f2 || true)"
+          if [ -n "${BASELINE:-}" ]; then
+            echo "Last deployed commit: $BASELINE"
+          else
+            echo "No deploy marker found on gh-pages - will publish."
+          fi
+          LAST_DEPLOY_SHA="$BASELINE" CURRENT_SHA="$(git rev-parse HEAD)" \
+            node scripts/has-build-changed.mjs
+
       - name: Deploy to GitHub Pages
+        if: ${{ steps.diff.outputs.changed == 'true' || (github.event_name == 'workflow_dispatch' && inputs.force) }}
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -62,3 +96,7 @@ jobs:
           keep_files: false
           enable_jekyll: false
           cname: mounir1.github.io
+
+      - name: Report no-op
+        if: ${{ steps.diff.outputs.changed == 'false' }}
+        run: echo "Skipped: the built site is identical to what is already live."

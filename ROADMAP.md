@@ -629,6 +629,59 @@ behaviour, so **CI would go green on a broken `cn()`**. Added `tailwind-merge`
 and `tailwindcss` major bumps to the `dependabot.yml` ignore list so this pair
 can only move together, via a deliberate migration.
 
+### [x] Branch cleanup + deploy efficiency (2026-09-28, session 9)
+
+**Branch cleanup.** Seven stale branches held 9 commits that were **not** in
+`main` (verified with `git merge-base --is-ancestor`), so they were archived as
+annotated tags *before* deletion — tags keep the commits reachable, deleted
+branches do not:
+
+| Archived tag | Was | Unmerged commits |
+|---|---|---|
+| `archive/genspark-ai-developer` | local `genspark_ai_developer` | 3 (framer-motion, full admin CMS) |
+| `archive/genspark-ai-developer-old` | local `genspark_ai_developer_old` | 2 (blog, testimonials, theme toggle) |
+| `archive/senior-dev-optimization` | `origin/senior-developer-portfolio-optimization-04a55` | 3 (SEO, animations, case studies) |
+| `archive/distinct-project-images` | `origin/feat/distinct-project-images` | 1 (unique per-project images) |
+
+Then deleted locally: `genspark_ai_developer`, `genspark_ai_developer_old`,
+`master`, `gh-pages`. Deleted on origin: the three feature branches above.
+`origin/master` was already in sync with `main` (`e5ffceaf`), so nothing was
+lost there. Recover with e.g. `git checkout -b restore archive/senior-dev-optimization`.
+
+**Deploy optimisations (`deploy.yml`).**
+- `fetch-depth: 0` → `1` for the checkout. peaceiris force-pushes `gh-pages`
+  itself and only needs the one commit being deployed; cloning full history was
+  dominating the job for no benefit.
+- `concurrency.cancel-in-progress: false`. Cancelling an in-flight deploy can
+  interrupt a push to `gh-pages` mid-update; a newer run should queue instead.
+- Added `timeout-minutes: 15` so a hung step fails instead of occupying a runner.
+- Added a `workflow_dispatch` `force` input to bypass the no-op check below.
+- Skip redundant publishes via `scripts/has-build-changed.mjs`.
+
+**On the no-op check — what I got wrong first, and why.** My initial approach
+was to byte-compare `dist/` against the published tree. That turned out to be
+unreliable, and chasing it produced three wrong turns worth recording:
+1. Windows checks out with CRLF, CI with LF, so the same source emits
+   different bytes and therefore *every* Vite content hash changes
+   (`index-Xvyr-ARN.js` vs `index-CJI9nQje.js`) with no functional difference.
+2. Each chunk embeds the hashed names of the assets it imports, so one changed
+   hash re-hashes the whole bundle. A raw diff can never match.
+3. The minifier's short-identifier *naming and ordering* is not stable across
+   environments either (`var L,C,D` vs `var L,D,C`, and `C`/`D`/`q`/`G`
+   genuinely swapping). I tried line-ending normalisation, then hash-token
+   canonicalisation, then a token multiset, then a minified-local anonymiser.
+   Each fixed one diff and exposed the next; a half-right normaliser can silently
+   mask a real change, which is worse than none.
+
+So the final version does **not** inspect the bundle. It asks whether any *build
+input* changed since the last publish, using `git diff --name-only` between the
+commit recorded in the gh-pages commit message (`deploy: <sha>`) and `HEAD`.
+That is exact, has no heuristics, and cannot mask a change. It errs towards
+publishing (an unknown baseline, or a diff that fails, publishes anyway) —
+a redundant force-push is cheap, a missed one ships stale code. Tests: 19, in
+`scripts/has-build-changed.test.ts`, including both directions against real
+commits in this repo's history.
+
 **Lesson recorded:** a green pipeline is not evidence for a change it does not
 exercise. The test suite added this session covers the admin data path; it
 deliberately does not pretend to cover styling.
