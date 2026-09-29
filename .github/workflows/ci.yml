@@ -43,6 +43,14 @@ jobs:
       - name: Test
         run: npm test
 
+      # Catches the specific footgun that silently deleted this workflow: an
+      # unquoted `run:` value containing ": " (e.g. `run: echo "a: b"`) parses
+      # as a YAML mapping, so the workflow is never scheduled and CI shows
+      # nothing at all. It is valid YAML, so a plain YAML parse will NOT catch
+      # it — `run` must be a string. Same trap applies to `env:`, `name:` etc.
+      - name: Guard workflow run/env values against YAML mapping coercion
+        run: node scripts/check-workflow-yaml.mjs
+
       - name: Build
         run: npm run build
         env:
