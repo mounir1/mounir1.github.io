@@ -61,6 +61,8 @@ describe('isBuildInput', () => {
   });
 
   it('normalises Windows path separators', () => {
+    // git emits forward slashes, but a backslash path must classify the same
+    // way on every platform.
     expect(isBuildInput('src\\test\\setup.ts')).toBe(false);
     expect(isBuildInput('src\\lib\\firebase.ts')).toBe(true);
   });

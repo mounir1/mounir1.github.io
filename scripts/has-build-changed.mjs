@@ -28,8 +28,6 @@ import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const IGNORED = new Set(['CNAME', '.nojekyll', '.git']);
-
 // Directories whose contents cannot change the built site.
 const NON_BUILD_PATHS = ['docs/', 'coverage/', 'node_modules/', '.git/'];
 
@@ -47,7 +45,10 @@ const NON_BUILD_FILES = [
 ];
 
 export function isBuildInput(rel) {
-  const normalized = rel.split(path.sep).join('/');
+  // git emits POSIX separators, but normalise defensively — and never via
+  // path.sep, which differs per platform and would make the result untestable
+  // on both.
+  const normalized = rel.replace(/\\/g, '/');
   if (NON_BUILD_FILES.includes(normalized)) return false;
   if (NON_BUILD_PATHS.some((p) => normalized.startsWith(p))) return false;
   // Unit tests are compiled out of the production bundle; the suite itself is
@@ -88,36 +89,6 @@ export function digestOf(buf) {
     return createHash('sha256').update(buf).digest('hex');
   }
   return createHash('sha256').update(Buffer.from(normalizeText(buf), 'utf8')).digest('hex');
-}
-
-export function collectFiles(root) {
-  const out = [];
-  const walk = (dir) => {
-    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-      const full = path.join(dir, entry.name);
-      const rel = path.relative(root, full).split(path.sep).join('/');
-      if (IGNORED.has(rel) || IGNORED.has(entry.name)) continue;
-      if (entry.isDirectory()) walk(full);
-      else if (entry.isFile()) out.push({ rel, canonical: rel });
-    }
-  };
-  walk(root);
-  return out.sort((a, b) => a.rel.localeCompare(b.rel));
-}
-
-export function compareTrees(currentRoot, liveRoot) {
-  const current = collectFiles(currentRoot);
-  const live = new Map(collectFiles(liveRoot).map((f) => [f.canonical, f]));
-  const digest = (root, rel) => digestOf(fs.readFileSync(path.join(root, rel)));
-
-  const added = current.filter((f) => !live.has(f.canonical)).map((f) => f.rel);
-  const removed = [...live.keys()].filter((k) => !current.some((f) => f.canonical === k));
-  const modified = current
-    .filter((f) => live.has(f.canonical))
-    .filter((f) => digest(currentRoot, f.rel) !== digest(liveRoot, live.get(f.canonical).rel))
-    .map((f) => f.rel);
-
-  return { added, removed, modified, hashedChanged: false };
 }
 
 function emit(value) {
