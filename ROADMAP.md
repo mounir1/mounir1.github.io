@@ -813,3 +813,32 @@ loud rather than silent.
    suspect client-side state — cache, worker, or storage — not the deploy.
 3. A test that passes against the broken version is not a test. Verify the guard
    red before trusting the green.
+
+### [x] Two documentation claims that were not true (found while verifying this)
+
+Checking the work rather than trusting the docs turned up two statements that
+the repo asserted about itself and that nothing enforced:
+
+- **`master` was not being kept in sync.** `AGENTS.md` described it as
+  "Force-synced to `main` after deploys", but no workflow does this. `ROADMAP`
+  line 648 records a *one-time* manual force-sync in session 9, after which
+  `main` advanced four commits while `master` stayed at `e5ffceaf`. The claim is
+  now corrected to say the sync is manual, with the exact command and the
+  `git merge-base --is-ancestor` pre-check that proves nothing unique is lost.
+  `master` was re-synced to `bfd587a8` as part of this session.
+- **The stale CV was only half-removed** — covered above.
+
+Both were the same failure mode as the service worker bug: a plausible
+description of the system that had drifted from the system, with nothing in CI
+able to notice. Documentation that asserts a guarantee should either name the
+thing enforcing it, or say plainly that it is manual.
+
+**Environment finding (cost several failed attempts):** outbound SSH to
+`github.com:22` never completes on this network, and `core.sshCommand` is set to
+a quiet `ssh`, which suppresses the real error — so `git fetch`/`git push` just
+hang and then report "Could not read from remote repository". Pushing requires
+`GIT_SSH_COMMAND` to bypass that config *and* GitHub's port-443 endpoint
+(`ssh://git@ssh.github.com:443/...`); `gh` also has a different account active
+(`mabderrahmani-hotech`) than the repo owner, so `GH_TOKEN` for `mounir1` must be
+set explicitly or PR creation 403s. Both are now documented in `AGENTS.md` so the
+next session does not rediscover them.
