@@ -19,9 +19,9 @@ export const initialProjects: ProjectInput[] = [
   {
     title: "Nava PMS — Hospitality Property Management Front-End",
     description:
-      "React + TypeScript property-management front-end for the OREST hospitality backend (HoTech ecosystem). MVP centers on a Room Rack calendar built on the Syncfusion Scheduler, with mock-first development via MSW and full test coverage.",
+      "React + TypeScript property-management front-end for the OREST hospitality backend (HoTech ecosystem). MVP centers on a Room Rack calendar built on the Syncfusion Scheduler, with mock-first development via MSW and 90%+ logic-layer coverage enforced in Vitest.",
     longDescription:
-      "A modern property-management system front-end built for the OREST hospitality API (the backend powering HoTech's hotel products). Feature-sliced architecture: a single OREST integration seam handling auth, token refresh, a typed query builder, and API types; a Room Rack (room calendar) MVP on the Syncfusion Scheduler; and a mock-first workflow (MSW mock OREST) that lets the UI be developed and tested without a live backend. Tooling includes Vitest unit tests, Playwright E2E tests, ESLint, and a pinned Node 22 Docker build.",
+      "A modern property-management system front-end built for the OREST hospitality API (the backend powering HoTech's hotel products). Feature-sliced architecture: a single OREST integration seam handling auth, token refresh, a typed query builder, and API types; a Room Rack (room calendar) MVP on the Syncfusion Scheduler; and a mock-first workflow (MSW mock OREST) that lets the UI be developed and tested without a live backend. Tooling includes Vitest unit tests, Playwright E2E tests, ESLint, and a multi-stage Docker build pinned to node:26.5-alpine.",
     category: "Hospitality Solutions",
     status: "in-development",
     achievements: [
@@ -30,7 +30,7 @@ export const initialProjects: ProjectInput[] = [
       "Mock-first development with MSW so the UI runs without a live backend",
       "Vitest unit tests + Playwright end-to-end tests",
       "Feature-sliced architecture (app shell, router, providers, lib/orest)",
-      "Dockerized build pinned to Node 22 LTS",
+      "Dockerized multi-stage build pinned to node:26.5-alpine",
     ],
     technologies: [
       "React", "TypeScript", "Vite", "Syncfusion Scheduler",
@@ -86,9 +86,9 @@ export const initialProjects: ProjectInput[] = [
   {
     title: "MAB Modules Suite — 28 Magento 2 Extensions for Algeria",
     description:
-      "Suite of 28 professional Magento 2.4 extensions built for the Algerian e-commerce market: Yalidine carrier integration (165+ delivery centers, all 58 wilayas), multi-source inventory, checkout customization, Firebase social login, and WebPush notifications.",
+      "Suite of 28 professional Magento 2.4 extensions built for the Algerian e-commerce market (20 deployed on the live TechnoStationery.com store): Yalidine carrier integration (165+ delivery centers, all 58 wilayas), multi-source inventory, checkout customization, Firebase social login, and WebPush notifications.",
     longDescription:
-      "A comprehensive collection of 28 production Magento 2 extensions purpose-built for Algerian e-commerce. Highlights: Mab_YalidineCarrier — real-time Yalidine Express shipping (home delivery, stop desk, source pickup) covering 165+ delivery centers across all 58 wilayas; Mab_SourceSelector — multi-source inventory with distance-based warehouse selection; Mab_CheckoutCustomization — Algerian address validation with pickup-source mismatch detection; Mab_SocialLogin — Firebase Authentication (Google, Facebook) wired into checkout; Mab_Notifications — WebPush notifications including abandoned-cart recovery; plus caching, Cloudflare CDN, Elasticsearch fixes, and theming modules. Fully localized in French with Arabic readiness.",
+      "A comprehensive collection of 28 Magento 2 extensions purpose-built for Algerian e-commerce — 20 of them running in production on TechnoStationery.com. Highlights: Mab_YalidineCarrier — real-time Yalidine Express shipping (home delivery, stop desk, source pickup) covering 165+ delivery centers across all 58 wilayas; Mab_SourceSelector — multi-source inventory with distance-based warehouse selection; Mab_CheckoutCustomization — Algerian address validation with pickup-source mismatch detection; Mab_SocialLogin — Firebase Authentication (Google, Facebook) wired into checkout; Mab_Notifications — WebPush notifications including abandoned-cart recovery; plus caching, Cloudflare CDN, Elasticsearch fixes, and theming modules. Fully localized in French with Arabic readiness.",
     category: "E-commerce",
     status: "active",
     achievements: [
@@ -291,26 +291,26 @@ export const initialProjects: ProjectInput[] = [
   {
     title: "TechnoStationery Dashboard — Operations & Monitoring Hub",
     description:
-      "Internal operations dashboard for Techno Stationery: task management, live server monitoring, Telegram/Slack alerting, and AI-assisted operational reporting via the OpenAI API.",
+      "Internal operations dashboard for Techno Stationery: task management, live server monitoring, Telegram alerting, and AI-assisted operational reporting via Cloudflare Workers AI.",
     longDescription:
-      "A live internal operations hub combining task management workflows, server and infrastructure health monitoring (CPU, RAM, disk, uptime, cron jobs), bot integrations for real-time alerts (Telegram, Slack), and AI-assisted reporting that summarizes raw operational metrics into readable periodic reports using the OpenAI API. Gives the engineering/ops team a single pane of glass over deployments, servers, and open tasks.",
+      "A live internal operations hub combining task management workflows, server and infrastructure health monitoring (CPU, RAM, disk, uptime, cron jobs), a Telegram bot for real-time alerts, and AI-assisted reporting that summarizes raw operational metrics into readable periodic reports using Cloudflare Workers AI (Llama 3.1). Gives the engineering/ops team a single pane of glass over deployments, servers, and open tasks.",
     category: "Web Application",
     status: "active",
     achievements: [
       "Live at dashboard.technostationery.com",
       "Unified task management and server monitoring in one dashboard",
-      "Telegram & Slack bot integration for operational alerts",
-      "AI-assisted operational report generation (OpenAI API)",
+      "Telegram bot integration for operational alerts",
+      "AI-assisted operational report generation (Cloudflare Workers AI)",
       "Server health monitoring: CPU, RAM, disk, uptime, cron jobs",
       "Role-based access for the ops team",
     ],
     technologies: [
-      "React", "TypeScript", "Node.js", "Firebase",
-      "Telegram Bot API", "Slack API", "OpenAI API", "Docker", "Nginx",
+      "React", "TypeScript", "Vite", "Node.js", "PHP",
+      "MySQL", "Redis", "Telegram Bot API", "Cloudflare Workers AI", "Playwright",
     ],
     tags: ["dashboard", "monitoring", "task-management", "bots", "automation", "operations"],
     image: "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&h=600&fit=crop",
-    logo: "https://technostationery.com/media/logo/default/logo_techno_2.png",
+    logo: "/dashboard-technostationery-logo.svg",
     icon: "📊",
     liveUrl: "https://dashboard.technostationery.com",
     githubUrl: "",
@@ -332,8 +332,8 @@ export const initialProjects: ProjectInput[] = [
     },
     metrics: {
       customMetrics: {
-        alerting: "Telegram + Slack bots",
-        reporting: "AI-assisted (OpenAI API)",
+        alerting: "Telegram bot",
+        reporting: "AI-assisted (Cloudflare Workers AI)",
         monitoring: "Servers, cron jobs, deployments",
       },
     },
@@ -344,7 +344,7 @@ export const initialProjects: ProjectInput[] = [
     ],
     solutions: [
       "Central metrics aggregation layer feeding one dashboard",
-      "OpenAI-based summarization of metrics into narrative reports",
+      "Cloudflare Workers AI summarization of metrics into narrative reports",
       "Alert filtering and escalation rules per channel",
     ],
     teamSize: 2,
@@ -597,7 +597,7 @@ export const initialProjects: ProjectInput[] = [
     ],
     tags: ["education", "networking", "security", "training", "simulator", "rtl", "arabic"],
     image: "https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800&h=600&fit=crop",
-    logo: "https://technostationery.com/media/logo/default/logo_techno_2.png",
+    logo: "/it-collaborator-logo.svg",
     icon: "🌐",
     liveUrl: "",
     githubUrl: "",
@@ -665,7 +665,7 @@ export const initialProjects: ProjectInput[] = [
     ],
     tags: ["etl", "mdm", "magento", "data-pipeline", "integration", "ecommerce"],
     image: "https://images.unsplash.com/photo-1518432031352-d6fc5c10da5a?w=800&h=600&fit=crop",
-    logo: "https://technostationery.com/media/logo/default/logo_techno_2.png",
+    logo: "/etl-platform-logo.svg",
     icon: "⚙️",
     liveUrl: "",
     githubUrl: "",
@@ -1009,7 +1009,7 @@ export const initialProjects: ProjectInput[] = [
     ],
     technologies: [
       "GrapesJS", "React", "TypeScript", "Vite",
-      "Tailwind CSS", "Go", "REST APIs", "Docker",
+      "Material UI", "REST APIs", "Docker", "Nginx",
     ],
     tags: ["builder", "cms", "hospitality", "drag-drop", "grapesjs", "react"],
     image: "https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=800&h=600&fit=crop",
@@ -1036,9 +1036,9 @@ export const initialProjects: ProjectInput[] = [
     metrics: {
       customMetrics: {
         builder: "GrapesJS + React",
-        theme_engine: "Tailwind CSS custom properties",
-        backend: "Go API server",
-        deployment: "Docker + Jenkins",
+        theme_engine: "Material UI theming",
+        backend: "OREST REST integration",
+        deployment: "Docker + Nginx",
       },
     },
     challenges: [
@@ -1048,7 +1048,7 @@ export const initialProjects: ProjectInput[] = [
     ],
     solutions: [
       "Custom React wrapper around GrapesJS with typed API seams",
-      "Tailwind-based brand theming with CSS custom properties",
+      "Material UI brand theming with design tokens",
       "Template schema validation at build and publish time",
     ],
     teamSize: 2,
@@ -1190,11 +1190,11 @@ export const initialProjects: ProjectInput[] = [
     description:
       "Founder project: a complete ERP for Algerian businesses built with Go + Vue 3 and shipped as a single self-contained binary — the only external dependency is PostgreSQL. Native SCF accounting, IRG/CNAS payroll, and G50/G29 tax compliance out of the box.",
     longDescription:
-      "Mab ERP is a full Enterprise Resource Planning system engineered for the Algerian market and distributed as one executable — the Vue 3 single-page app is embedded into the Go binary via go:embed, so deployment is a single binary plus PostgreSQL. It ships 14 modules: Accounting (Algerian SCF chart of accounts, journal entries, fixed assets with linear/diminishing depreciation, bank reconciliation, trial balance, balance sheet, income statement, budgets, cost centers), HR & Payroll (employees, departments, attendance, leave, payroll with IRG brackets and CNAS 9%/26% contributions, G29 export), Sales & CRM (leads, Kanban pipeline, quotations, sales orders, TVA/stamp-tax invoices, customer aging), Purchase (suppliers, RFQs, purchase orders with approval workflow, goods receipts, 3-way matching, supplier evaluations), Inventory (items with CMUP/FIFO valuation, warehouses, stock levels, movements, counts), Manufacturing (BOM, work centers, manufacturing orders with MRP, auto purchase suggestions), Projects (tasks, timesheets, budget vs actual), Treasury (cash, bank accounts, cheques with deposit/bounce, payments, cash position), Tax (G50 monthly TVA declarations, VAT register), plus rule-based Workflow approvals, Reports/BI, and multi-company settings. Built on raw SQL via pgx (zero ORM) with transactional integrity on invoices, payroll, and stock movements, JWT auth (access + refresh tokens), and a Vue 3 + Tailwind SPA with a Ctrl+K command palette.",
+      "Mab ERP is a full Enterprise Resource Planning system engineered for the Algerian market and distributed as one executable — the Vue 3 single-page app is embedded into the Go binary via go:embed, so deployment is a single binary plus PostgreSQL. It ships 19 modules: Accounting (Algerian SCF chart of accounts, journal entries, fixed assets with linear/diminishing depreciation, bank reconciliation, trial balance, balance sheet, income statement, budgets, cost centers), HR & Payroll (employees, departments, attendance, leave, payroll with IRG brackets and CNAS 9%/26% contributions, G29 export), Sales & CRM (leads, Kanban pipeline, quotations, sales orders, TVA/stamp-tax invoices, customer aging), Purchase (suppliers, RFQs, purchase orders with approval workflow, goods receipts, 3-way matching, supplier evaluations), Inventory (items with CMUP/FIFO valuation, warehouses, stock levels, movements, counts), Manufacturing (BOM, work centers, manufacturing orders with MRP, auto purchase suggestions), Projects (tasks, timesheets, budget vs actual), Treasury (cash, bank accounts, cheques with deposit/bounce, payments, cash position), Tax (G50 monthly TVA declarations, VAT register), Assets, Budgeting, Fleet, Helpdesk, Maintenance and Quality, plus rule-based Workflow approvals, Reports/BI, and multi-company settings. Built on raw SQL via pgx (zero ORM) with transactional integrity on invoices, payroll, and stock movements, JWT auth (access + refresh tokens), and a Vue 3 + Tailwind SPA with a Ctrl+K command palette.",
     category: "Enterprise Integration",
     status: "active",
     achievements: [
-      "Complete 14-module ERP: Accounting, HR/Payroll, Sales/CRM, Purchase, Inventory, Manufacturing, Projects, Treasury, Tax, Workflow, Reports, Dashboard, Settings",
+      "Complete 19-module ERP: Accounting, HR/Payroll, Sales/CRM, Purchase, Inventory, Manufacturing, Projects, Treasury, Tax, Assets, Budgeting, Fleet, Helpdesk, Maintenance, Quality, Workflow, Reports, Dashboard, Settings",
       "Single-binary deployment: Vue 3 SPA embedded in the Go executable via go:embed — only PostgreSQL required",
       "Native Algerian compliance: SCF chart of accounts, IRG payroll brackets, CNAS 9%/26%, TVA 19%, G50/G29 declarations",
       "100+ REST API endpoints with JWT auth (access + refresh tokens)",
@@ -1230,7 +1230,7 @@ export const initialProjects: ProjectInput[] = [
     metrics: {
       customMetrics: {
         repository: "Private — demo on request",
-        modules: 14,
+        modules: 19,
         api_endpoints: "100+",
         compliance: "SCF, IRG, CNAS, TVA, G50/G29",
         deployment: "Single binary + PostgreSQL",
