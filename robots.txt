@@ -7,13 +7,28 @@ Disallow: /admin/*
 # Sitemap
 Sitemap: https://mounir1.github.io/sitemap.xml
 
-# Crawl-delay for respectful crawling
-Crawl-delay: 1
+# AdSense + search crawlers are explicitly welcome.
+User-agent: Mediapartners-Google
+Allow: /
 
-# Allow specific bots
+User-agent: AdsBot-Google
+Allow: /
+
+User-agent: AdsBot-Google-Mobile
+Allow: /
+
 User-agent: Googlebot
 Allow: /
-Disallow: /admin
+
+# AI answer-engine crawlers (answer-first content strategy, 2026 research).
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
 
 User-agent: Bingbot
 Allow: /
