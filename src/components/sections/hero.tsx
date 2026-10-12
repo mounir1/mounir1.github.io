@@ -25,11 +25,19 @@ const TECH_BADGES = [
 ];
 
 // ─── Typing animation hook ────────────────────────────────────────────────────
+/**
+ * `enabled` gates the whole state machine. The hero is above the fold, but a
+ * visitor who scrolls to the projects section leaves this component mounted and
+ * ticking forever: five setTimeout chains running on a hidden subtree, plus the
+ * ~13 setStates/second they cause. On mobile that is measurable battery drain
+ * and it competes with the scroll for main-thread time.
+ */
 function useTyping(
   words: string[],
   typingSpeed = 75,
   deletingSpeed = 40,
-  pauseMs = 1800
+  pauseMs = 1800,
+  enabled = true
 ) {
   const [displayed,   setDisplayed]   = useState("");
   const [wordIndex,   setWordIndex]   = useState(0);
@@ -37,7 +45,7 @@ function useTyping(
   const [isPaused,    setIsPaused]    = useState(false);
 
   useEffect(() => {
-    if (words.length === 0) return;
+    if (!enabled || words.length === 0) return;
     const current = words[wordIndex % words.length];
 
     if (isPaused) {
@@ -76,10 +84,64 @@ function useTyping(
         return () => clearTimeout(t);
       }
     }
-  }, [displayed, isDeleting, isPaused, wordIndex, words, typingSpeed, deletingSpeed, pauseMs]);
+  }, [displayed, isDeleting, isPaused, wordIndex, words, typingSpeed, deletingSpeed, pauseMs, enabled]);
 
   return displayed;
 }
+
+/**
+ * Owns the typing tick so a re-render happens ~13x/second in *this* component
+ * only. When the state lived in `Hero`, every tick re-rendered the avatar —
+ * which is the LCP image — plus all the floating badges and the parallax
+ * handlers, for no visual reason.
+ *
+ * Also honours `prefers-reduced-motion`: the parallax code two blocks above
+ * already checked it, so it would be odd for the headline to keep stuttering at
+ * users who asked for stillness.
+ */
+const TypedHeadline = ({ words }: { words: string[] }) => {
+  const [reduced] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+
+  // Only animate while this headline is actually on screen. IntersectionObserver
+  // rather than a scroll listener so the check costs nothing per scroll event.
+  const [inView, setInView] = useState(true);
+  const ref = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    if (reduced) return;
+    const el = ref.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+
+    const io = new IntersectionObserver(
+      ([entry]) => setInView(entry?.isIntersecting ?? true),
+      { threshold: 0 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [reduced]);
+
+  const typed = useTyping(words, 75, 40, 2000, inView && !reduced);
+  const text = reduced ? (words[0] ?? "") : typed;
+
+  return (
+    <h2
+      ref={ref}
+      className="text-2xl md:text-3xl font-medium text-muted-foreground min-h-[2.25rem] flex items-center gap-0 justify-center lg:justify-start"
+    >
+      <span>{text}</span>
+      {!reduced && (
+        <span
+          aria-hidden="true"
+          className="inline-block w-[2px] h-[1.2em] ml-0.5 bg-primary rounded-sm animate-[typing-cursor_1s_step-end_infinite]"
+        />
+      )}
+    </h2>
+  );
+};
 
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 export const Hero = () => {
@@ -94,8 +156,6 @@ export const Hero = () => {
     personalInfo.title,
     ...(personalInfo.typingWords ?? ["Full-Stack Developer", "Magento Expert", "ERP Integrator", "AI Solutions Builder"]),
   ].filter(Boolean) as string[];
-
-  const typed = useTyping(typingWords, 75, 40, 2000);
 
   // ── Subtle mouse-parallax tilt on avatar (RAF, no deps) ─────────────────
   useEffect(() => {
@@ -143,7 +203,7 @@ export const Hero = () => {
     <section
       ref={sectionRef}
       id="home"
-      className="min-h-screen flex items-center justify-center bg-gradient-subtle px-6 py-16 overflow-hidden"
+      className="min-h-[100svh] flex items-center justify-center bg-gradient-subtle px-5 sm:px-6 py-16 overflow-hidden"
     >
       <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
 
@@ -173,16 +233,9 @@ export const Hero = () => {
               </span>
             </h1>
 
-            {/* Typing animation */}
+            {/* Typing animation — isolated so 75ms ticks don't re-render the LCP image */}
             <div className="space-y-2">
-              <h2 className="text-2xl md:text-3xl font-medium text-muted-foreground min-h-[2.25rem] flex items-center gap-0 justify-center lg:justify-start">
-                <span>{typed}</span>
-                {/* Blinking cursor */}
-                <span
-                  aria-hidden="true"
-                  className="inline-block w-[2px] h-[1.2em] ml-0.5 bg-primary rounded-sm animate-[typing-cursor_1s_step-end_infinite]"
-                />
-              </h2>
+              <TypedHeadline words={typingWords} />
               <div className="flex items-center gap-4 justify-center lg:justify-start text-sm text-muted-foreground flex-wrap">
                 <div className="flex items-center gap-1">
                   <MapPin className="h-4 w-4 shrink-0" />
@@ -356,6 +409,11 @@ export const Hero = () => {
                 <img
                   src={personalInfo.profilePhoto ?? "/profile.webp"}
                   alt={`${personalInfo.name} — ${personalInfo.title}`}
+                  width={400}
+                  height={400}
+                  loading="eager"
+                  decoding="async"
+                  fetchPriority="high"
                   className="w-full max-w-lg object-cover aspect-square transition-transform duration-500 group-hover:scale-[1.03]"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-primary/20 via-transparent to-transparent pointer-events-none" />

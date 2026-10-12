@@ -1,14 +1,6 @@
-import { useEffect, useState } from "react";
-import { db, isFirebaseEnabled } from "@/lib/firebase";
-import {
-  collection,
-  onSnapshot,
-  addDoc,
-  deleteDoc,
-  setDoc,
-  doc,
-  getDocs,
-} from "firebase/firestore";
+import { useEffect, useRef, useState } from "react";
+import { isFirebaseEnabled } from "@/lib/firebase-config";
+import { getDb } from "@/lib/firestore-client";
 import { sanitizeDoc } from "@/utils/firestore-write";
 
 export interface PortfolioLink {
@@ -52,7 +44,7 @@ export function useLinks() {
   // Local fallback resolved during lazy state init — no synchronous setState
   // in the effect (react-hooks/set-state-in-effect) and no empty-state flash.
   const [links, setLinks] = useState<PortfolioLink[]>(() => {
-    if (isFirebaseEnabled && db) return [];
+    if (isFirebaseEnabled) return [];
     try {
       const stored = JSON.parse(localStorage.getItem("portfolio_links") || "[]");
       return stored.length > 0 ? stored : DEFAULT_LINKS;
@@ -60,43 +52,61 @@ export function useLinks() {
       return DEFAULT_LINKS;
     }
   });
-  const [loading, setLoading] = useState(isFirebaseEnabled && !!db);
+  const [loading, setLoading] = useState(isFirebaseEnabled);
+  // Shared across mutations so simultaneous admin saves coalesce into one seed.
+  const seedInFlight = useRef<Promise<void> | null>(null);
 
   useEffect(() => {
     // Local data already seeded via lazy init when Firebase is disabled
-    if (!isFirebaseEnabled || !db) {
+    if (!isFirebaseEnabled) {
       return;
     }
 
-    // Index-free by design — see useProjects for rationale. A single-field
-    // orderBy still fails whenever its index was never deployed, which used to
-    // fall back silently to DEFAULT_LINKS (ids d1…dN) that don't exist in
-    // Firestore, so admin edits appeared to work while writing nothing.
-    const q = collection(db, LINKS_COLLECTION);
+    let unsub: (() => void) | undefined;
+    let cancelled = false;
 
-    const unsub = onSnapshot(
-      q,
-      (snap) => {
-        const all = snap.docs.map((d) => ({ id: d.id, ...d.data() } as PortfolioLink));
-        const sorted = [...all].sort(
-          (a, b) =>
-            (b.priority ?? 0) - (a.priority ?? 0) || a.id.localeCompare(b.id)
+    void (async () => {
+      try {
+        const [{ collection, onSnapshot }, db] = await Promise.all([
+          import("firebase/firestore"),
+          getDb(),
+        ]);
+        if (cancelled) return;
+
+        // Index-free by design — see useProjects for rationale. A single-field
+        // orderBy still fails whenever its index was never deployed, which used
+        // to fall back silently to DEFAULT_LINKS (ids d1…dN) that don't exist in
+        // Firestore, so admin edits appeared to work while writing nothing.
+        unsub = onSnapshot(
+          collection(db, LINKS_COLLECTION),
+          (snap) => {
+            const all = snap.docs.map((d) => ({ id: d.id, ...d.data() } as PortfolioLink));
+            const sorted = [...all].sort(
+              (a, b) =>
+                (b.priority ?? 0) - (a.priority ?? 0) || a.id.localeCompare(b.id)
+            );
+            setLinks(sorted.length > 0 ? sorted : DEFAULT_LINKS);
+            setLoading(false);
+          },
+          () => {
+            try {
+              const stored = JSON.parse(localStorage.getItem("portfolio_links") || "[]");
+              setLinks(stored.length > 0 ? stored : DEFAULT_LINKS);
+            } catch {
+              setLinks(DEFAULT_LINKS);
+            }
+            setLoading(false);
+          }
         );
-        setLinks(sorted.length > 0 ? sorted : DEFAULT_LINKS);
-        setLoading(false);
-      },
-      () => {
-        try {
-          const stored = JSON.parse(localStorage.getItem("portfolio_links") || "[]");
-          setLinks(stored.length > 0 ? stored : DEFAULT_LINKS);
-        } catch {
-          setLinks(DEFAULT_LINKS);
-        }
+      } catch {
         setLoading(false);
       }
-    );
+    })();
 
-    return () => unsub();
+    return () => {
+      cancelled = true;
+      unsub?.();
+    };
   }, []);
 
   /**
@@ -108,25 +118,43 @@ export function useLinks() {
    * stay complete. No-op once the collection has any docs.
    */
   const ensureSeeded = async () => {
-    if (!isFirebaseEnabled || !db) return;
-    const snap = await getDocs(collection(db, LINKS_COLLECTION));
-    if (!snap.empty) return;
-    const now = Date.now();
-    await Promise.all(
-      DEFAULT_LINKS.map(({ id, ...data }) =>
-        setDoc(doc(db!, LINKS_COLLECTION, id), sanitizeDoc({ ...data, createdAt: now, updatedAt: now }))
-      )
-    );
+    if (!isFirebaseEnabled) return;
+    // Concurrent mutations each used to run their own getDocs, so two rapid
+    // saves both saw an empty collection and both wrote every default.
+    if (seedInFlight.current) return seedInFlight.current;
+    seedInFlight.current = (async () => {
+      const [{ collection, doc: docRef, getDocs, setDoc }, db] = await Promise.all([
+        import("firebase/firestore"),
+        getDb(),
+      ]);
+      const snap = await getDocs(collection(db, LINKS_COLLECTION));
+      if (!snap.empty) return;
+      const now = Date.now();
+      await Promise.all(
+        DEFAULT_LINKS.map(({ id, ...data }) =>
+          setDoc(docRef(db, LINKS_COLLECTION, id), sanitizeDoc({ ...data, createdAt: now, updatedAt: now }))
+        )
+      );
+    })();
+    try {
+      await seedInFlight.current;
+    } finally {
+      seedInFlight.current = null;
+    }
   };
 
   const addLink = async (data: PortfolioLinkInput) => {
-    if (!isFirebaseEnabled || !db) {
+    if (!isFirebaseEnabled) {
       const newLink: PortfolioLink = { ...data, id: Date.now().toString(), createdAt: Date.now(), updatedAt: Date.now() };
       const updated = [...links.filter(l => l.id.startsWith("d") === false || l.id === newLink.id), newLink];
       setLinks(updated);
       localStorage.setItem("portfolio_links", JSON.stringify(updated));
       return;
     }
+    const [{ addDoc, collection }, db] = await Promise.all([
+      import("firebase/firestore"),
+      getDb(),
+    ]);
     await ensureSeeded();
     await addDoc(collection(db, LINKS_COLLECTION), sanitizeDoc({
       ...data,
@@ -136,30 +164,38 @@ export function useLinks() {
   };
 
   const updateLink = async (id: string, data: Partial<PortfolioLinkInput>) => {
-    if (!isFirebaseEnabled || !db) {
+    if (!isFirebaseEnabled) {
       const updated = links.map((l) => l.id === id ? { ...l, ...data, updatedAt: Date.now() } : l);
       setLinks(updated);
       localStorage.setItem("portfolio_links", JSON.stringify(updated));
       return;
     }
+    const [{ doc: docRef, setDoc }, db] = await Promise.all([
+      import("firebase/firestore"),
+      getDb(),
+    ]);
     await ensureSeeded();
     // setDoc+merge is an upsert — never throws "No document to update".
-    await setDoc(doc(db, LINKS_COLLECTION, id), sanitizeDoc({ ...data, updatedAt: Date.now() }), { merge: true });
+    await setDoc(docRef(db, LINKS_COLLECTION, id), sanitizeDoc({ ...data, updatedAt: Date.now() }), { merge: true });
   };
 
   const deleteLink = async (id: string) => {
-    if (!isFirebaseEnabled || !db) {
+    if (!isFirebaseEnabled) {
       const updated = links.filter((l) => l.id !== id);
       setLinks(updated);
       localStorage.setItem("portfolio_links", JSON.stringify(updated));
       return;
     }
+    const [{ deleteDoc, doc: docRef }, db] = await Promise.all([
+      import("firebase/firestore"),
+      getDb(),
+    ]);
     await ensureSeeded();
-    await deleteDoc(doc(db, LINKS_COLLECTION, id));
+    await deleteDoc(docRef(db, LINKS_COLLECTION, id));
   };
 
   const seedDefaults = async () => {
-    if (!isFirebaseEnabled || !db) {
+    if (!isFirebaseEnabled) {
       setLinks(DEFAULT_LINKS);
       localStorage.setItem("portfolio_links", JSON.stringify(DEFAULT_LINKS));
       return;

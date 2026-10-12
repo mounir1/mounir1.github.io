@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
-import { db, isFirebaseEnabled } from "@/lib/firebase";
-import {
-  collection, onSnapshot, addDoc, updateDoc, deleteDoc,
-  doc, orderBy, query,
-} from "firebase/firestore";
+import { isFirebaseEnabled } from "@/lib/firebase-config";
+import { getDb } from "@/lib/firestore-client";
 import { sanitizeDoc } from "@/utils/firestore-write";
 
 export type MessageStatus = "unread" | "read" | "replied" | "archived" | "spam";
@@ -37,22 +34,46 @@ export const CONTACT_COLLECTION = "contact_messages";
 export function useContactMessages() {
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   // No remote source without Firebase — skip the loading state entirely.
-  const [loading, setLoading] = useState(isFirebaseEnabled && !!db);
+  const [loading, setLoading] = useState(isFirebaseEnabled);
 
   useEffect(() => {
-    if (!isFirebaseEnabled || !db) {
+    if (!isFirebaseEnabled) {
       return;
     }
-    const q = query(collection(db, CONTACT_COLLECTION), orderBy("createdAt", "desc"));
-    const unsub = onSnapshot(q, (snap) => {
-      setMessages(snap.docs.map((d) => ({ id: d.id, ...d.data() } as ContactMessage)));
-      setLoading(false);
-    }, () => setLoading(false));
-    return () => unsub();
+
+    let unsub: (() => void) | undefined;
+    let cancelled = false;
+
+    void (async () => {
+      try {
+        const [{ collection, onSnapshot, doc: docRef, orderBy, query }, db] = await Promise.all([
+          import("firebase/firestore"),
+          getDb(),
+        ]);
+        if (cancelled) return;
+
+        const q = query(collection(db, CONTACT_COLLECTION), orderBy("createdAt", "desc"));
+        unsub = onSnapshot(q, (snap) => {
+          setMessages(snap.docs.map((d) => ({ id: d.id, ...d.data() } as ContactMessage)));
+          setLoading(false);
+        }, () => setLoading(false));
+      } catch {
+        setLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      unsub?.();
+    };
   }, []);
 
   const submitMessage = async (data: ContactMessageInput) => {
-    if (!isFirebaseEnabled || !db) return;
+    if (!isFirebaseEnabled) return;
+    const [{ addDoc, collection }, db] = await Promise.all([
+      import("firebase/firestore"),
+      getDb(),
+    ]);
     await addDoc(collection(db, CONTACT_COLLECTION), sanitizeDoc({
       ...data,
       status: "unread",
@@ -61,23 +82,39 @@ export function useContactMessages() {
   };
 
   const markRead = async (id: string) => {
-    if (!isFirebaseEnabled || !db) return;
-    return updateDoc(doc(db, CONTACT_COLLECTION, id), { status: "read", readAt: Date.now() });
+    if (!isFirebaseEnabled) return;
+    const [{ updateDoc, doc: docRef }, db] = await Promise.all([
+      import("firebase/firestore"),
+      getDb(),
+    ]);
+    return updateDoc(docRef(db, CONTACT_COLLECTION, id), { status: "read", readAt: Date.now() });
   };
 
   const markReplied = async (id: string) => {
-    if (!isFirebaseEnabled || !db) return;
-    return updateDoc(doc(db, CONTACT_COLLECTION, id), { status: "replied", repliedAt: Date.now() });
+    if (!isFirebaseEnabled) return;
+    const [{ updateDoc, doc: docRef }, db] = await Promise.all([
+      import("firebase/firestore"),
+      getDb(),
+    ]);
+    return updateDoc(docRef(db, CONTACT_COLLECTION, id), { status: "replied", repliedAt: Date.now() });
   };
 
   const markStatus = async (id: string, status: MessageStatus) => {
-    if (!isFirebaseEnabled || !db) return;
-    return updateDoc(doc(db, CONTACT_COLLECTION, id), { status });
+    if (!isFirebaseEnabled) return;
+    const [{ updateDoc, doc: docRef }, db] = await Promise.all([
+      import("firebase/firestore"),
+      getDb(),
+    ]);
+    return updateDoc(docRef(db, CONTACT_COLLECTION, id), { status });
   };
 
   const deleteMessage = async (id: string) => {
-    if (!isFirebaseEnabled || !db) return;
-    return deleteDoc(doc(db, CONTACT_COLLECTION, id));
+    if (!isFirebaseEnabled) return;
+    const [{ deleteDoc, doc: docRef }, db] = await Promise.all([
+      import("firebase/firestore"),
+      getDb(),
+    ]);
+    return deleteDoc(docRef(db, CONTACT_COLLECTION, id));
   };
 
   const unreadCount = messages.filter((m) => m.status === "unread").length;

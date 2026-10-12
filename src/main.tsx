@@ -2,7 +2,6 @@ import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 import { ErrorBoundary } from './components/ui/error-boundary';
-import { initFirebaseAnalytics } from './lib/firebase';
 import { isServiceWorkerDisableRequested, purgeServiceWorker } from './utils/sw-registration';
 
 // ── Service worker escape hatch ─────────────────────────────────────────────
@@ -17,10 +16,17 @@ if (typeof window !== 'undefined' && isServiceWorkerDisableRequested(window.loca
 }
 
 // ── Lazy-init Firebase Analytics after the page is fully interactive ──────────
-// Production only — see initFirebaseAnalytics() internals for guards
+// The import is dynamic on purpose: `./lib/firebase` statically pulls in
+// firebase/app + firebase/firestore (~380 kB), and a static import here would
+// put that whole chunk on the landing page's critical path to ship a single
+// analytics beacon that fires 3 seconds after `load` anyway.
 if (typeof window !== 'undefined') {
   window.addEventListener('load', () => {
-    setTimeout(() => { initFirebaseAnalytics(); }, 3000);
+    setTimeout(() => {
+      void import('./lib/firebase').then(({ initFirebaseAnalytics }) => {
+        initFirebaseAnalytics();
+      });
+    }, 3000);
   }, { once: true });
 }
 

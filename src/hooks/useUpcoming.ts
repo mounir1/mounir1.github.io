@@ -1,14 +1,6 @@
 import { useEffect, useState } from "react";
-import { db, isFirebaseEnabled } from "@/lib/firebase";
-import {
-  collection,
-  onSnapshot,
-  addDoc,
-  deleteDoc,
-  setDoc,
-  doc,
-  getDocs,
-} from "firebase/firestore";
+import { isFirebaseEnabled } from "@/lib/firebase-config";
+import { getDb } from "@/lib/firestore-client";
 import { sanitizeDoc } from "@/utils/firestore-write";
 
 export type UpcomingStatus = "idea" | "planned" | "in-development" | "beta" | "soon";
@@ -117,7 +109,7 @@ export function useUpcoming() {
   // Local fallback resolved during lazy state init — no synchronous setState
   // in the effect (react-hooks/set-state-in-effect) and no empty-state flash.
   const [upcoming, setUpcoming] = useState<UpcomingProject[]>(() => {
-    if (isFirebaseEnabled && db) return [];
+    if (isFirebaseEnabled) return [];
     try {
       const stored = JSON.parse(localStorage.getItem("portfolio_upcoming") || "[]");
       return stored.length > 0 ? stored : DEFAULT_UPCOMING;
@@ -125,41 +117,57 @@ export function useUpcoming() {
       return DEFAULT_UPCOMING;
     }
   });
-  const [loading, setLoading] = useState(isFirebaseEnabled && !!db);
+  const [loading, setLoading] = useState(isFirebaseEnabled);
 
   useEffect(() => {
     // Local data already seeded via lazy init when Firebase is disabled
-    if (!isFirebaseEnabled || !db) {
+    if (!isFirebaseEnabled) {
       return;
     }
 
-    // Index-free by design — see useProjects for rationale (same silent
-    // fallback-to-DEFAULT_UPCOMING failure mode with ids u1…uN).
-    const q = collection(db, UPCOMING_COLLECTION);
+    let unsub: (() => void) | undefined;
+    let cancelled = false;
 
-    const unsub = onSnapshot(
-      q,
-      (snap) => {
-        const all = snap.docs.map((d) => ({ id: d.id, ...d.data() } as UpcomingProject));
-        const sorted = [...all].sort(
-          (a, b) =>
-            (b.priority ?? 0) - (a.priority ?? 0) || a.id.localeCompare(b.id)
+    void (async () => {
+      try {
+        const [{ collection, onSnapshot }, db] = await Promise.all([
+          import("firebase/firestore"),
+          getDb(),
+        ]);
+        if (cancelled) return;
+
+        // Index-free by design — see useProjects for rationale (same silent
+        // fallback-to-DEFAULT_UPCOMING failure mode with ids u1…uN).
+        unsub = onSnapshot(
+          collection(db, UPCOMING_COLLECTION),
+          (snap) => {
+            const all = snap.docs.map((d) => ({ id: d.id, ...d.data() } as UpcomingProject));
+            const sorted = [...all].sort(
+              (a, b) =>
+                (b.priority ?? 0) - (a.priority ?? 0) || a.id.localeCompare(b.id)
+            );
+            setUpcoming(sorted.length > 0 ? sorted : DEFAULT_UPCOMING);
+            setLoading(false);
+          },
+          () => {
+            try {
+              const stored = JSON.parse(localStorage.getItem("portfolio_upcoming") || "[]");
+              setUpcoming(stored.length > 0 ? stored : DEFAULT_UPCOMING);
+            } catch {
+              setUpcoming([]);
+            }
+            setLoading(false);
+          }
         );
-        setUpcoming(sorted.length > 0 ? sorted : DEFAULT_UPCOMING);
-        setLoading(false);
-      },
-      () => {
-        try {
-          const stored = JSON.parse(localStorage.getItem("portfolio_upcoming") || "[]");
-          setUpcoming(stored.length > 0 ? stored : DEFAULT_UPCOMING);
-        } catch {
-          setUpcoming([]);
-        }
+      } catch {
         setLoading(false);
       }
-    );
+    })();
 
-    return () => unsub();
+    return () => {
+      cancelled = true;
+      unsub?.();
+    };
   }, []);
 
   /**
@@ -169,25 +177,33 @@ export function useUpcoming() {
    * before the first mutation; no-op once the collection has docs.
    */
   const ensureSeeded = async () => {
-    if (!isFirebaseEnabled || !db) return;
+    if (!isFirebaseEnabled) return;
+    const [{ collection, doc: docRef, getDocs, setDoc }, db] = await Promise.all([
+      import("firebase/firestore"),
+      getDb(),
+    ]);
     const snap = await getDocs(collection(db, UPCOMING_COLLECTION));
     if (!snap.empty) return;
     const now = Date.now();
     await Promise.all(
       DEFAULT_UPCOMING.map(({ id, ...data }) =>
-        setDoc(doc(db!, UPCOMING_COLLECTION, id), sanitizeDoc({ ...data, createdAt: now, updatedAt: now }))
+        setDoc(docRef(db, UPCOMING_COLLECTION, id), sanitizeDoc({ ...data, createdAt: now, updatedAt: now }))
       )
     );
   };
 
   const addUpcoming = async (data: UpcomingProjectInput) => {
-    if (!isFirebaseEnabled || !db) {
+    if (!isFirebaseEnabled) {
       const item: UpcomingProject = { ...data, id: Date.now().toString(), createdAt: Date.now(), updatedAt: Date.now() };
       const updated = [...upcoming, item];
       setUpcoming(updated);
       localStorage.setItem("portfolio_upcoming", JSON.stringify(updated));
       return;
     }
+    const [{ addDoc, collection }, db] = await Promise.all([
+      import("firebase/firestore"),
+      getDb(),
+    ]);
     await ensureSeeded();
     await addDoc(collection(db, UPCOMING_COLLECTION), sanitizeDoc({
       ...data,
@@ -197,26 +213,34 @@ export function useUpcoming() {
   };
 
   const updateUpcoming = async (id: string, data: Partial<UpcomingProjectInput>) => {
-    if (!isFirebaseEnabled || !db) {
+    if (!isFirebaseEnabled) {
       const updated = upcoming.map((u) => u.id === id ? { ...u, ...data, updatedAt: Date.now() } : u);
       setUpcoming(updated);
       localStorage.setItem("portfolio_upcoming", JSON.stringify(updated));
       return;
     }
+    const [{ setDoc, doc: docRef }, db] = await Promise.all([
+      import("firebase/firestore"),
+      getDb(),
+    ]);
     await ensureSeeded();
     // setDoc+merge is an upsert — never throws "No document to update".
-    await setDoc(doc(db, UPCOMING_COLLECTION, id), sanitizeDoc({ ...data, updatedAt: Date.now() }), { merge: true });
+    await setDoc(docRef(db, UPCOMING_COLLECTION, id), sanitizeDoc({ ...data, updatedAt: Date.now() }), { merge: true });
   };
 
   const deleteUpcoming = async (id: string) => {
-    if (!isFirebaseEnabled || !db) {
+    if (!isFirebaseEnabled) {
       const updated = upcoming.filter((u) => u.id !== id);
       setUpcoming(updated);
       localStorage.setItem("portfolio_upcoming", JSON.stringify(updated));
       return;
     }
+    const [{ deleteDoc, doc: docRef }, db] = await Promise.all([
+      import("firebase/firestore"),
+      getDb(),
+    ]);
     await ensureSeeded();
-    await deleteDoc(doc(db, UPCOMING_COLLECTION, id));
+    await deleteDoc(docRef(db, UPCOMING_COLLECTION, id));
   };
 
   return { upcoming, loading, addUpcoming, updateUpcoming, deleteUpcoming };
