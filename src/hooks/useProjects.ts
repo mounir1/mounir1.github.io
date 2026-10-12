@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { db, isFirebaseEnabled } from "@/lib/firebase";
-import { collection, onSnapshot } from "firebase/firestore";
+import { isFirebaseEnabled } from "@/lib/firebase-config";
+import { getDb } from "@/lib/firestore-client";
 import { initialProjects } from "@/data/initial-projects";
 
 export type ProjectCategory = 
@@ -156,61 +156,83 @@ export function useProjects(adminMode = false) {
   // Local fallback resolved during lazy state init — no synchronous setState
   // in the effect (react-hooks/set-state-in-effect) and no empty-state flash.
   const [projects, setProjects] = useState<Project[]>(() => {
-    if (isFirebaseEnabled && db) return [];
+    if (isFirebaseEnabled) return [];
     const local = initialProjects.map((project, index) => ({ id: `local-${index}`, ...project }));
     return adminMode ? local : local.filter(p => !p.disabled);
   });
-  const [loading, setLoading] = useState(isFirebaseEnabled && !!db);
+  const [loading, setLoading] = useState(isFirebaseEnabled);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     // Local data already seeded via lazy init when Firebase is disabled
-    if (!isFirebaseEnabled || !db) {
+    if (!isFirebaseEnabled) {
       console.log('Using local project data - Firebase disabled in development');
       return;
     }
 
-    // Index-free by design — fetch the whole collection (single-field
-    // auto-indexes always exist) and sort/filter client-side; a composite-
-    // index query fails on any collection whose index was never deployed and
-    // would silently fall back to local data with phantom `local-*` ids that
-    // admin edits can't write to. Admin still sees disabled projects —
-    // otherwise hiding a project removes it from the admin list permanently.
-    const q = collection(db, PROJECTS_COLLECTION);
+    let unsub: (() => void) | undefined;
+    let cancelled = false;
 
-    const unsubscribe = onSnapshot(
-      q,
-      (snapshot) => {
-        const all = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        })) as Project[];
+    void (async () => {
+      try {
+        const [{ collection, onSnapshot }, db] = await Promise.all([
+          import("firebase/firestore"),
+          getDb(),
+        ]);
+        if (cancelled) return;
 
-        const sorted = [...all].sort(
-          (a, b) =>
-            (b.priority ?? 0) - (a.priority ?? 0) ||
-            (b.createdAt ?? 0) - (a.createdAt ?? 0) ||
-            a.id.localeCompare(b.id)
+        // Index-free by design — fetch the whole collection (single-field
+        // auto-indexes always exist) and sort/filter client-side; a composite-
+        // index query fails on any collection whose index was never deployed and
+        // would silently fall back to local data with phantom `local-*` ids that
+        // admin edits can't write to. Admin still sees disabled projects —
+        // otherwise hiding a project removes it from the admin list permanently.
+        unsub = onSnapshot(
+          collection(db, PROJECTS_COLLECTION),
+          (snapshot) => {
+            const all = snapshot.docs.map(doc => ({
+              id: doc.id,
+              ...doc.data()
+            })) as Project[];
+
+            const sorted = [...all].sort(
+              (a, b) =>
+                (b.priority ?? 0) - (a.priority ?? 0) ||
+                (b.createdAt ?? 0) - (a.createdAt ?? 0) ||
+                a.id.localeCompare(b.id)
+            );
+            setProjects(adminMode ? sorted : sorted.filter(p => p.disabled !== true));
+            setLoading(false);
+            setError(null);
+          },
+          (err) => {
+            console.error("Error fetching projects from Firebase:", err);
+            console.log('Falling back to local project data');
+            // Fallback to local data on Firebase error
+            const localProjects: Project[] = initialProjects.map((project, index) => ({
+              id: `fallback-${index}`,
+              ...project
+            }));
+            setProjects(adminMode ? localProjects : localProjects.filter(p => !p.disabled));
+            setLoading(false);
+            setError(null);
+          }
         );
-        setProjects(adminMode ? sorted : sorted.filter(p => p.disabled !== true));
-        setLoading(false);
-        setError(null);
-      },
-      (err) => {
-        console.error("Error fetching projects from Firebase:", err);
-        console.log('Falling back to local project data');
-        // Fallback to local data on Firebase error
+      } catch (err) {
+        console.error("Failed to open the Firestore listener:", err);
         const localProjects: Project[] = initialProjects.map((project, index) => ({
           id: `fallback-${index}`,
           ...project
         }));
         setProjects(adminMode ? localProjects : localProjects.filter(p => !p.disabled));
         setLoading(false);
-        setError(null);
       }
-    );
+    })();
 
-    return () => unsubscribe();
+    return () => {
+      cancelled = true;
+      unsub?.();
+    };
   }, [adminMode]);
 
   const featured = useMemo(() => 

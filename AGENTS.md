@@ -17,8 +17,11 @@ npm run build        # Production build -> dist/
 npm run type-check   # TypeScript validation (tsc --build tsconfig.json)
 npm run lint         # ESLint check
 npm run lint:fix     # ESLint auto-fix
-npm test             # Vitest suite (jsdom + Testing Library), 162 tests
+npm test             # Vitest suite (jsdom + Testing Library), 172 tests
 npm run test:coverage # Vitest with v8 coverage (lib/hooks/data)
+npm run perf:critical-path # Sizes the first-paint bundle; fails if firebase-vendor is on it
+npm run assets:images # Regenerate profile.webp + og-image.jpg (see decision 11)
+npm run assets:favicons # Regenerate the favicon PNG set + favicon.ico
 npm run preview      # Preview production build locally
 npm run clean        # Remove dist/ and Vite cache
 npm run analyze      # Bundle size analysis
@@ -93,11 +96,11 @@ commits reachable, a deleted branch does not.
 
 ## Tech Stack
 
-- **Framework:** React 18 + TypeScript 5.8 + Vite 7
+- **Framework:** React 18 + TypeScript 5.8 + Vite 8 (Rolldown)
 - **UI:** shadcn/ui + Radix UI + Tailwind CSS 3
 - **Backend:** Firebase (Auth + Firestore + Analytics)
 - **State:** TanStack React Query (server state) + React hooks (local)
-- **Routing:** React Router DOM v6
+- **Routing:** React Router DOM v7
 - **Forms:** React Hook Form + Zod validation
 
 ## Architecture
@@ -124,6 +127,26 @@ src/
    are bundled into ONE chunk (`firebase-vendor`). Splitting them causes circular
    TDZ runtime crashes due to deep internal cross-references. See
    `vite.config.ts` manualChunks.
+
+1a. **Firebase is off the landing page's critical path** — the single-chunk rule
+   says firebase must be *one* chunk, not that it must be an *eager* one. Public
+   hooks used above the fold (`useLinks`, `useProjects`, `useSettings`,
+   `useSkills`, `useExperience`, `useTestimonials`, `useUpcoming`,
+   `useContactMessages`) must NOT statically import `@/lib/firebase`: that put
+   the whole chunk in the entry graph and `modulepreload`. Instead:
+
+   - Config flags (`isFirebaseEnabled`, `hasRequiredConfig`) come from
+     `@/lib/firebase-config` — pure booleans, no `firebase/*` import.
+   - The handle comes from `await getDb()` in `@/lib/firestore-client`, which
+     `import()`s `@/lib/firebase` on first use.
+
+   This is safe because every hook renders seed data synchronously and only
+   *subscribes* inside an effect, so nothing needs a connection to paint. When
+   adding or editing a list hook, keep the `firebase/firestore` symbols inside
+   the effect's `await import(...)` alongside `getDb()` — moving one back to a
+   top-level import silently re-adds ~380 kB to first load. Verify with
+   `node scripts/measure-critical-path.mjs` (asserts no `firebase-vendor`
+   `modulepreload`).
 
 2. **Lazy-loaded sections** — Below-fold sections (Experience, Skills, Projects,
    etc.) use `React.lazy()` with per-section Error Boundaries for resilience.
@@ -209,8 +232,29 @@ src/
     `scripts/generate-cv-claims.test.ts` asserts the headline numbers appear in
     both files, that the four unverifiable pre-verification metrics stay absent,
     and that the PDF is the exact file `useSettings.resumeUrl` links to.
-    Regenerating the PDF (`python3 scripts/generate_cv.py`) is still manual and
-    needs Python installed; the test makes forgetting it loud instead of silent.
+Regenerating the PDF (`python3 scripts/generate_cv.py`) is still manual and
+   needs Python installed; the test makes forgetting it loud instead of silent.
+
+11. **Binary assets live in `public/` and only in `public/`** — GitHub Pages
+    serves `dist/`, and `dist/` copies `public/` verbatim, so a file at the repo
+    root is unreachable dead weight. It used to be worse than dead: the root
+    copies of `favicon.ico`/`mounir-icon.svg` had drifted from the `public/`
+    ones that are actually served, so editing one changed nothing.
+
+    Everything raster is generated, not hand-edited:
+
+    | Command | Derives | From |
+    |---|---|---|
+    | `npm run assets:images` | `public/profile.webp` (512², LCP), `public/og-image.jpg` (1200×630) | `public/profile-source.png` (gitignored lossless master) |
+    | `npm run assets:favicons` | `favicon-{16,32,48,180,192,512}.png`, `favicon.ico` (16/32/48/256) | `public/favicon.svg` |
+
+    Both keep their input out of the build deliberately. The favicon script
+    rasterises with **8-bit palette PNGs** (`palette: true`, `quality: 90`):
+    the source is a blurred gradient, so a plain `.png()` emits 32-bit RGBA and
+    the 512 px tile alone was 66 KB. It also hand-assembles a real ICO
+    directory — the previous version wrote a 32×32 *PNG* to `favicon.ico`, so
+    browsers saw exactly one resolution. Re-run both after changing either
+    source, and do not add a generated asset back at the repo root.
 
 
 ## Code Conventions

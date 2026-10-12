@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { db, isFirebaseEnabled } from "@/lib/firebase";
-import { doc, onSnapshot, setDoc } from "firebase/firestore";
+import { isFirebaseEnabled } from "@/lib/firebase-config";
+import { getDb } from "@/lib/firestore-client";
 import { stripUndefined } from "@/utils/firestore-write";
 
 export { stripUndefined };
@@ -136,31 +136,57 @@ export function deepMerge(base: unknown, override: unknown): unknown {
 export function useSettings() {
   const [settings, setSettings] = useState<SiteSettings>(DEFAULT_SETTINGS);
   // Defaults already available synchronously — only load when Firebase is on.
-  const [loading, setLoading] = useState(isFirebaseEnabled && !!db);
+  const [loading, setLoading] = useState(isFirebaseEnabled);
 
   useEffect(() => {
-    if (!isFirebaseEnabled || !db) {
+    if (!isFirebaseEnabled) {
       return;
     }
-    const ref = doc(db, "settings", "site");
-    const unsub = onSnapshot(ref, (snap) => {
-      if (snap.exists()) {
-        const merged = deepMerge(DEFAULT_SETTINGS, snap.data()) as SiteSettings;
-        setSettings(merged);
+
+    let unsubscribe: (() => void) | undefined;
+    let cancelled = false;
+
+    void (async () => {
+      try {
+        const [{ doc, onSnapshot }, db] = await Promise.all([
+          import("firebase/firestore"),
+          getDb(),
+        ]);
+        if (cancelled) return;
+        unsubscribe = onSnapshot(
+          doc(db, "settings", "site"),
+          (snap) => {
+            if (snap.exists()) {
+              const merged = deepMerge(DEFAULT_SETTINGS, snap.data()) as SiteSettings;
+              setSettings(merged);
+            }
+            setLoading(false);
+          },
+          () => setLoading(false),
+        );
+      } catch {
+        setLoading(false);
       }
-      setLoading(false);
-    }, () => setLoading(false));
-    return () => unsub();
+    })();
+
+    return () => {
+      cancelled = true;
+      unsubscribe?.();
+    };
   }, []);
 
   const saveSettings = async (data: Partial<SiteSettings>) => {
-    if (!isFirebaseEnabled || !db) return;
+    if (!isFirebaseEnabled) return;
     const merged: SiteSettings = {
       ...settings,
       ...data,
       updatedAt: Date.now(),
     };
-    await setDoc(doc(db, "settings", "site"), stripUndefined(merged) as Record<string, unknown>, { merge: true });
+    const [{ setDoc, doc: docRef }, db] = await Promise.all([
+      import("firebase/firestore"),
+      getDb(),
+    ]);
+    await setDoc(docRef(db, "settings", "site"), stripUndefined(merged) as Record<string, unknown>, { merge: true });
   };
 
   return { settings, loading, saveSettings };

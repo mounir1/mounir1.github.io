@@ -248,6 +248,30 @@
     animation: shimmer 1.5s infinite;
   }
 
+  /*
+   * Users who ask for reduced motion get every infinite animation stopped, not
+   * just the scroll-reveal ones above. These six run forever by definition, so
+   * on a low-end phone they keep the compositor awake for the entire session —
+   * the animation itself is decorative, but the repaint cost is real.
+   *
+   * `.gradient-text-animated` and `.shimmer-bg` are declared in this same layer,
+   * so they are covered too. Their final static frame is whatever the keyframes
+   * start/end on, which is a sensible resting state for all of them.
+   */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-float,
+    .animate-float-slow,
+    .animate-pulse-glow,
+    .animate-spin-slow,
+    .animate-shimmer,
+    .animate-badge-bounce,
+    .gradient-text-animated,
+    .shimmer-bg,
+    .animate-pulse {
+      animation: none !important;
+    }
+  }
+
   /* Glassmorphism card */
   .glass {
     background: hsl(var(--card) / 0.6);

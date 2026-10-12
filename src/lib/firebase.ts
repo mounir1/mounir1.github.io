@@ -4,6 +4,7 @@ import {
   type Firestore,
   connectFirestoreEmulator,
 } from 'firebase/firestore';
+import { firebaseConfig, hasRequiredConfig, isFirebaseEnabled } from './firebase-config';
 
 // Auth, Storage, and Analytics are lazy-loaded on demand to keep the
 // synchronous entry-point bundle as small as possible.
@@ -11,43 +12,13 @@ import {
 // – firebase/storage → loaded only when image-upload is triggered
 // – firebase/analytics → loaded only in production after page is interactive
 
-// ─── Firebase configuration (from Vite env vars, baked in at build time) ─────
-const firebaseConfig = {
-  apiKey:            import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain:        import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId:         import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket:     import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId:             import.meta.env.VITE_FIREBASE_APP_ID,
-  measurementId:     import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
-};
+// The public hooks import isFirebaseEnabled / hasRequiredConfig from
+// ./firebase-config, which carries no firebase/* import, so nothing above the
+// fold pulls this ~380 kB module into the entry graph. Firestore is reached
+// through getDb() in ./firestore-client instead of a static `db` binding.
+export { hasRequiredConfig, isFirebaseEnabled };
 
-// ─── Validate: all three required keys must be non-empty, non-placeholder ─────
-const PLACEHOLDER = ['', 'undefined', 'null', 'demo', 'mock', 'test', 'placeholder'];
-function isRealValue(v: string | undefined): boolean {
-  if (!v) return false;
-  const lower = v.toLowerCase().trim();
-  return !PLACEHOLDER.some(p => lower === p || lower.startsWith(p + '-'));
-}
-
-export const hasRequiredConfig: boolean = (
-  isRealValue(firebaseConfig.apiKey) &&
-  isRealValue(firebaseConfig.authDomain) &&
-  isRealValue(firebaseConfig.projectId)
-);
-
-// ─── isFirebaseEnabled ────────────────────────────────────────────────────────
-// Enabled ONLY when the three required config values are genuinely present.
-// In development: also enabled when VITE_FIREBASE_ENABLE_DEV=true and real keys exist.
-// This is the single source of truth — no "PROD always true" bypass.
-export const isFirebaseEnabled: boolean = (() => {
-  if (!hasRequiredConfig) return false;                           // always gate on real keys
-  if (import.meta.env.PROD) return true;                         // production: enable
-  if (import.meta.env.VITE_FIREBASE_ENABLE_DEV === 'true') return true; // dev opt-in
-  return false;                                                   // dev default: local data
-})();
-
-// ─── Core Firebase instances (synchronous — needed on every page load) ────────
+// ─── Core Firebase instances (synchronous) ──────────────────────────────────
 let app: FirebaseApp | undefined;
 let db:  Firestore   | undefined;
 

@@ -57,6 +57,14 @@ public/*.dmg
 # Vite cache
 .vite/
 
+# Image optimisation source masters — scripts/optimize-images.mjs derives the
+# shipped profile.webp from these. They must stay out of public/ (and therefore
+# dist/): the master is a lossless 202 KB PNG, ~17x the size of the optimised
+# avatar it produces, and nothing references it.
+public/*-source.png
+public/*-source.webp
+public/*-source.jpg
+
 # TypeScript build info (incremental builds via tsc --build)
 *.tsbuildinfo
 

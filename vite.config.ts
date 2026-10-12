@@ -97,12 +97,7 @@ export default defineConfig(({ mode }) => ({
             return "theming-vendor";
           }
 
-          // ── Notifications ──────────────────────────────────────────────
-          if (id.includes("node_modules/sonner")) {
-            return "notifications-vendor";
-          }
-
-          // ── Everything else from node_modules ─────────────────────────
+          // ── Everything else from node_modules ───────────────────────────
           if (id.includes("node_modules/")) {
             return "misc-vendor";
           }
@@ -166,7 +161,6 @@ export default defineConfig(({ mode }) => ({
       "@radix-ui/react-tabs",
       "@radix-ui/react-select",
       "lucide-react",
-      "sonner",
       "clsx",
       "class-variance-authority",
       "tailwind-merge",
@@ -176,10 +170,13 @@ export default defineConfig(({ mode }) => ({
     exclude: ["@firebase/app-check"],
   },
   base: "/",
-  esbuild: {
-    legalComments: "none",
-    target: "es2020",
-  },
+  // Vite 8 minifies/transforms with Oxc (Rolldown), not esbuild. The old
+  // `esbuild: { legalComments, target }` block was silently *ignored* — Vite
+  // warns that oxc wins whenever both are set, so the comment policy it
+  // expressed was never actually applied. `build.target` already covers the
+  // syntax level, and Vite strips comments by default, so the block is gone
+  // rather than translated: carrying dead config that reads as if it does
+  // something is worse than not having it.
   css: {
     devSourcemap: mode !== "production",
   },
