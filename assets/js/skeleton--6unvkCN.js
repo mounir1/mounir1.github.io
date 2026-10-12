@@ -1,0 +1,1 @@
+import{r}from"./query-vendor-CUYG-GgI.js";import{c as e}from"./index-Dpgpbzus.js";var s=r();function a({className:r,...a}){return(0,s.jsx)("div",{className:e("animate-pulse rounded-md bg-muted",r),...a})}export{a as t};
