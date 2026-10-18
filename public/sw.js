@@ -13,11 +13,12 @@
 // stays broken across *every* deploy. Bumping this is the fix.
 //
 // v2: index.html / navigations are no longer precached or served from cache.
-//      They are always fetched from the network, falling back to the cache only
-//      when offline. That removes the stale-HTML failure mode at the source
-//      rather than relying on a version bump alone.
+//      They are always fetched from the network, falling back to offline.html.
+// v3: cache-first is limited to content-hashed Vite assets under /assets/.
+//      Unhashed public files are fetched directly so stale logos/images cannot
+//      survive a deploy.
 // ─────────────────────────────────────────────────────────────────────────────
-const CACHE_VERSION = 'v2';
+const CACHE_VERSION = 'v3';
 const CACHE_NAME = `mounir-portfolio-${CACHE_VERSION}`;
 const STATIC_CACHE_NAME = `mounir-portfolio-static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE_NAME = `mounir-portfolio-dynamic-${CACHE_VERSION}`;
@@ -26,20 +27,7 @@ const DYNAMIC_CACHE_NAME = `mounir-portfolio-dynamic-${CACHE_VERSION}`;
 // NOTE: index.html and '/' are deliberately NOT here. They are precaching the
 // exact document that references content-hashed assets, which is what causes a
 // cached HTML page to outlive its own chunks. Navigations go to the network.
-const STATIC_FILES = [
-  '/mounir-icon.svg',
-  '/favicon.ico',
-  '/favicon.svg',
-  '/site.webmanifest',
-  '/offline.html',
-];
-
-// Cache dynamic resources with these patterns
-const CACHE_PATTERNS = [
-  /\.(?:png|jpg|jpeg|svg|gif|webp)$/,
-  /\.(?:js|css)$/,
-  /\/assets\//,
-];
+const STATIC_FILES = ['/offline.html'];
 
 // Network-first resources (always try network first)
 const NETWORK_FIRST_PATTERNS = [
@@ -124,7 +112,7 @@ self.addEventListener('fetch', event => {
   } else if (isStaticAsset(request)) {
     event.respondWith(cacheFirst(request));
   } else {
-    event.respondWith(staleWhileRevalidate(request));
+    event.respondWith(fetch(request));
   }
 });
 
@@ -138,19 +126,12 @@ function isNetworkFirst(request) {
   return NETWORK_FIRST_PATTERNS.some(pattern => pattern.test(request.url));
 }
 
-// Network-first for HTML, with the cache and offline.html as fallbacks.
+// Network-first for HTML, with offline.html as the only fallback.
 async function navigationHandler(request) {
   try {
-    const networkResponse = await fetch(request);
-    if (networkResponse.ok) {
-      const cache = await caches.open(DYNAMIC_CACHE_NAME);
-      cache.put(request, networkResponse.clone());
-    }
-    return networkResponse;
+    return await fetch(request);
   } catch (error) {
-    console.log('[SW] Network failed for navigation, trying cache:', request.url);
-    const cached = await caches.match(request);
-    if (cached) return cached;
+    console.log('[SW] Network failed for navigation, serving offline page:', request.url);
     const offline = await caches.match('/offline.html');
     if (offline) return offline;
     return new Response('Offline', { status: 503 });
@@ -159,7 +140,9 @@ async function navigationHandler(request) {
 
 // Check if request is for static asset
 function isStaticAsset(request) {
-  return CACHE_PATTERNS.some(pattern => pattern.test(request.url));
+  const pathname = new URL(request.url).pathname;
+  return pathname.startsWith('/assets/') &&
+    /-[A-Za-z0-9_-]{8,}\.[^/]+$/.test(pathname);
 }
 
 // Network-first strategy (for API calls, Firebase, etc.)
@@ -225,44 +208,6 @@ async function cacheFirst(request) {
     }
     
     throw error;
-  }
-}
-
-// Stale-while-revalidate strategy (for HTML pages)
-async function staleWhileRevalidate(request) {
-  const cache = await caches.open(DYNAMIC_CACHE_NAME);
-  const cachedResponse = await cache.match(request);
-  
-  // Fetch from network in background
-  const fetchPromise = fetch(request).then(networkResponse => {
-    if (networkResponse.ok) {
-      cache.put(request, networkResponse.clone());
-    }
-    return networkResponse;
-  }).catch(error => {
-    console.error('[SW] Network fetch failed:', request.url, error);
-    return null;
-  });
-  
-  // Return cached response immediately if available, otherwise wait for network
-  if (cachedResponse) {
-    // Update cache in background
-    fetchPromise.catch(() => {}); // Ignore errors for background updates
-    return cachedResponse;
-  } else {
-    const networkResponse = await fetchPromise;
-    
-    if (networkResponse) {
-      return networkResponse;
-    }
-    
-    // Return offline page for navigation requests
-    if (request.destination === 'document') {
-      const offlineResponse = await caches.match('/offline.html');
-      return offlineResponse || new Response('Offline', { status: 503 });
-    }
-    
-    throw new Error('Network unavailable and no cache available');
   }
 }
 

@@ -5,6 +5,7 @@ import { execSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { loadEnv } from 'vite';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.join(__dirname, '..');
@@ -23,7 +24,11 @@ const requiredEnvVars = [
 ];
 
 console.log('📋 Checking environment variables...');
-const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
+// loadEnv, not process.env: Vite reads .env.production itself, so an export in
+// the shell was never what decided whether Firebase gets configured — the old
+// check warned on every run on every machine, including the working ones.
+const env = loadEnv('production', rootDir, 'VITE_');
+const missingVars = requiredEnvVars.filter((varName) => !env[varName]);
 
 if (missingVars.length > 0) {
   console.warn('⚠️  Warning: Missing environment variables:');
@@ -40,7 +45,9 @@ fs.rmSync(path.join(rootDir, 'dist'), { recursive: true, force: true });
 // Run type checking
 console.log('🔍 Running TypeScript type checking...');
 try {
-  execSync('npx tsc --noEmit', { stdio: 'inherit' });
+  // The repo's own gate: tsconfig.json is a solution file of project references,
+  // so `tsc --noEmit` validates nothing here — it needs --build.
+  execSync('npm run type-check', { stdio: 'inherit' });
   console.log('✅ TypeScript check passed.\n');
 } catch (error) {
   console.error('❌ TypeScript errors found. Please fix them before building.');
@@ -50,10 +57,11 @@ try {
 // Run linting
 console.log('🔧 Running ESLint...');
 try {
-  execSync('npx eslint . --ext .ts,.tsx --max-warnings 0', { stdio: 'inherit' });
+  execSync('npm run lint', { stdio: 'inherit' });
   console.log('✅ Linting passed.\n');
 } catch (error) {
-  console.warn('⚠️  Linting warnings found. Consider fixing them.\n');
+  console.error('❌ Linting failed. Fix the errors before building for production.');
+  process.exit(1);
 }
 
 // Build the project
@@ -103,6 +111,18 @@ if (missingFiles.length > 0) {
 }
 
 console.log('✅ Build verification passed.\n');
+
+// The guard for the Firebase critical-path rule (AGENTS.md decision 1a): a
+// single static `import "@/lib/firebase"` above the fold puts ~500 kB back on
+// first paint, and nothing else in this pipeline notices.
+console.log('🩺 Measuring the critical path...');
+try {
+  execSync('npm run perf:critical-path', { stdio: 'inherit' });
+  console.log('✅ Critical path within budget.\n');
+} catch (error) {
+  console.error('❌ Critical-path check failed — see the report above.');
+  process.exit(1);
+}
 
 // Calculate build size (cross-platform — was `du -sh dist`)
 const distDir = path.join(rootDir, 'dist');

@@ -18,12 +18,42 @@ service cloud.firestore {
       );
     }
 
-    function isValidString(field, maxLen) {
-      return field is string && field.size() <= maxLen;
+    function isValidString(data, field, maxLen) {
+      return !(field in data) ||
+        (data[field] is string && data[field].size() <= maxLen);
     }
 
-    function hasRequiredFields(fields) {
-      return request.resource.data.keys().hasAll(fields);
+    function isValidContactMetadata(data) {
+      return !("metadata" in data) || (
+        data.metadata is map &&
+        data.metadata.keys().hasOnly(["userAgent", "referrer", "page"]) &&
+        isValidString(data.metadata, "userAgent", 500) &&
+        isValidString(data.metadata, "referrer", 2048) &&
+        isValidString(data.metadata, "page", 200)
+      );
+    }
+
+    function isValidContactMessage() {
+      let data = request.resource.data;
+      return data.keys().hasAll([
+          "name", "email", "subject", "message", "type", "status", "createdAt"
+        ]) &&
+        data.keys().hasOnly([
+          "name", "email", "subject", "message", "phone", "company", "budget",
+          "type", "status", "metadata", "createdAt"
+        ]) &&
+        data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
+        data.email is string && data.email.size() <= 200 &&
+        data.email.matches("^[^@ ]+@[^@ ]+[.][^@ ]+$") &&
+        data.subject is string && data.subject.size() > 0 && data.subject.size() <= 200 &&
+        data.message is string && data.message.size() > 0 && data.message.size() <= 5000 &&
+        data.type in ["general", "project", "hire", "collaboration", "other"] &&
+        data.status == "unread" &&
+        data.createdAt is int &&
+        isValidString(data, "phone", 40) &&
+        isValidString(data, "company", 120) &&
+        isValidString(data, "budget", 80) &&
+        isValidContactMetadata(data);
     }
 
     // ─── PUBLIC READ collections (portfolio content) ────────────────────────
@@ -74,14 +104,8 @@ service cloud.firestore {
 
     // Contact messages — public CREATE only (form submissions), owner read/update
     match /contact_messages/{docId} {
-      // Anyone can submit a contact form
-      allow create: if
-        hasRequiredFields(["name", "email", "message", "type", "createdAt"]) &&
-        isValidString(request.resource.data.name, 100) &&
-        isValidString(request.resource.data.email, 200) &&
-        isValidString(request.resource.data.message, 5000) &&
-        // Prevent abuse: ensure status is "unread" on create
-        request.resource.data.status == "unread";
+      // Shape and size checks limit malformed writes; they are not rate limits.
+      allow create: if isValidContactMessage();
       // Only owner can read messages and update status
       allow read, update, delete: if isOwner();
     }

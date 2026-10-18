@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#064e3b"/>
+      <stop offset="50%" stop-color="#022c22"/>
+      <stop offset="100%" stop-color="#09090b"/>
+    </linearGradient>
+    <linearGradient id="tileGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#e2e8f0"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <filter id="tileShadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="16" stdDeviation="20" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+    <filter id="pipGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#0f172a" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <!-- App Icon Background: Dark Emerald & Obsidian -->
+  <rect width="512" height="512" rx="128" fill="url(#bgGrad)"/>
+  <rect width="504" height="504" x="4" y="4" rx="124" fill="none" stroke="#10b981" stroke-width="4" stroke-opacity="0.4"/>
+
+  <!-- Tilted Domino Tile (Ivory with 3D shadow) -->
+  <g transform="translate(256, 256) rotate(-12) translate(-256, -256)">
+    <!-- Main Tile Body -->
+    <rect x="136" y="86" width="240" height="340" rx="36" fill="url(#tileGrad)" filter="url(#tileShadow)"/>
+    <rect x="138" y="88" width="236" height="336" rx="34" fill="none" stroke="#ffffff" stroke-width="3" stroke-opacity="0.8"/>
+
+    <!-- Central Divider Groove with Golden Brass Pin -->
+    <line x1="156" y1="256" x2="356" y2="256" stroke="#94a3b8" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="256" cy="256" r="7" fill="url(#goldGrad)" stroke="#78350f" stroke-width="1.5"/>
+
+    <!-- Top Half (4 pips: Algerian/Standard high-contrast obsidian dots) -->
+    <g fill="#09090b" filter="url(#pipGlow)">
+      <circle cx="196" cy="146" r="14"/>
+      <circle cx="316" cy="146" r="14"/>
+      <circle cx="196" cy="206" r="14"/>
+      <circle cx="316" cy="206" r="14"/>
+    </g>
+
+    <!-- Bottom Half (3 diagonal pips) -->
+    <g fill="#09090b" filter="url(#pipGlow)">
+      <circle cx="196" cy="306" r="14"/>
+      <circle cx="256" cy="356" r="14"/>
+      <circle cx="316" cy="406" r="14"/>
+    </g>
+  </g>
+</svg>

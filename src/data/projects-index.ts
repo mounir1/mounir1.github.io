@@ -32,9 +32,11 @@ export interface ProjectDiskEntry {
   title: string;
   /**
    * Relative path under C:\projects.
-   * Empty string ("") means the project is cloud-hosted only (e.g. a live
-   * deployment or a remote Git repo) with no local working copy — the
-   * verifier skips the on-disk existence check for those.
+   * Empty string ("") means the verifier cannot — or should not — look for a
+   * local working copy: the project is cloud-hosted only (a live deployment or
+   * a remote Git repo), or its checkout no longer lives on the machine running
+   * `verify-project-data.ts`. The verifier skips the on-disk existence check for
+   * those rather than failing a project that plainly still exists.
    */
   diskPath: string;
   type: ProjectDiskType;
@@ -86,7 +88,9 @@ export const projectsIndex: Record<string, ProjectDiskEntry> = {
   "it-collaborator": {
     slug: "it-collaborator",
     title: "IT Collaborator — Networking & Security Training Platform",
-    diskPath: "TECHNO/it-collaborator-react",
+    // The TECHNO/it-collaborator-react checkout is no longer on this machine;
+    // the platform itself is still live and still listed in the portfolio.
+    diskPath: "",
     type: "client",
     status: "active",
     importance: "core",
@@ -164,7 +168,8 @@ export const projectsIndex: Record<string, ProjectDiskEntry> = {
   "mab-erp": {
     slug: "mab-erp",
     title: "Mab ERP — Algerian Enterprise Resource Planning (Founder)",
-    diskPath: "Nexus-ERP",
+    // The Nexus-ERP checkout is no longer on this machine.
+    diskPath: "",
     type: "personal",
     status: "active",
     importance: "supporting",
@@ -197,6 +202,42 @@ export const projectsIndex: Record<string, ProjectDiskEntry> = {
     importance: "supporting",
     description: "Spring AI MCP server for hospitality ERP",
   },
+  "quickkeep": {
+    slug: "quickkeep",
+    title: "QuickKeep — Offline-First Personal Workspace PWA",
+    diskPath: "Mab Project/quickkeep",
+    type: "personal",
+    status: "active",
+    importance: "supporting",
+    description: "React 19 + Vite 8 + Tailwind v4 + Firebase notes, tasks and tickets — installable, offline-first",
+  },
+  "aquafine": {
+    slug: "aquafine",
+    title: "AquaFine — Static Brand Site on Firebase Hosting",
+    diskPath: "Mab Project/aquaFine",
+    type: "client",
+    status: "active",
+    importance: "supporting",
+    description: "Dependency-free brand site for an Algerian beverage label, hardened and cached on Firebase Hosting",
+  },
+  "hotech-e2e": {
+    slug: "hotech-e2e",
+    title: "HoTech Cross-App E2E Suite — Playwright Regression Harness",
+    diskPath: "Hotech/e2e",
+    type: "contract",
+    status: "active",
+    importance: "supporting",
+    description: "Playwright suite exercising WebEX, Builder and Website together against the OREST stack",
+  },
+  "techno-magento-scripts": {
+    slug: "techno-magento-scripts",
+    title: "Magento ↔ ERP ETL Scripts — TechnoStationery Data Pipelines",
+    diskPath: "TECHNO/scripts",
+    type: "client",
+    status: "active",
+    importance: "supporting",
+    description: "Node ETL job scripts over the technostationery.com REST V1 API, streaming catalogue and order data to CSV",
+  },
 
   // ── LEGACY — Completed or maintenance ────────────────────────────────
   "noor-almaarifa": {
@@ -225,6 +266,35 @@ export const projectsIndex: Record<string, ProjectDiskEntry> = {
     status: "active",
     importance: "core",
     description: "This site — data-driven portfolio with admin CMS",
+  },
+
+  // ── PERSONAL PRODUCTIVITY — Shipped, self-directed ─────────────────────
+  "my-date": {
+    slug: "my-date",
+    title: "My Date — Historical Date Explorer (mydate.app)",
+    diskPath: "Mab Project/Dateinfo",
+    type: "personal",
+    status: "active",
+    importance: "supporting",
+    description: "React + Gemini historical-date PWA: multi-calendar metrology, live feeds, AI synthesis",
+  },
+  "domino-table": {
+    slug: "domino-table",
+    title: "Domino Table — Offline-First Score Counter PWA",
+    diskPath: "Mab Project/domino-table",
+    type: "personal",
+    status: "active",
+    importance: "supporting",
+    description: "Mobile-first domino scoring PWA that keeps playing with no connection",
+  },
+  "godseye": {
+    slug: "godseye",
+    title: "GOD EYE — AI Evidence Handling & Verification Platform",
+    diskPath: "Mab Project/godseye",
+    type: "personal",
+    status: "active",
+    importance: "supporting",
+    description: "Live Next.js static front end for evidence findings, with a Go + Postgres backend scaffolded behind it",
   },
 };
 
