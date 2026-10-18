@@ -57,10 +57,11 @@ public/*.dmg
 # Vite cache
 .vite/
 
-# Image optimisation source masters — scripts/optimize-images.mjs derives the
-# shipped profile.webp from these. They must stay out of public/ (and therefore
-# dist/): the master is a lossless 202 KB PNG, ~17x the size of the optimised
-# avatar it produces, and nothing references it.
+# Lossless image masters belong in asset-sources/ (committed) — never in
+# public/, because dist copies public/ verbatim and GitHub Pages serves dist, so
+# a master parked here ships ~17x the bytes of the asset it produces on every
+# deploy. These lines stay as a guard against exactly that; scripts/optimize-images.mjs
+# still reads public/profile-source.png for backward compatibility.
 public/*-source.png
 public/*-source.webp
 public/*-source.jpg

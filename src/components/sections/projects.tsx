@@ -202,13 +202,25 @@ export const Projects = () => {
                       loading="lazy"
                     />
                   ) : (
-                    <div className="w-full h-48 bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-                      <div className="text-5xl">{project.icon || "🚀"}</div>
+                    <div className="w-full h-48 bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center p-8">
+                      {project.logo ? (
+                        <div className="flex h-full w-full items-center justify-center rounded-2xl border border-white/50 bg-white/90 p-5 shadow-medium">
+                          <img
+                            src={project.logo}
+                            alt={`${project.title} logo`}
+                            className="max-h-full max-w-full object-contain"
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        </div>
+                      ) : (
+                        <div className="text-5xl">{project.icon || "🚀"}</div>
+                      )}
                     </div>
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-                  {project.logo && (
+                  {project.logo && project.image && (
                     <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm rounded-lg p-2 shadow-medium hover:scale-110 transition-transform duration-300">
                       <img
                         src={project.logo}
@@ -328,8 +340,20 @@ export const Projects = () => {
                           loading="lazy"
                         />
                       ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 rounded-l-lg flex items-center justify-center">
-                          <div className="text-2xl">{project.icon || "🚀"}</div>
+                        <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 rounded-l-lg flex items-center justify-center p-3">
+                          {project.logo ? (
+                            <div className="flex h-full w-full items-center justify-center rounded-lg bg-white/90 p-2">
+                              <img
+                                src={project.logo}
+                                alt={`${project.title} logo`}
+                                className="max-h-full max-w-full object-contain"
+                                loading="lazy"
+                                decoding="async"
+                              />
+                            </div>
+                          ) : (
+                            <div className="text-2xl">{project.icon || "🚀"}</div>
+                          )}
                         </div>
                       )}
                     </div>
@@ -338,7 +362,7 @@ export const Projects = () => {
                         <CardTitle className="text-base group-hover:text-primary transition-colors leading-tight">
                           {project.title}
                         </CardTitle>
-                        {project.logo && (
+                        {project.logo && project.image && (
                           <img
                             src={project.logo}
                             alt=""

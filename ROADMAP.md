@@ -842,3 +842,86 @@ hang and then report "Could not read from remote repository". Pushing requires
 (`mabderrahmani-hotech`) than the repo owner, so `GH_TOKEN` for `mounir1` must be
 set explicitly or PR creation 403s. Both are now documented in `AGENTS.md` so the
 next session does not rediscover them.
+
+---
+
+## Session 10 — 2026-10-14 (build config, asset pipeline, seed-data truth)
+
+### [x] `vite.config.production.ts` could not build — and nothing was checking it
+
+`ts(2769)` on the object-form `manualChunks` was not a typing nuisance, it was
+Rolldown telling the truth: Vite 8 bundles with Rolldown, whose
+`output.manualChunks` is **function-only and deprecated** (the compat layer wraps
+it as `codeSplitting.groups[{ name(moduleId, ctx) }]`, so an object is called as a
+function). Proven by building both forms: the object form fails with
+"Build failed with 1 error", the function form succeeds.
+
+The file was never caught because `tsconfig.node.json` only includes
+`vite.config.ts`, so `npm run type-check` had never opened it. It was then
+**deleted** rather than repaired: it duplicated `vite.config.ts` and had silently
+diverged from it (no `firebase-vendor` single-chunk rule, which per decision 1 is
+the difference between a working site and a TDZ crash), and `build:prod` pointed at
+it. `build:prod` is now `vite build --mode production`, i.e. the one config that
+is actually maintained.
+
+### [x] A WIP changeset that would have broken the live site
+
+The working tree already held a large uncommitted asset/data pass before this
+session started: 10 logo SVGs deleted, 8 brand assets added, 7 new projects, all
+`image` URLs blanked. A Firestore REST audit against the **deployed** collections
+showed live documents still referencing 4 of the files being deleted
+(`etl-platform`, `it-collaborator`, `jskit`, `noor-almaarifa`,
+`dashboard-technostationery`) — the cards would have rendered broken-image badges
+in production while looking fine on Windows. All deleted marks were restored, and
+name casing was normalised to match the git index (`Moodle-logo.svg` →
+`moodle-logo.svg`, `Cegid_logo_2018.svg` → `cegid-logo.svg`,
+`OpenProject.svg` → `openproject-logo.svg`) because GitHub Pages is
+case-sensitive and serves the index, not the working copy.
+
+### [x] Asset gate + generated project imagery
+
+- `src/data/asset-references.test.ts` (9 tests): every seed `logo`/`image`/
+  `companyLogo`/`avatar` resolves in `public/` byte-exact on case, is self-hosted,
+  matches its file signature by magic bytes, and no image master ships inside
+  `public/`. Also pins `profile.webp` at 512² and `og-image.jpg` at the dimensions
+  `index.html` declares.
+- `npm run assets:images` was unrunnable (uncaught `ENOENT` on the missing
+  `profile-source.png`), so no brand mark had ever been derived. It now warns and
+  continues, and derives the Techno wordmark (25 KB PNG → 2.9 KB WebP) plus real
+  card art for QuickKeep, Domino Table and AquaFine from each project's own OG/hero
+  image (137–164 KB PNG → 14–23 KB WebP). Masters are committed under
+  `asset-sources/`, which is what decision 11 always said but did not do.
+- **Open:** the avatar master is gone from every machine and the shipped
+  `profile.webp` is the only copy left, so `profile.webp`/`og-image.jpg` must not be
+  regenerated until a lossless original is recovered. The test guards drift instead.
+
+### [x] Silent defects in `scripts/build-production.js`
+
+Three of them, all of which made the release gate report success it had not earned:
+`npx tsc --noEmit` against a solution-style tsconfig validates **nothing** (now
+`npm run type-check`); an ESLint failure was downgraded to a warning and the build
+continued (now fatal); and the env check read `process.env` instead of the `.env`
+files, so it warned on every run whether or not the keys were set (now
+`loadEnv('production', …)`). Added `npm run perf:critical-path` as a post-build gate.
+
+### [x] Four seed claims the repos did not support
+
+Every new project entry was checked against its working copy; four claims were
+fabricated, overstated or stale:
+
+| Entry | Claim | Reality |
+|---|---|---|
+| HoTech E2E | "against the live OREST stack", "caught by CI" | `helpers/orestMock.ts` intercepts every `…/orest/**` call, base URLs are localhost-only, there is no `.github` |
+| Magento ETL | "firebase-admin runs the jobs on a schedule", "commander provides the CLI surface" | `firebase-admin` is used by one unrelated Storage-token script, `commander` is imported nowhere; jobs run from npm scripts, no scheduler exists |
+| GOD EYE | "52-page static export", "backend build breaks repaired" | 67 HTML pages (7 routes + 60 records); `go build ./...` still fails on missing `go.sum` entries and `go mod tidy` needs a newer toolchain. It also *was* live all along — the front end answers at `godseye-app.web.app`, so `liveUrl` was empty for a shipped site |
+| AquaFine / My Date | "brand site live at aquafine.dz", "deployment at mydate.app" | both custom domains are unreachable from the deliverable: `aquafine.dz` resolves to a non-Firebase host, and My Date's own deployed `canonical`/`og:url` point at `mydate-app.web.app` |
+
+QuickKeep, Domino Table and My Date's technical claims were checked and stand
+(React 19/Vite 8/Tailwind v4, `vite-plugin-pwa`, `@firebase/rules-unit-testing`, the
+VIEW/COMMENT/EDIT/FULL share tiers, explicit ad slots) — and `quick-keep.web.app`
+is live, so its previously-empty `liveUrl` is now filled in.
+
+**Lesson carried forward:** the failure mode is the same as session 9's two
+documentation claims — a statement about the system that nothing enforced. For
+portfolio data the enforcement is a probe of the deployed URL and a read of the
+project's own build output, not its README or commit message.

@@ -17,10 +17,10 @@ npm run build        # Production build -> dist/
 npm run type-check   # TypeScript validation (tsc --build tsconfig.json)
 npm run lint         # ESLint check
 npm run lint:fix     # ESLint auto-fix
-npm test             # Vitest suite (jsdom + Testing Library), 172 tests
+npm test             # Vitest suite (jsdom + Testing Library), 187 tests
 npm run test:coverage # Vitest with v8 coverage (lib/hooks/data)
 npm run perf:critical-path # Sizes the first-paint bundle; fails if firebase-vendor is on it
-npm run assets:images # Regenerate profile.webp + og-image.jpg (see decision 11)
+npm run assets:images # Regenerate profile.webp, og-image.jpg, brand marks and project card images (see decision 11)
 npm run assets:favicons # Regenerate the favicon PNG set + favicon.ico
 npm run preview      # Preview production build locally
 npm run clean        # Remove dist/ and Vite cache
@@ -168,6 +168,15 @@ src/
      every portfolio entry matches a real directory on disk.
      Run with: `npx tsx src/data/verify-project-data.ts`
      (if `npx` is unavailable: `node node_modules/tsx/dist/cli.mjs src/data/verify-project-data.ts`)
+   - **Claims are evidence-backed** — a `liveUrl`, achievement or metric must be
+     provable from the project's own working copy under `C:\projects`, not from
+     a dependency listing or an aspiration. Concretely: probe the `liveUrl`
+     (the `*.web.app` host answers even when a custom domain is filtered here),
+     confirm the *deployed* build actually declares that URL as its canonical /
+     `og:url`, and check the claim is real in the code — a declared-but-unused
+     dependency (`commander`, `firebase-admin` scheduling) or a page count read
+     from a stale commit message is not a fact. `src/data/asset-references.test.ts`
+     enforces the asset half of this; the claim half is enforced at review time.
    - **Publishing seed changes** — editing a seed file does NOT change live data
      until it is pushed: Admin → **Data Upload** → **Sync (update existing)**
      (console: `window.syncPortfolio()` / `window.syncCollection("projects")`).
@@ -241,20 +250,44 @@ Regenerating the PDF (`python3 scripts/generate_cv.py`) is still manual and
     copies of `favicon.ico`/`mounir-icon.svg` had drifted from the `public/`
     ones that are actually served, so editing one changed nothing.
 
-    Everything raster is generated, not hand-edited:
+    Everything raster is generated, not hand-edited, from **committed masters in
+    `asset-sources/`**:
 
     | Command | Derives | From |
     |---|---|---|
-    | `npm run assets:images` | `public/profile.webp` (512², LCP), `public/og-image.jpg` (1200×630) | `public/profile-source.png` (gitignored lossless master) |
+    | `npm run assets:images` | `public/profile.webp` (512², LCP), `public/og-image.jpg` (1200×630) | `asset-sources/profile-source.png` — **currently absent on every machine**, so the script warns and skips it |
+    | `npm run assets:images` | `public/technostationery-logo.webp` (192px) | `asset-sources/technostationery-logo.png` (800×200 client wordmark) |
+    | `npm run assets:images` | `public/project-{domino-table,quickkeep,aquafine}.webp` (960px card art) | each project's own OG/hero PNG in `asset-sources/`, copied from that repo |
     | `npm run assets:favicons` | `favicon-{16,32,48,180,192,512}.png`, `favicon.ico` (16/32/48/256) | `public/favicon.svg` |
 
-    Both keep their input out of the build deliberately. The favicon script
-    rasterises with **8-bit palette PNGs** (`palette: true`, `quality: 90`):
-    the source is a blurred gradient, so a plain `.png()` emits 32-bit RGBA and
-    the 512 px tile alone was 66 KB. It also hand-assembles a real ICO
-    directory — the previous version wrote a 32×32 *PNG* to `favicon.ico`, so
-    browsers saw exactly one resolution. Re-run both after changing either
-    source, and do not add a generated asset back at the repo root.
+    Masters are committed, never gitignored, and never placed in `public/`: a
+    gitignored master makes the pipeline unrunnable on the next clone (that is how
+    `profile-source.png` was lost), and a master in `public/` ships to every
+    visitor because `dist/` copies `public/` verbatim.
+
+    **Do not regenerate `profile.webp`/`og-image.jpg` from the served files.** The
+    avatar master is gone and the shipped 512² WebP is the only copy left; upscaling
+    it to 1200×630 would visibly degrade `og-image.jpg`, so recover a real lossless
+    master before running that path again. `src/data/asset-references.test.ts` pins
+    the shipped dimensions against what `index.html` declares instead.
+
+    A project with no artwork of its own keeps `image: ""` and renders the gradient +
+    icon fallback in the card. Never put a stock or generated placeholder there —
+    the Unsplash photos this file used to carry showed bookshelves for projects that
+    had nothing to do with them.
+
+    The favicon script rasterises with **8-bit palette PNGs** (`palette: true`,
+    `quality: 90`): the source is a blurred gradient, so a plain `.png()` emits
+    32-bit RGBA and the 512 px tile alone was 66 KB. It also hand-assembles a real
+    ICO directory — the previous version wrote a 32×32 *PNG* to `favicon.ico`, so
+    browsers saw exactly one resolution. Re-run after changing any source, and do
+    not add a generated asset back at the repo root.
+
+    `src/data/asset-references.test.ts` is the gate for all of this: every seed
+    `logo`/`image`/`companyLogo`/`avatar` must resolve in `public/` **byte-exact on
+    case** (readdirSync, not existsSync — Windows resolves the wrong case, GitHub
+    Pages 404s), must be self-hosted, must match its file signature (a PNG named
+    `.webp` is a 202 KB PNG), and no `*-source.*` master may sit in `public/`.
 
 
 ## Code Conventions

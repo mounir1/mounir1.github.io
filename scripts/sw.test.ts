@@ -37,8 +37,8 @@ class Res {
 
 class Cache {
   entries = new Map<string, Res>();
-  async match(r: { url: string }) {
-    return this.entries.get(r.url);
+  async match(request: { url: string } | string) {
+    return this.entries.get(typeof request === 'string' ? request : request.url);
   }
   async put(r: { url: string }, res: Res) {
     this.entries.set(r.url, res);
@@ -62,7 +62,7 @@ class Caches {
     this.deleted.push(n);
     return this.stores.delete(n);
   }
-  async match(r: { url: string }) {
+  async match(r: { url: string } | string) {
     for (const s of this.stores.values()) {
       const hit = await s.match(r);
       if (hit) return hit;
@@ -146,6 +146,8 @@ describe('service worker — stale HTML is the bug this file exists to prevent',
     expect(urls).not.toContain('/index.html');
     expect(urls).not.toContain('/');
     expect(urls).toContain('/offline.html');
+    expect(urls).not.toContain('/mounir-icon.svg');
+    expect(urls).not.toContain('/favicon.ico');
   });
 
   it('serves a navigation from the network even when a stale copy is cached', async () => {
@@ -157,23 +159,34 @@ describe('service worker — stale HTML is the bug this file exists to prevent',
     expect((await worker.handle(navigate(url))).body).toBe('fresh-html');
   });
 
-  it('falls back to cache, then to offline.html, when the network is down', async () => {
+  it('falls back to offline.html, never a cached document, when the network is down', async () => {
     const worker = loadWorker();
     const cached = 'https://mounir1.github.io/projects';
     (await worker.caches.open('mounir-portfolio-dynamic-v2')).entries.set(cached, new Res('cached-page'));
+    await worker.install();
 
-    expect((await worker.handle(navigate(cached))).body).toBe('cached-page');
-    expect((await worker.handle(navigate('https://mounir1.github.io/gone'))).status).toBe(503);
+    expect((await worker.handle(navigate(cached))).body).toBe('precached');
+    expect((await worker.handle(navigate('https://mounir1.github.io/gone'))).body).toBe('precached');
   });
 
   it('still serves content-hashed assets cache-first', async () => {
     const worker = loadWorker();
-    const url = 'https://mounir1.github.io/assets/js/index-abc123.js';
+    const url = 'https://mounir1.github.io/assets/js/index-abc12345.js';
     worker.respondTo(url, 'from-network');
-    (await worker.caches.open('mounir-portfolio-static-v2')).entries.set(url, new Res('from-cache'));
+    (await worker.caches.open('mounir-portfolio-static-v3')).entries.set(url, new Res('from-cache'));
 
     expect((await worker.handle(asset(url))).body).toBe('from-cache');
     expect(worker.fetchCalls).not.toContain(url);
+  });
+
+  it('fetches unhashed public images from the network instead of a stale cache', async () => {
+    const worker = loadWorker();
+    const url = 'https://mounir1.github.io/hotech-logo.svg';
+    worker.respondTo(url, 'fresh-logo');
+    (await worker.caches.open('mounir-portfolio-dynamic-v3')).entries.set(url, new Res('stale-logo'));
+
+    expect((await worker.handle(asset(url))).body).toBe('fresh-logo');
+    expect(worker.fetchCalls).toContain(url);
   });
 });
 
@@ -186,6 +199,9 @@ describe('service worker — cache versioning', () => {
       'mounir-portfolio-v1',
       'mounir-portfolio-static-v1',
       'mounir-portfolio-dynamic-v1',
+      'mounir-portfolio-v2',
+      'mounir-portfolio-static-v2',
+      'mounir-portfolio-dynamic-v2',
       'workbox-cache-7',
     ];
     for (const name of legacy) await worker.caches.open(name);
@@ -198,8 +214,8 @@ describe('service worker — cache versioning', () => {
 
   it('never deletes its own current caches', async () => {
     const worker = loadWorker();
-    await worker.caches.open('mounir-portfolio-static-v2');
-    await worker.caches.open('mounir-portfolio-dynamic-v2');
+    await worker.caches.open('mounir-portfolio-static-v3');
+    await worker.caches.open('mounir-portfolio-dynamic-v3');
 
     await worker.activate();
 
