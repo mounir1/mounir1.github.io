@@ -1286,7 +1286,7 @@ export const initialProjects: ProjectInput[] = [
     logo: "/quickkeep-logo.webp",
     icon: "📝",
     liveUrl: "https://quick-keep.web.app",
-    githubUrl: "",
+    githubUrl: "https://github.com/mounir1/quickkeep",
     demoUrl: "",
     caseStudyUrl: "",
     featured: false,
