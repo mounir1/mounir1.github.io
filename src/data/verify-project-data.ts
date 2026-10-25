@@ -6,14 +6,15 @@
  *   npx tsx src/data/verify-project-data.ts
  *
  * What it checks:
- *   1. Every entry in projects-index.ts has a matching directory on disk
- *   2. Every project in initial-projects.ts has a matching slug in projects-index
- *   3. Directory existence, README presence, and package.json validity
- *   4. Reports warnings for missing directories, outdated data, or mismatches
+ *   1. Local entries in projects-index.ts have matching directories on disk
+ *   2. Remote-only entries have a repository reference (the URL is not probed)
+ *   3. Every project in initial-projects.ts has a matching slug in projects-index
+ *   4. Local directory existence, README presence, and package.json validity
+ *   5. Reports warnings for missing references or local project files
  *
  * ─── Data Policy ─────────────────────────────────────────────────────────
- * Every project in the portfolio must correspond to a real directory on disk
- * at C:\projects. This utility enforces that invariant.
+ * Every project must correspond to a local checkout or a recorded remote
+ * repository. Remote availability and portfolio claims require separate review.
  */
 
 import { existsSync, readFileSync, readdirSync } from "fs";
@@ -30,7 +31,8 @@ interface VerificationResult {
   title: string;
   diskPath: string;
   fullDiskPath: string;
-  directoryExists: boolean;
+  verificationMode: "local" | "remote";
+  directoryExists: boolean | null;
   hasReadme: boolean;
   hasPackageJson: boolean;
   hasSrc: boolean;
@@ -40,26 +42,29 @@ interface VerificationResult {
 function verifySingleEntry(
   slug: string,
   entry: (typeof projectsIndex)[string],
+  projectsRoot = PROJECTS_ROOT,
 ): VerificationResult {
-  const fullDiskPath = join(PROJECTS_ROOT, entry.diskPath);
+  const verificationMode = entry.diskPath ? "local" : "remote";
+  const fullDiskPath = entry.diskPath ? join(projectsRoot, entry.diskPath) : "";
   const issues: string[] = [];
   const result: VerificationResult = {
     slug,
     title: entry.title,
     diskPath: entry.diskPath,
     fullDiskPath,
-    directoryExists: existsSync(fullDiskPath),
+    verificationMode,
+    directoryExists: verificationMode === "local" ? existsSync(fullDiskPath) : null,
     hasReadme: false,
     hasPackageJson: false,
     hasSrc: false,
     issues,
   };
 
-  // Cloud-hosted-only entries (no local working copy) are verified by their
-  // repoUrl instead — skip all on-disk checks for them.
-  if (!entry.diskPath) {
+  // Remote-only entries have no local checkout to inspect. The repository URL
+  // is recorded as a reference, but this offline check does not probe it.
+  if (verificationMode === "remote") {
     if (!entry.repoUrl) {
-      issues.push("Cloud-hosted entry has neither diskPath nor repoUrl");
+      issues.push("Remote-only entry has neither diskPath nor repoUrl");
     }
     return result;
   }
@@ -115,17 +120,19 @@ function verifyAll(): {
   passed: number;
   failed: number;
   warnings: number;
+  remote: number;
 } {
   const entries = Object.entries(projectsIndex);
   const results = entries.map(([slug, entry]) => verifySingleEntry(slug, entry));
 
-  const missingOnDisk = results.filter((r) => !r.directoryExists);
-  const withWarnings = results.filter(
-    (r) => r.directoryExists && r.issues.length > 0,
+  const missingOnDisk = results.filter(
+    (r) => r.verificationMode === "local" && !r.directoryExists,
   );
+  const withWarnings = results.filter((r) => r.issues.length > 0);
   const clean = results.filter(
-    (r) => r.directoryExists && r.issues.length === 0,
+    (r) => r.verificationMode === "local" && r.directoryExists && r.issues.length === 0,
   );
+  const remote = results.filter((r) => r.verificationMode === "remote");
 
   // Cross-check: every project in initial-projects.ts should have a matching slug
   const seedTitles = new Set(initialProjects.map((p) => p.title));
@@ -164,6 +171,7 @@ function verifyAll(): {
     passed: clean.length,
     failed: missingOnDisk.length,
     warnings: withWarnings.length,
+    remote: remote.length,
   };
 }
 
@@ -177,13 +185,18 @@ function printReport(summary: ReturnType<typeof verifyAll>): void {
   console.log("══════════════════════════════════════════════════════════\n");
 
   results.forEach((r) => {
-    const status = !r.directoryExists
-      ? "❌ MISSING"
-      : r.issues.length > 0
+    const status =
+      r.issues.length > 0
         ? "⚠️  WARN"
-        : "✅ OK";
+        : r.verificationMode === "remote"
+          ? "🌐 REMOTE"
+          : !r.directoryExists
+            ? "❌ MISSING"
+            : "✅ OK";
     console.log(`  ${status}  ${r.slug}`);
-    console.log(`       ${r.diskPath}`);
+    console.log(
+      `       ${r.diskPath || `Remote reference: ${projectsIndex[r.slug]?.repoUrl ?? "not recorded (not network-checked)"}`}`,
+    );
     if (r.issues.length > 0) {
       r.issues.forEach((issue) => console.log(`       → ${issue}`));
     }
@@ -191,7 +204,9 @@ function printReport(summary: ReturnType<typeof verifyAll>): void {
   });
 
   console.log("──────────────────────────────────────────────────────────");
-  console.log(`  Total: ${results.length}  |  ✅ Pass: ${passed}  |  ⚠️  Warnings: ${warnings}  |  ❌ Missing: ${failed}`);
+  console.log(
+    `  Total: ${results.length}  |  ✅ Local pass: ${passed}  |  🌐 Remote refs: ${summary.remote} (not network-checked)  |  ⚠️  Warnings: ${warnings}  |  ❌ Missing local: ${failed}`,
+  );
   console.log("──────────────────────────────────────────────────────────\n");
 
   if (failed > 0) {
