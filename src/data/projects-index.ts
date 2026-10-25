@@ -19,8 +19,9 @@
  * // entry.type === "contract"
  *
  * ─── Data Policy ─────────────────────────────────────────────────────────
- * Every entry represents a REAL project on disk at C:\projects.
- * Do NOT add projects that do not exist on disk or are not verifiable.
+ * Every entry represents a real project with either a local checkout or a
+ * recorded remote reference. Do not add projects without verifiable evidence.
+ * For remote-only projects, leave diskPath empty and record repoUrl when public.
  */
 
 export type ProjectDiskType = "client" | "personal" | "contract";

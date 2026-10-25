@@ -17,7 +17,7 @@ npm run build        # Production build -> dist/
 npm run type-check   # TypeScript validation (tsc --build tsconfig.json)
 npm run lint         # ESLint check
 npm run lint:fix     # ESLint auto-fix
-npm test             # Vitest suite (jsdom + Testing Library), 187 tests
+npm test             # Vitest suite (jsdom + Testing Library), 191 tests
 npm run test:coverage # Vitest with v8 coverage (lib/hooks/data)
 npm run perf:critical-path # Sizes the first-paint bundle; fails if firebase-vendor is on it
 npm run assets:images # Regenerate profile.webp, og-image.jpg, brand marks and project card images (see decision 11)

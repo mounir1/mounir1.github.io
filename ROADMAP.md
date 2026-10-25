@@ -1,7 +1,7 @@
 # ROADMAP
 
 > Issue-handling plan, priorities, and technical-debt tracker.
-> Last updated: 2026-09-23.
+> Last updated: 2026-10-25.
 
 ## Status Legend
 
@@ -499,17 +499,36 @@ untyped at the admin-tabs layer (`BrandAssetPicker.tsx`, `DataManager.tsx`,
 **Files affected:** `src/hooks/*`, `src/components/admin/tabs/*`,
 `src/utils/database-uploader.ts`, `src/lib/firebase.ts` (create if missing)
 
-### [ ] Project data verification — run `verify-project-data.ts` before seeding
+### [~] Portfolio project registry coverage
 
-**Current:** Seed data is manually maintained; no automated check that every
-project on disk has a matching portfolio entry.
+**Current:** The seed and disk registry are cross-checked by unit tests, and
+`npx tsx src/data/verify-project-data.ts` checks local paths. The 2026-10-25
+audit found 26 indexed projects: 23 local checkouts (22 clean), 3 remote-only
+references, no missing local directories, and 3 actionable warnings. Remote references
+are classified separately and are not network-probed.
+
+**Known follow-ups:**
+- `it-collaborator` and `mab-erp` have neither a local checkout nor a recorded
+  repository reference.
+- `aquaFine` has no README; its code and hosting configuration are still
+  inspected as evidence.
+- Mab Project folders `AIBlogger`, `dashboard`, and `moodleapp` are not in the
+  portfolio registry. Classify them before adding public entries: dashboard is
+  operational/internal, moodleapp is an upstream clone, and AIBlogger needs a
+  public-content and configuration review.
+- The portfolio currently describes MabCoin in detail while the Mab workspace
+  classifies it as confidential/restricted. Do not expand or republish that
+  material until the owner chooses its public visibility.
 
 **Plan:**
-- Run `npx tsx src/data/verify-project-data.ts` before seeding to Firestore
-- Add verification step to CI pipeline (optional gate)
-- Keep `projects-index.ts` as the single source of truth for disk ↔ portfolio
-  mapping
-- Goal: every `C:\projects` directory used in daily work has a portfolio entry
+- [x] Distinguish local checkouts from remote-only references in the verifier.
+- [x] Add regression coverage for remote paths and local directory checks.
+- [ ] Decide public showcase and disclosure policy for the omitted/restricted
+  Mab projects.
+- [ ] Add only approved projects, backed by repository evidence and verified
+  public URLs.
+- [ ] Add the project verifier to CI after the workspace-path dependency is
+  replaced with a portable source of project paths.
 
 ### [ ] Branch protection rules for `main`
 
